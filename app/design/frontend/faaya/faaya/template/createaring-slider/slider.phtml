@@ -1,0 +1,47 @@
+<?php $customCreation = $this->getcustomCreation();?>
+<?php $customCreation = array_chunk($customCreation->getData(),8);?>
+<?php $sliderProperty = array(1=>array("40,140","left",200,""),
+                              2=>array("50,650","bottomRight",200,""),
+                              3=>array("0,1325","left",'',"left"),
+                              4=>array("600,-202","bottomLeft",500,"fade"),
+                              5=>array("460,275","bottomRight",500,"fade"),
+                              6=>array("580,714","left",500,"fade"),
+                              7=>array("668,1230","right",500,"fade"),
+                              8=>array("472,1685","top",500,"fade"))?>
+<?php if($customCreation):?>
+<div class="slider-wrapper">
+        <div class="responisve-container">
+            <div class="slider">
+                <div class="fs_loader"></div>
+                 <?php foreach ($customCreation as $products): //print_r($products);exit;?>
+                        <div class="slide">
+                            <?php $i=1;foreach($products as $_product): ?>
+                                 <?php $product = Mage::getModel('catalog/product')->load($_product['entity_id']);?>
+                                 
+                                     <img id="product-collection-image-<?php echo $product->getId(); ?>" src="<?php echo $this->helper('catalog/image')->init($product, 'small_image')->resize(340,340); ?>" alt="<?php echo $this->stripTags($this->getImageLabel($product, 'small_image'), null, true) ?>" data-position="<?php echo $sliderProperty[$i][0];?>" data-in="<?php echo $sliderProperty[$i][1];?>" data-delay="<?php echo $sliderProperty[$i][3];?>" data-out="<?php echo $sliderProperty[$i][3];?>" />
+                                 
+                            <?php $i++;endforeach;?>
+                            <div class="claim" data-position="410,1116" data-in="right" data-step="1" data-out="left">
+                                  <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('create-a-ring-slider-text')->toHtml();?>
+                            </div>
+                        </div>
+                <?php endforeach;?>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        jQuery(window).load(function () {
+            jQuery('.slider').fractionSlider({
+                'fullWidth': true,
+                'controls': true,
+                'responsive': true,
+                'dimensions': "1920,970",
+                'increase': false,
+                'pauseOnHover': true,
+                'autoChange': false
+            });
+        });
+
+    </script>
+<?php endif;?>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Faaya_Deleteapi>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Faaya_Deleteapi>
+    </modules>
+</config>

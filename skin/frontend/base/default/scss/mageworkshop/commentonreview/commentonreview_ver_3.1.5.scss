@@ -1,0 +1,476 @@
+@import "../var";
+@import "../mixin/breakpoint";
+
+#customer-reviews {
+
+    .clear {
+        clear: both;
+    }
+    .reply-list-wrap {
+        .reply-action {
+            .reply-button {
+                cursor: pointer;
+                color: $c-blue;
+            }
+        }
+        .reply-expander {
+            cursor: pointer;
+            color: $c-blue;
+            display: none;
+            margin-bottom: 10px;
+
+            &.collapse {
+                .expand {
+                    display: none;
+                }
+
+                .collapse {
+                    display: inline;
+                }
+            }
+
+            &.show {
+                display: inline-block;
+            }
+
+            &.expand {
+                .collapse {
+                    display: none;
+                }
+
+                .expand {
+                    display: inline;
+                }
+            }
+        }
+
+        .reply-list {
+            margin-left: 20px;
+            margin-top: 10px;
+
+            & > .reply {
+                margin-bottom: 15px;
+                display: none;
+
+                &.expanded {
+                    display: list-item;
+                }
+            }
+
+            &.open {
+                & > .reply {
+                    display: list-item;
+                }
+
+                & + .reply-expander {
+
+                    .admin-response-icon {
+                        display: none;
+                    }
+                }
+            }
+
+            .reply-wrap {
+                font-size: 14px;
+
+                & > li {
+                    float: left;
+
+                    &.avatar {
+                        width: 50px;
+                        float: left;
+                        height: 50px;
+                    }
+                    &.reply-info {
+                        width: 86%;
+                        margin-bottom: 10px;
+
+                        .admin-response {
+                            word-break: break-all;
+                        }
+
+                        .reply-author-date {
+                            margin-bottom: 10px;
+
+                            .reply-author {
+                                cursor: pointer;
+                            }
+                            .reply-author.title {
+                                cursor: default;
+                            }
+                            .reply-date-wrap {
+                                margin-left: 10px;
+
+                                .reply-date {
+                                    font-family: "Helvetica Neue", Verdana, Arial, sans-serif;
+                                    color: $c-dark-grey;
+                                    font-size: 12px;
+                                }
+                            }
+
+                        }
+                        .reply-detail {
+                            margin-bottom: 10px;
+                            word-break: break-all;
+
+                            span.reply-comment-nickname {
+                                color: #424242;
+                                font-weight: 500;
+                            }
+                        }
+
+                        .reply-action-wrapper {
+                            height: 32px;
+
+                            .reply-action {
+                                float: left;
+                                margin: 7px 10px 0 0;
+                            }
+
+                            .reply-helpful {
+                                float: none;
+                                clear: none;
+                                padding-bottom: 0;
+
+                                .rating-wrapper {
+                                    float: left;
+                                    min-width: 50px;
+
+                                    a.review-vote-rating {
+                                        float: left;
+                                        display: block;
+                                        width: 29px;
+                                        height: 30px;
+                                        margin-right: 3px;
+                                        padding: 1px 0 0 0;
+                                        text-decoration: none;
+                                        line-height: 28px;
+                                        cursor: pointer;
+                                    }
+
+                                    a.helpful-btn {
+                                        background: url(../../../images/detailedreview/helpful-rwd.png) no-repeat;
+                                    }
+
+                                    a.unhelpful-btn {
+                                        background: url(../../../images/detailedreview/unhelpful-rwd.png) no-repeat;
+                                    }
+
+                                    .voting-qty {
+                                        padding-right: 6px;
+                                        font: normal 14px/1.55 "Helvetica Neue", Verdana, Arial, sans-serif;
+                                        margin-left: 0;
+                                        line-height: 32px;
+                                        text-align: left;
+                                    }
+
+                                    .helpful-qty.voting-qty {
+                                        color: $c-blue;
+                                    }
+
+                                    .unhelpful-qty.voting-qty {
+                                        color: $c-dark-grey;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .abuse-action {
+                        width: 10px;
+                        float: right;
+                        height: 50px;
+                        position: relative;
+
+                        .complaint-icon {
+                            width: 10px;
+                            height: 40px;
+                            display: inline-block;
+                            cursor: pointer;
+
+                            &:hover {
+
+                            }
+                        }
+                    }
+                    .report-button-wrapper {
+                        display: none;
+
+                        &.show-ask {
+                            position: absolute;
+                            display: inline-block;
+                            width: 176px;
+                            right: 18px;
+                            top: 0;
+                            z-index: 99;
+                            padding: 10px;
+                            overflow: hidden;
+                            border: 1px solid #fff;
+                            margin: 0;
+                            white-space: nowrap;
+                            background: #f4f4f4;
+
+                            .report-abuse {
+                                cursor: pointer;
+                            }
+                        }
+                    }
+
+                }
+                &:after {
+                    clear: both;
+                    content: '';
+                    display: block;
+                }
+            }
+        }
+
+        .admin-response-icon {
+            background: url(/media/mageworkshop/commentonreview/admin_response.png) no-repeat;
+            display: inline-block;
+            width: 21px;
+            height: 21px;
+            margin-left: 10px;
+            cursor: help;
+        }
+    }
+
+    .submit-button, .cancel-button {
+        display: inline-block;
+        padding: 7px 24px;
+        font-size: 16px;
+        font-weight: 400;
+        font-family: "Raleway", "Helvetica Neue", Verdana, Arial, sans-serif;
+        line-height: 14px;
+        text-align: center;
+        text-transform: uppercase;
+        vertical-align: middle;
+        white-space: nowrap;
+        cursor: pointer;
+        margin: 0 10px 0 0;
+        float: right;
+    }
+
+    .submit-button {
+        background: $c-blue;
+        border: 1px solid $c-blue;
+        color: $c-white;
+        margin: 0;
+    }
+
+    .cancel-button {
+        background: $c-light-grey;
+        border: 1px solid $c-grey;
+        color: $c-black;
+    }
+
+}
+
+.reply-wrapper {
+    margin-bottom: 10px;
+
+    #reply-form {
+        .reply-captcha-wrapper {
+            width: 257px;
+            float: right;
+            margin-bottom: 30px;
+            position: relative;
+
+            #reply-grecaptcha {
+                -moz-transform:scale(0.85);
+                -ms-transform:scale(0.85);
+                -o-transform:scale(0.85);
+                -moz-transform-origin:0;
+                -ms-transform-origin:0;
+                -o-transform-origin:0;
+                -webkit-transform:scale(0.85);
+                transform:scale(0.85);
+                -webkit-transform-origin:0 0;
+                transform-origin:0;
+            }
+
+            .captcha-error {
+                color: $c-red;
+                font-size: 13px;
+                font-weight: 600;
+                position: absolute;
+                bottom: -15px;
+            }
+        }
+    }
+
+    .reply-comment-wrapper {
+        position: relative;
+
+        .reply-comment {
+            width: 100%;
+            height: 75px;
+            border: 1px solid silver;
+            overflow: auto;
+            margin: 15px 0 15px 0;
+            padding: 5px;
+            white-space: pre-wrap;
+
+            &:focus {
+                border: 1px solid $c-blue;
+                outline: 0;
+            }
+
+            &.error-detail {
+                border: 1px solid $c-red;
+            }
+
+            span.reply-comment-nickname {
+                color: #424242;
+                font-weight: 500;
+            }
+        }
+
+        .reply-message-wrapper {
+            margin-bottom: 10px;
+
+            .reply-message {
+                li {
+                    margin: 5px 0 0;
+                    color: $c-red;
+                    font-size: 13px;
+                    font-weight: 600;
+                }
+            }
+        }
+    }
+
+    .reply-button-wrapper {
+        height: 30px;
+        margin-bottom: 20px;
+        clear: both;
+    }
+}
+
+.reply-hide {
+    display: none;
+}
+
+.reply-show {
+    display: block;
+}
+
+@include bp(max-width, $bp-xlarge) {
+
+}
+
+@include bp(max-width, $bp-large) {
+    #customer-reviews {
+        .submit-button, .cancel-button {
+            padding: 7px 20px;
+        }
+
+        .reply-list-wrap {
+            .reply-list {
+                .reply-wrap {
+                    & > li {
+                        &.reply-info {
+                            width: 84%;
+                            .reply-author-date {
+                                .reply-date-wrap {
+                                    display: block;
+                                    margin-left: 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@include bp(max-width, $bp-xmedium) {
+
+}
+
+@include bp(max-width, $bp-medium) {
+
+}
+
+@include bp(max-width, $bp-xsmall) {
+    #customer-reviews {
+        .reply-list-wrap {
+            .reply-list {
+                .reply-wrap {
+                    & > li {
+                        &.reply-info {
+                            width: 80%;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@include bp(max-width, $bp-small) {
+    #customer-reviews {
+        .reply-list-wrap {
+            .reply-list {
+                .reply-wrap {
+                    & > li {
+                        &.reply-info {
+                            width: 73%;
+                        }
+                    }
+                }
+            }
+        }
+        .submit-button, .cancel-button {
+            width: 100%;
+            padding: 13px 24px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .cancel-button {
+            margin: 20px 0;
+        }
+
+        .complaint-list-wrapper {
+            &.complaint-show {
+                margin-left: 45px;
+            }
+
+            .complaint-action {
+                .submit-button, .cancel-button {
+                    padding: 13px 17px;
+                }
+
+                .cancel-button {
+                    margin: 20px 0 0 0;
+                }
+            }
+
+            .reply-message-wrapper {
+                .reply-message {
+                    li {
+                        font-size: 12px;
+                    }
+                }
+            }
+        }
+    }
+
+    .reply-wrapper {
+
+        #reply-form {
+            .reply-captcha-wrapper {
+                width: 244px;
+
+                #reply-grecaptcha {
+                    -moz-transform:scale(0.81);
+                    -ms-transform:scale(0.81);
+                    -o-transform:scale(0.81);
+                    -webkit-transform:scale(0.81);
+                    transform:scale(0.81);
+                }
+            }
+        }
+    }
+}

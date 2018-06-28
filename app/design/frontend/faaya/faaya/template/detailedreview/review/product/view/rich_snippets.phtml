@@ -1,0 +1,12 @@
+<?php /** @var MageWorkshop_DetailedReview_Block_Product_View_RichSnippets $this */ ?>
+<?php if (Mage::getStoreConfig(MageWorkshop_DetailedReview_Helper_Config::DETAILEDREVIEW_XML_PATH_SEO_DETECT_BOT)): ?>
+    <?php if ($this->isCrawler()): ?>
+        <script type="application/ld+json">
+            <?php echo $this->getJsonRichSnippets(); ?>
+        </script>
+    <?php endif; ?>
+<?php else: ?>
+    <script type="application/ld+json">
+        <?php echo $this->getJsonRichSnippets(); ?>
+    </script>
+<?php endif; ?>

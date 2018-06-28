@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<config>
+    <api>
+        <resources>
+            <deleteapi translate="title" module="deleteapi">
+                <model>deleteapi/deleteapi_api</model>
+                <title>Products delete</title>
+                <methods>
+                   <deleteapi translate="title" module="deleteapi">
+                        <title>Products delete</title>
+                   </deleteapi>
+                </methods>
+                <faults module="deleteapi">
+                    <data_invalid>
+                        <code>100</code>
+                        <message>Invalid data</message>
+                    </data_invalid>
+                    <filters_invalid>
+                        <code>101</code>
+                        <message>Invalid filters specified. Details in error message.</message>
+                    </filters_invalid>
+                    <not_exists>
+                        <code>102</code>
+                        <message>deleteapi not exists.</message>
+                    </not_exists>
+                    <not_deleted>
+                        <code>103</code>
+                        <message>deleteapi not deleted. Details in error message.</message>
+                    </not_deleted>
+                </faults>
+            </deleteapi>
+          </resources>
+          <acl>
+              <resources>
+                <deleteapi translate="title" module="deleteapi">
+                      <title>Products delete</title>
+                      <sort_order>5</sort_order>
+                      <deleteapi translate="title" module="deleteapi">
+                        <title>Delete data</title>
+                      </deleteapi>
+                </deleteapi>
+              </resources>
+        </acl>
+      </api>
+</config>
+

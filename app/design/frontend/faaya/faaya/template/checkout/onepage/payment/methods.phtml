@@ -1,0 +1,142 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2006-2017 X.commerce, Inc. and affiliates (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+/**
+ * One page checkout payment methods
+ *
+ * @var $this Mage_Checkout_Block_Onepage_Payment_Methods
+ */
+?>
+
+
+
+<?php
+    // For Grand Total
+    $quote = Mage::getModel('checkout/session')->getQuote();
+    $quoteData = $quote->getData();
+    //echo '<pre>';
+    //print_R($quoteData);
+    //$grandTotal = $quoteData['subtotal_with_discount'];
+    $grandTotal = $quoteData['grand_total'];
+    $methods = $this->getMethods();
+    $oneMethod = count($methods) <= 1;
+?>
+<?php if (empty($methods)): ?>
+    <dt>
+        <?php echo $this->__('No Payment Methods') ?>
+    </dt>
+<?php else:
+    foreach ($methods as $_method):
+        $_code = $_method->getCode();
+?>
+    <dt id="dt_method_<?php echo $_code ?>">
+    <?php if(!$oneMethod): ?>
+        <input id="p_method_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[method]" title="<?php echo $this->escapeHtml($_method->getTitle()) ?>" onclick="payment.switchMethod('<?php echo $_code ?>')"<?php if($this->getSelectedMethodCode()==$_code): ?> checked="checked" <?php else: if($_code == "cryozonic_stripe"):?> checked="checked"<?php  endif;?><?php endif; ?> class="radio enablePayment strip-checked" />
+    <?php else: ?>
+        <span class="no-display"><input id="p_method_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[method]" checked="checked" class="radio" /></span>
+        <?php $oneMethod = $_code; ?>
+    <?php endif; ?>
+        <label for="p_method_<?php echo $_code ?>"><?php echo $this->escapeHtml($this->getMethodTitle($_method)) ?> <?php echo $this->getMethodLabelAfterHtml($_method) ?></label>
+    </dt>
+
+    <?php if ($html = $this->getPaymentMethodFormHtml($_method)): ?>
+    <dd id="dd_method_<?php echo $_code ?>">
+        <?php echo $html; ?>
+    </dd>
+    <?php endif; ?>
+<?php endforeach;
+    endif;
+?>
+
+
+<div class="submit-btn" id="payment-buttons-container">
+      <div class="totalPrice"><?php echo $this->__('Total : ').Mage::helper('core')->currency($grandTotal, true, false); ?></div>
+      <button type="button" class="button btn payment-btn" onclick="payment.save()"><span><span><?php echo $this->__('Continue') ?></span></span></button>
+      <span class="please-wait" id="payment-please-wait" style="display:none;">
+          <img src="<?php echo $this->getSkinUrl('images/opc-ajax-loader.gif') ?>" alt="<?php echo Mage::helper('core')->quoteEscape($this->__('Loading next step...')) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Loading next step...')) ?>" class="v-middle" /> <?php echo $this->__('Loading next step...') ?>
+      </span>
+  </div>
+
+
+  <div class="payment-card-info hidden-xs">
+     <p><?php echo $this->__('<span>Pay with multiple credit cards:</span> If you would like to pay for your purchase with more than one credit card, please call customer service at 1-800-242-2728 for more information.'); ?></p>
+            <p class="mobile-gift-certificate"><?php echo $this->__('<span>Gift Certificate</span> If you have a Gift Certificate, you can enter it below. Check your balance.'); ?></p>
+  </div>
+</div>
+
+<?php //echo $this->getChildChildHtml('additional'); ?>
+<script type="text/javascript">
+    var taxURL='<?php echo Mage::getURL('wizard/index/taxamount');?>';
+    jQuery(document).ready(function(){
+        jQuery(".enablePayment").click(function(){
+             jQuery(".payment-btn").removeAttr('disabled');
+        });
+        jQuery("#p_method_cryozonic_stripe").trigger('click');
+
+        var getPrice = jQuery('.totalPrice').text();
+        getPrice = getPrice.split(" : ");
+        var exist = jQuery('.order-summary').find('.a-right').find('.price').last().text();
+        var taxValue = parseInt(getPrice[1].replace(/\$|,/g, ""))-parseInt(exist.replace(/\$|,/g, ""));
+        taxValue = ReplaceNumberWithCommas(taxValue);
+        jQuery('.order-summary').find('.a-right').find('.price').last().text(getPrice[1]);
+        jQuery('.order-summary').find('table').addClass('loadingprice');
+
+        jQuery.ajax({
+           url:'<?php echo Mage::getURL('wizard/index/checkcartlock');?>',
+           type: "GET",
+              success: function(data){
+                var response = JSON.parse(data);
+                if(response.length > 0){
+                  window.location =  "<?php echo Mage::getURL('checkout/cart'); ?>";
+                }
+              }
+        });
+        jQuery.ajax({
+           url:taxURL,
+           type:'GET',
+           success: function(data){
+                jQuery('.taxamount').find('.price').text(JSON.parse(data));
+                jQuery('.order-summary').find('table').removeClass('loadingprice');
+           }
+        });
+    });
+    function ReplaceNumberWithCommas(yourNumber) {
+        //Seperates the components of the number
+        var n= yourNumber.toString().split(".");
+        //Comma-fies the first part
+        n[0] = n[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        //Combines the two sections
+        return n.join(".");
+    }
+    //<![CDATA[
+    <?php echo $this->getChildChildHtml('scripts'); ?>
+    payment.init();
+    <?php if (is_string($oneMethod)): ?>
+    payment.switchMethod('<?php echo $oneMethod ?>');
+        <?php endif; ?>
+    //]]>
+</script>

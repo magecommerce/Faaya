@@ -1,0 +1,89 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @package Amasty_GiftCard
+ */
+?>
+<?php
+/* @var $this Amasty_GiftCard_Block_Adminhtml_Image_Edit_Canvas */
+/* @var $_helper Amasty_GiftCard_Helper_Data */
+/* @var $_formElement Amasty_GiftCard_Block_Form_Element_Block */
+/* @var $_image Amasty_GiftCard_Model_Image */
+$_helper = Mage::helper('amgiftcard');
+
+$_formElement = $this->getFormElement();
+$_image = $_formElement->getImage();
+?>
+
+<?php if($_imageUrl = $_image->getImageUrl()):?>
+<div id="parent_block" style="position: relative">
+	<div id="code_block" style="border: 1px solid #000; cursor: move; position: absolute;background-color:white;width: 100px; text-align: center; font-size: 18px;"><?php echo $_helper->__('Drag me');?></div>
+		<img src="<?php echo $_imageUrl?>" />
+</div>
+<?php endif;?>
+<!--
+<div id="parent_block" style="border: 1px solid #000; width: 400px; height: 400px;">
+	<div id="code_block" style="border: 1px solid #000; cursor: move; position: absolute;width: 80px; text-align: center"><?php echo $_helper->__('Drag me');?></div>
+</div>
+-->
+<script type='text/javascript'>
+	var dragCodeBlock = document.getElementById('code_block');
+	var fieldX = document.getElementById('code_pos_x');
+	var fieldY = document.getElementById('code_pos_y');
+	dragCodeBlock.style.top = parseInt(fieldY.value) + 'px';
+	dragCodeBlock.style.left = parseInt(fieldX.value) + 'px';
+
+	jQuery(dragCodeBlock).draggable({
+		containment:"#parent_block",
+		scroll:false,
+		stop: function(event, ui) {
+			fieldX.value = ui.position.left;
+			fieldY.value = ui.position.top;
+		}
+	});
+	/*jQuery("#code_block").resizable({
+		aspectRatio:5/1,
+		containment:"#parent_block",
+		start: function (event, ui) {
+			originalSize = parseInt(this.style.fontSize);
+		},
+		resize: function(event, ui) {
+			var coef = ui.size.height/ui.originalSize.height;
+			this.style.fontSize = coef * originalSize + 'px';
+		},
+		stop: function(event, ui) {
+			console.log(this.style.fontSize);
+		}
+	});*/
+
+	/*var dragCodeBlock = document.getElementById('code_block');
+	var fieldX = document.getElementById('code_pos_x');
+	var fieldY = document.getElementById('code_pos_y');
+	dragCodeBlock.style.top = parseInt(fieldY.value) + 'px';
+	dragCodeBlock.style.left = parseInt(fieldX.value) + 'px';
+	function mFunc(){
+		//console.log('timeout 2');
+		//console.log(dragCodeBlock.parentNode.offsetLeft);
+		var posParent = getPosition(dragCodeBlock.parentNode);
+		//posParent.x += parseInt(fieldX.value);
+		//posParent.y += parseInt(fieldY.value);
+		console.log(fieldX.value, fieldY.value);
+		console.log(posParent);
+		with(dragCodeBlock.style) {
+			position = 'absolute';
+			top = posParent.y + parseInt(fieldY.value) + 'px';
+			left = posParent.x + parseInt(fieldX.value) + 'px';
+		}
+
+	}
+	dragCodeBlock.onDragEnd = function(relativeX, relativeY){
+		fieldX.value = relativeX;
+		fieldY.value = relativeY;
+	}
+	dragMaster.makeDraggable(dragCodeBlock);
+
+	(function() {
+		//setTimeout(mFunc, 500);
+	})();*/
+</script>

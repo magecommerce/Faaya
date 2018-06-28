@@ -1,0 +1,86 @@
+<?php
+class Cda_Wizard_Model_Observer extends Mage_Core_Model_Abstract {
+    public function addtocartData($data,$ringData){
+        $randomInt = strtotime("now");
+        $cart = Mage::getModel('checkout/cart');
+        foreach ($data as $key=>$item) {
+            $item = explode("-",$item);
+            //print_r($item);exit;
+            $id = $item[0];
+            $flag = $item[1];
+            if($id){
+                $cart->init();
+                $subItem = Mage::getModel('catalog/product')->load($id);
+                $options = array();
+                $options['group']['sid'] = $randomInt;
+                $options['group']['type'] = $key;
+                if (array_key_exists($item,$ringData)){
+                    $options['group']['option'] = $ringData[$item];
+                }
+                
+                // Set Price
+                /*if($flag == 1){
+                    $price = $subItem->getPrice();
+                    $specialPrice = $subItem->getSpecialPrice();
+                    $subItem->setPrice($price);
+                    $subItem->setSpecialPrice($price);
+                    Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
+                    $subItem->save();
+                }*/
+                if($flag == 0){
+                    $mainPrice = $subItem->getPrice();                   
+                    $options['group']['flag'] = $flag;
+                    $options['group']['mainprice'] = $mainPrice;
+                }else{
+                    $specialPrice = $subItem->getSpecialPrice();
+                    $options['group']['flag'] = $flag;
+                    $options['group']['specialprice'] = $specialPrice;
+                }
+                // End Set Price
+                $subItem->addCustomOption('setting', serialize($options));
+                Mage::app()->setCurrentStore(Mage_Core_Model_App::DISTRO_STORE_ID);
+                $cart->addProduct($subItem, array('qty' => 1));
+                $cart->save();
+            }
+        }
+        return true;
+
+    }
+
+    public function updateProduct(Varien_Event_Observer $observer){
+       /* $observer->getEvent()->getProduct()->setIsSuperMode(true);
+        $product = $observer->getEvent()->getProduct();
+        $quote = Mage::getModel('checkout/cart')->getQuote();
+        $quoteItem = $quote->getItemByProduct( $product );
+        $randomInt = strtotime("now");
+        $productId = $product->getId();
+        try {
+            $options = array();
+            $options['group']['sid'] = $randomInt;
+            $quoteItem->addCustomOption('setting', serialize($options));
+            $quoteItem->save();
+        }
+        catch (Exception $e) {
+            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+        }*/
+        $quote = $observer->getEvent()->getQuote();
+        $item = $observer->getQuoteItem();
+        $product_id = $item->getProductId();
+        $_product = Mage::getModel('catalog/product')->load($product_id);
+        $options = Mage::getModel('catalog/product_option')->getProductOptionCollection($_product);
+        if ($additionalOption = $item->getProduct()->getCustomOption('setting'))
+        {
+           $additionalOptions =  unserialize($additionalOption->getValue());
+           $flag = $additionalOptions['group']['flag'];
+           $mainPrice = $additionalOptions['group']['mainprice'];
+           $mainSpecialPrice = $additionalOptions['group']['specialprice'];
+           if($flag ==0){
+              $item->setPrice($mainPrice); 
+           }else{
+               $item->setSpecialPrice($mainSpecialPrice); 
+           }
+        }
+        $item->save();
+    }
+}
+?>

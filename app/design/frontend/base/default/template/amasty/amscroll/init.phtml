@@ -1,0 +1,55 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @package Amasty_Scroll
+ */
+?>
+<?php
+
+	/* @var $hlp Amasty_Scroll_Helper_Data */
+	$hlp = Mage::helper('amscroll');
+	if (!$hlp->isEnabled()) {
+	    return;
+	}
+
+	$containerSelector = $hlp->getModuleConfig('advanced/product_container_group');
+?>
+<script type="text/javascript">
+	var amscroll_object = new amscroll();		
+	var amscroll_params = {
+		'page'              : '<?php echo intVal($this->getRequest()->getParam('p', 0))?>',
+		'actionMode'        : '<?php echo $hlp->getModuleConfig('general/loading')?>',
+		'loadingImage'      : '<?php echo $this->getSkinUrl($hlp->getModuleConfig('general/loading_icon')) ?>',
+		'pageNumbers'       : '<?php echo $hlp->getModuleConfig('general/page_numbers')?>',
+		'loadNextStyle'     : '<?php echo $hlp->getModuleConfig('button/styles')?>',
+		'loadingTextButton' : '<?php echo $hlp->getModuleConfig('button/label') ?>',
+		'progressbar'       :  <?php echo Zend_Json::encode($hlp->getModuleConfig('info'))?>, 
+		'remove_hash'		: '<?php echo $hlp->getModuleConfig('general/remove_hash') ?>',
+		'page_text'			: '<?php echo $this->__('Page #'); ?>',
+		'page_of_text'		: '<?php echo $this->__('Page {0} of {1}'); ?>'
+	};
+	
+	<?php 
+	   foreach($hlp->getModuleConfig('advanced') as $k => $v) { 
+	       echo "var amscroll_$k = '$v';";  
+	   }
+	?>
+	document.observe("dom:loaded", function() {
+        if ($$('<?php echo $containerSelector?>').length  != 0 ) {
+            amscroll_object.init(amscroll_params);
+        }
+	}); 
+  
+		
+		Event.observe(window, 'scroll', function(event) {
+		    if (typeof(amscroll_object) == 'undefined'){
+		    return;
+		  }		    
+		  if ($$('<?php echo $containerSelector?>').length  != 0 ) {
+		    amscroll_object.handleScroll();
+		    }
+		});
+    
+   
+</script>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<layout>
+    <default>
+        <reference name="notifications">
+            <block type="mageworkshop_commentonreview/adminhtml_notification_message" name="mageworkshop_commentonreview_notification" template="mageworkshop/commentonreview/admin_notification.phtml"/>
+        </reference>
+    </default>
+    <adminhtml_mageworkshop_commentonreview_comment_index>
+        <reference name="content">
+            <block type="mageworkshop_commentonreview/adminhtml_comment" name="commentonreview" />
+        </reference>
+    </adminhtml_mageworkshop_commentonreview_comment_index>
+    <adminhtml_mageworkshop_commentonreview_comment_pending>
+        <reference name="content">
+            <block type="mageworkshop_commentonreview/adminhtml_comment" name="commentonreview_pending"/>
+        </reference>
+    </adminhtml_mageworkshop_commentonreview_comment_pending>
+</layout>

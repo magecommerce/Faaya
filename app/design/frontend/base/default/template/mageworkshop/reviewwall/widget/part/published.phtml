@@ -1,0 +1,8 @@
+<p>
+    <small>
+        <?php echo Mage::helper('reviewwall')->__(
+            'Published %s by %s',
+            Mage::helper('reviewwall')->getTimeElapsedString($this->getCreatedAt()),
+            $this->escapeHtml($this->getNickname())); ?>
+    </small>
+</p>

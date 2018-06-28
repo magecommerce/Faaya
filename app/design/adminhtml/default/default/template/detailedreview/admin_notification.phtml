@@ -1,0 +1,35 @@
+<?php /** MageWorkshop_DetailedReview_Block_Adminhtml_Notification_Message $this */?>
+
+<?php
+$detailedReviewUrl = $this->getDetailedReviewAdminUrl();
+
+/** @var MageWorkshop_Core_Helper_Data $mageWorkshopCoreHelper */
+$mageWorkshopCoreHelper = Mage::helper('drcore');
+$reCaptchaPingResult  = $mageWorkshopCoreHelper->pingMageWorkshopReCaptcha(Mage::getStoreConfig('detailedreview/captcha/private_key'));
+
+/** @var MageWorkshop_Core_Helper_Data $drCoreHelper */
+$drCoreHelper = Mage::helper('drcore');
+$facebookPingResult   = $drCoreHelper->pingDetailedReviewFacebook();
+?>
+
+<?php if (Mage::getStoreConfig('detailedreview/captcha/enabled') && !$reCaptchaPingResult): ?>
+    <div class="notification-global">
+        <?php
+            echo $this->__(
+                '<strong class="label">MageWorkshop DetailedReview: </strong><strong>Please check ReCaptcha "Private Key" configuration in "Captcha Options" </strong><a href="%s">go to MageWorkshop DetailedReview configuration</a>',
+                $detailedReviewUrl
+            );
+        ?>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($facebookPingResult['error'])): ?>
+    <div class="notification-global">
+        <?php
+        echo $this->__(
+            '<strong class="label">MageWorkshop DetailedReview: </strong><strong>Please check "Facebook App ID Key" or "Facebook App Secret Key" configuration in "Social Share" </strong><a href="%s">go to MageWorkshop DetailedReview configuration</a>',
+            $detailedReviewUrl
+        );
+        ?>
+    </div>
+<?php endif; ?>

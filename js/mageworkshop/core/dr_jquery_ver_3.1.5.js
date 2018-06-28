@@ -1,0 +1,1 @@
+window.DRjQuery = jQuery.noConflict();

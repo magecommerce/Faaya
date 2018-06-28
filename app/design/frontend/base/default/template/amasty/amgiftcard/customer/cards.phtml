@@ -1,0 +1,26 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @package Amasty_GiftCard
+ */
+?>
+<?php /* @var $this Amasty_GiftCard_Block_Customer_Cards */ ?>
+
+<?php $_cards = $this->getCards() ?>
+
+<?php foreach($_cards as $_card): ?>
+	<div class="am-gift-card-info customer-account-gift-card-item">
+		<p><?php echo $this->__("Code: %s", '<strong>' . $_card->getCode() . '</strong>'); ?></p>
+		<p><?php echo $this->__("Status: %s", '<strong>' . $_card->getStatus() . '</strong>'); ?></p>
+		<p><?php echo $this->__('Current Balance: %s', '<strong>' . Mage::helper('core')->currency($_card->getCurrentValue()) . '</strong>'); ?></p>
+		<?php if ($_card->getExpiredDate()): ?>
+			<?php $_validTill = $this->formatDate($_card->getExpiredDate(), 'short'); ?>
+		<?php else: ?>
+			<?php $_validTill = $this->__('unlimited'); ?>
+		<?php endif; ?>
+		<p><?php echo $this->__('Valid till: %s', '<strong>' . $_validTill . '</strong>'); ?></p>
+
+		<a href="<?php echo $this->getUrl('amgiftcard/acc/remove', array('id'=>$_card->getId())) ?>"><?php echo $this->__('Remove');?></a>
+	</div>
+<?php endforeach; ?>

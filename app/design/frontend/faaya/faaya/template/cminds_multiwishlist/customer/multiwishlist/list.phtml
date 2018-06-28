@@ -1,0 +1,72 @@
+<?php
+/**
+ * @var $this Cminds_Multiwishlist_Block_Customer_Multiwishlist_List
+ */
+$wishlists = $this->getItems();
+?>
+
+<div class="dashboard my-wishboard">
+    <div class="page-title">
+        <h1><?php echo $this->__('My <strong>Wishboard</strong>') ?></h1>
+    </div>
+    <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
+    <?php //echo $this->getChildHtml('pager'); ?>
+    <?php if (count($wishlists)): ?>
+
+        <ul class="wishboard-grid">
+            <?php foreach ($wishlists as $wishlist){ ?>
+            <li class="item">
+                <h3 class="title"><?php echo $this->escapeHtml($wishlist->getName()) ?></h3>
+                <div class="wishboard-image">
+                    <a class="icon remove" href="<?php echo $this->escapeHtml($this->getRemoveUrl($wishlist->getId()))?>"
+                           onclick=" return confirm('Are you sure you want to remove this Wishlist?')"
+                        >
+                            <?php echo $this->__('<i class="fa fa-close"></i>') ?>
+                    </a>
+                    <a href="<?php echo $this->escapeHtml($this->getViewUrl($wishlist->getId())); ?>" class="icon editicon">
+                        <img src="<?php echo $this->getSkinUrl('images/edit-icon.png'); ?>">
+                    </a>
+
+                    <?php $itemList = Mage::getModel('cminds_multiwishlist/item')->getCollection()->addFieldToFilter('wishlist_id',$wishlist->getWishlistId());
+
+                    $chunk = array_chunk($itemList->getData(), 2);
+                    //echo "<pre/>";print_r($chunk[0]);exit;
+                    if(count($chunk)>1){ ?>
+                        <ul class="multi-images">
+                            <?php foreach ($chunk[0] as $value) {
+                                $_product = Mage::getModel('catalog/product')->load($value['product_id']);?>
+                                <li><img src="<?php echo Mage::helper('catalog/image')->init($_product, 'image', $_product->getImage())->backgroundColor(245, 245, 245)->resize(150, 150); ?>"></li>
+                              <?php } ?>
+                        </ul>
+                        <ul class="multi-images">
+                            <?php foreach ($chunk[1] as $value) {
+                                $_product = Mage::getModel('catalog/product')->load($value['product_id']);?>
+                                <li><img src="<?php echo Mage::helper('catalog/image')->init($_product, 'image', $_product->getImage())->backgroundColor(245, 245, 245)->resize(150, 150); ?>"></li>
+                              <?php } ?>
+                        </ul>
+                    <?php }else if(count($chunk)>0){ ?>
+                        <ul class="multi-images single-image">
+                            <?php foreach ($chunk[0] as $value) {
+                                $_product = Mage::getModel('catalog/product')->load($value['product_id']);?>
+                                <li><img src="<?php echo Mage::helper('catalog/image')->init($_product, 'image', $_product->getImage())->backgroundColor(245, 245, 245)->resize(150, 150); ?>"></li>
+                              <?php } ?>
+                        </ul>
+                    <?php }else{ ?>
+                        <ul class="multi-images single-image">
+                            <li>
+                               <img src="<?php echo Mage::getBaseUrl('media').'catalog'.DS.'product'.DS.'placeholder'.DS.'default'.DS.'placeholder.jpg'?>">
+                            </li>
+                        </ul>
+                    <?php } ?>
+                </div>
+            </li>
+            <?php } ?>
+        </ul>
+
+
+        <script type="text/javascript">decorateTable('list-multiwishlist-table')</script>
+    <?php else: ?>
+        <p style="padding: 20px;"><?php echo $this->__('No Wishlist Found') ?></p>
+    <?php endif; ?>
+    <?php //echo $this->getChildHtml('pager'); ?>
+</div>

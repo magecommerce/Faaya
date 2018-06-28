@@ -1,0 +1,315 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2006-2017 X.commerce, Inc. and affiliates (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php /* @var $this Mage_Sales_Block_Order_Print_Shipment */?>
+<?php $order = $this->getOrder(); ?>
+<h1><?php echo $this->__('Order #%s', $this->getObjectData($order, 'real_order_id')); ?></h1>
+<p class="order-date"><?php echo $this->__('Order Date: %s', $this->formatDate($this->getObjectData($order, 'created_at_store_date'), 'long')) ?></p>
+<?php if (!$this->getObjectData($order, 'is_virtual')): ?>
+<?php foreach ($this->getShipmentsCollection() as $shipment): ?>
+    <h2 class="h2"><?php echo $this->__('Shipment #%s', $this->getObjectData($shipment, 'increment_id')); ?></h2>
+    <div class="col2-set">
+        <div class="col-1">
+            <h3><?php echo $this->__('Shipping Address') ?></h3>
+            <address><?php echo $this->getShipmentAddressFormattedHtml($shipment); ?></address>
+        </div>
+        <div class="col-2">
+            <h3><?php echo $this->__('Billing Address') ?></h3>
+            <address><?php echo $this->getBillingAddressFormattedHtml($order); ?></address>
+        </div>
+    </div>
+    <div class="col2-set">
+        <div class="col-1">
+            <h3><?php echo $this->__('Shipping Method') ?></h3>
+             <?php echo $this->escapeHtml($this->getObjectData($order, 'shipping_description')); ?>
+             <?php $tracks = $this->getShipmentTracks($shipment); 
+                if ($tracks): ?>
+                <table class="data-table" id="my-shipment-tracking">
+                    <col />
+                    <col />
+                    <thead>
+                        <tr>
+                            <th><?php echo Mage::helper('sales')->__('Title')?></th>
+                            <th><?php echo Mage::helper('sales')->__('Number')?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($tracks as $track): ?>
+                            <tr>
+                                <td><?php echo $this->escapeHtml($this->getObjectData($track, 'title')); ?></td>
+                                <td><?php echo $this->escapeHtml($this->getObjectData($track, 'number')); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <script type="text/javascript">decorateTable('my-shipment-tracking');</script>
+            <?php endif; ?>
+        </div>
+        <div class="col-2">
+            <h3><?php echo $this->__('Payment Method') ?></h3>
+            <?php echo $this->getPaymentInfoHtml() ?>
+        </div>
+    </div>
+    <h3><?php echo $this->__('Items Shipped') ?></h3>
+    <table class="data-table" id="my-shipment-table-<?php echo $this->getObjectData($shipment, 'id') ?>">
+        <col />
+        <col width="1" />
+        <col width="1" />
+        <thead>
+            <tr>
+                <th><?php echo $this->__('Product Name') ?></th>
+                <th><?php echo $this->__('SKU') ?></th>
+                <th class="a-center"><span class="nobr"><?php echo $this->__('Qty Shipped') ?></span></th>
+            </tr>
+        </thead>
+        <?php 
+    // New added code      
+        echo '<pre>';
+        $itemArray = array();
+        foreach ($this->getShipmentItems($shipment) as $_item) {
+            //print_R($_item->getData());
+            $OrderItemId = $_item->getOrderItemId();
+            //echo "<br/>";
+            $orderItem = Mage::getModel("sales/order_item")->load($OrderItemId);
+            $quoteItemId = $orderItem->getQuoteItemId();
+           
+           $options = Mage::getResourceModel('sales/quote_item_option_collection');
+           $options->addItemFilter($quoteItemId);
+
+            foreach ($options as $option) {
+                //print_R($option->getData());
+                 if($option->getCode() == "setting"){
+                  $additionalOptions =  unserialize($option->getValue());
+                 // print_R($additionalOption);
+                  if($additionalOptions){
+                        $product =  Mage::getModel('catalog/product')->load($_item->getProductId());
+                        $groupOption = $additionalOptions['group']['option'];
+                        $ringSize = $groupOption['size'];
+                        $text = $groupOption['text'];
+                        $fontFamily = $groupOption['fontfamily'];
+                        $sid = $additionalOptions['group']['sid'];
+                        $_item->setGroupType($additionalOptions['group']['type']);
+                        $_item->setSmryid($additionalOptions['group']['smryid']);
+                        $_item->setGroupOrderdate($additionalOptions['group']['orderdate']);
+                        $_item->setGroupConstruction($additionalOptions['group']['construction']);
+                        $_item->setGroupRing($additionalOptions['group']['ring']);
+                        $_item->setGroupPendant($additionalOptions['group']['pendant']);
+                        $_item->setGroupEarring($additionalOptions['group']['earring']);
+                        $_item->setGroupBracelets($additionalOptions['group']['bracelets']);
+                        $_item->setGroupDiamond($additionalOptions['group']['diamond']);
+                        $_item->setGroupChain($additionalOptions['group']['chain']);
+                        $_item->setGroupSide1($additionalOptions['group']['side1']);
+                        $_item->setGroupSide2($additionalOptions['group']['side2']);
+                        $_item->setGroupPromise($additionalOptions['group']['promise']);
+                        $_item->setGroupMatchpair($additionalOptions['group']['matchpair']);
+                        $_item->setGroupRingSize($ringSize);
+                        $itemArray[$sid][$_item->getProductId()] = $_item;
+                        //$itemArray[$_item->getProductId()] = $_item;
+                  }
+                  else{
+                        $randomInt = strtotime("now");
+                        $product =  Mage::getModel('catalog/product')->load($_item->getProductId());
+                        //$itemArray[$randomInt][$orderItem->getProduct()->getId()] = $orderItem;
+                        $itemArray[$randomInt][$_item->getProductId()] = $_item;
+                        //$itemArray[$_item->getProductId()] = $_item;
+                  }
+                } 
+            }
+            //echo count($itemArray);
+        }
+    ?> 
+        <?php 
+    //echo count($itemArray);
+            foreach($itemArray as $items):
+                        $firstItem = array_keys($items);
+                        $price = 0.0;
+                        $diamondDetail = $ringDetail = $pendantDetail = $earringDetail = $braceletsDetail= $chainDetail = $sidestone1 = $sidestone2 = $chaindata = $promiseDetail = $ringSize = $matchpair = "";
+                        $receiveDay ="";
+                        $flag=0;
+                        $i = 1;
+                        foreach($firstItem as $itm){ 
+                            $cnt = count($items);
+                            //echo "<br/>";
+                            $type = $items[$itm]->getGroupType();
+                            //echo "<br/>";
+                            $orderDate = $items[$itm]->getGroupOrderdate();
+                            //echo "<br/>";
+                            if($items[$itm]->getGroupRing()){
+                                $ringDetail = $items[$itm]->getGroupRing();
+
+                            }
+                            if($items[$itm]->getGroupPendant()){
+                                $pendantDetail = $items[$itm]->getGroupPendant();
+
+                            }
+                            if($items[$itm]->getGroupEarring()){
+                                $earringDetail = $items[$itm]->getGroupEarring();
+
+                            }
+                            if($items[$itm]->getGroupBracelets()){
+                                $braceletsDetail = $items[$itm]->getGroupBracelets();
+
+                            }
+                            if($items[$itm]->getGroupDiamond()){
+                                $diamondDetail = $items[$itm]->getGroupDiamond();
+
+                            }
+                            if($items[$itm]->getGroupChain()){
+                                $chainDetail = $items[$itm]->getGroupChain();
+
+                            }
+                            if($items[$itm]->getGroupSide1()){
+                                $sidestone1 = $items[$itm]->getGroupSide1();
+
+                            }
+                            if($items[$itm]->getGroupSide2()){
+                                $sidestone2 = $items[$itm]->getGroupSide2();
+
+                            }
+                            if($items[$itm]->getGroupPromise()){
+                                $promiseDetail = $items[$itm]->getGroupPromise();
+
+                            }
+                             if($items[$itm]->getGroupRingSize()){
+                                $ringSize = $items[$itm]->getGroupRingSize();
+
+                            }
+                            if($_items[$itm]->getGroupMatchpair()){
+                                $matchpair = $_items[$itm]->getGroupMatchpair(); 
+                            }
+                            $price += $items[$itm]->getPrice();
+
+
+                             if($type == "chain" && $flag==0){
+                                $receiveDay =  $orderDate;
+                                $flag = 1;
+                            }
+                            elseif($type == "sid" && $flag==0){
+                                $receiveDay =  $orderDate;
+                                $flag = 1;
+                            }
+                            elseif($type == "did" && $flag==0){
+                                $receiveDay =  $orderDate;
+                                $flag = 1;
+                            }
+                            if($cnt == 1 && $type =="wedding"){
+                                $receiveDay =  $orderDate;
+                            }
+                        }
+                        $firstItem = Mage::getModel('catalog/product')->load($firstItem[0]);
+                    ?>
+                    <tr>
+                         <td class="product-cart-info">
+                                    <img src="<?php echo Mage::helper('catalog/image')->init($firstItem, 'small_image')->constrainOnly(false)->keepAspectRatio(true)->keepFrame(false)->resize(160, 210); ?>" alt="<?php echo $this->htmlEscape($this->getImageLabel($firstItem, 'small_image')) ?>" />
+                                    <h2 class="product-name"><?php echo $firstItem->getName();?></h2>
+                                    <div class="product-cart-sku">
+                                        <div class="information">
+                                         <?php if($ringDetail): ?>
+                                             <p>
+                                                  <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/ringicon.png'); ?>" alt=""></span> */ ?>
+                                                  <span><?php echo $this->__('Setting : ');?></span>
+                                                  <?php echo $this->__($ringDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($pendantDetail): ?>
+                                             <p>
+                                              <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/pendanticon.png'); ?>" alt=""></span>  */ ?>
+                                              <span><?php echo $this->__('Pendent : ');?></span>
+                                              <?php echo $this->__($pendantDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($braceletsDetail): ?>
+                                             <p>
+                                              <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/braceletsicon.png'); ?>" alt=""></span> */ ?>
+                                              <span><?php echo $this->__('Bracelet : ');?></span> 
+                                              <?php echo $this->__($braceletsDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($earringDetail): ?>
+                                             <p>
+                                              <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/earringicon.png'); ?>" alt=""></span> */ ?>
+                                              <span><?php echo $this->__('Earring : ');?></span> 
+                                              <?php echo $this->__($earringDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($promiseDetail): ?>
+                                             <p>
+                                                <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/promiseicon.png'); ?>" alt=""></span> */ ?>
+                                                <span><?php echo $this->__('Setting : ');?></span>
+                                                <?php echo $this->__($promiseDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($chainDetail): ?>
+                                             <p>
+                                              <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/chainicon.png'); ?>" alt=""></span>  */ ?>
+                                              <span><?php echo $this->__('Chain : ');?></span>
+                                              <?php echo $this->__($chainDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($diamondDetail): ?>
+                                             <p>
+                                              <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/diamondicon.png'); ?>" alt=""></span>  */ ?>
+                                              <span><?php echo $this->__('Diamond : ');?></span>
+                                              <?php echo $this->__($diamondDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($matchpair): ?>
+                                             <p>
+                                                  <strong><?php echo $this->__('Match Pair : ');?></strong>
+                                                  <?php echo $this->__($matchpair); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($receiveDay):?>
+                                             <p>
+                                                <span><?php echo $this->__('Dispatch by : ').$receiveDay;?></span>
+                                             </p>
+                                             <?php endif; ?>
+                                        </div>
+                                        <?php if($ringSize):?>
+                                            <div class="cart-ring-size">
+                                              <label><?php echo $this->__('Ring Size - ').$ringSize; ?></label>
+                                            </div>
+                                        <?php endif;?>
+                              </div>
+                                </td>
+                                <td class="product-cart-info">
+                                    <h2 class="product-sku"><?php echo $firstItem->getSku();?></h2>
+                                </td>
+                                <td class="product-cart-qty">
+                                    <?php echo $this->__('1');?>
+                                </td>
+                    </tr>
+            <?php endforeach; ?> 
+        <?php foreach ($this->getShipmentItems($shipment) as $item): ?>
+        <tbody>
+            <?php //echo $this->getItemHtml($item) ?>
+        </tbody>
+        <?php endforeach; ?>
+    </table>
+    <script type="text/javascript">decorateTable('my-shipment-table-<?php echo $this->getObjectData($shipment, 'id')?>', {'tbody' : ['odd', 'even'], 'tbody tr' : ['first', 'last']})</script>
+<?php endforeach; ?>
+<?php endif; ?>
+<script type="text/javascript">window.print();</script>

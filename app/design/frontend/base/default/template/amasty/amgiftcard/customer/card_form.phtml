@@ -1,0 +1,39 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @package Amasty_GiftCard
+ */
+?>
+<?php /* @var $this Amasty_GiftCard_Block_Customer_CardForm */ ?>
+
+<div class="page-title">
+	<h1><?php echo $this->__('Gift Cards'); ?></h1>
+</div>
+
+<?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
+
+<div class="amgiftcard">
+	<form id="amgiftcard-form" action="<?php echo $this->getUrl('amgiftcard/acc/add') ?>" method="post">
+		<input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>">
+
+		<div class="fieldset">
+
+			<ul class="form-list">
+				<li>
+					<label for="giftcard_code"><?php echo $this->__('Specify Gift Code') ?> </label>
+					<div class="v-fix"><input class="required-entry input-text" id="am_giftcard_code" name="am_giftcard_code" value="" /></div>
+				</li>
+			</ul>
+		</div>
+		<div class="buttons-set form-buttons btn-only">
+			<button class="button" onclick="amgiftcardForm.submit()" type="button" value="<?php echo $this->__('Submit') ?>"><span><span><?php echo $this->__('Submit') ?></span></span></button>
+		</div>
+	</form>
+
+	<script type="text/javascript">
+		//<![CDATA[
+		var amgiftcardForm = new VarienForm('amgiftcard-form');
+		//]]>
+	</script>
+</div>

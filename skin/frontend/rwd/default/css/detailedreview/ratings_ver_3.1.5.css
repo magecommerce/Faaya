@@ -1,0 +1,100 @@
+/* Average and Separate ratings CSS */
+
+.reviews-container .ratings-table .rating-box {
+    height: 18px;
+    width: 100px;
+}
+.reviews-container .ratings-table .rating-box .rating {
+    height: 18px;
+    width: 100px;
+}
+.block-reviewed .rating-box{
+    height: 17px;
+    width: 85px;
+}
+.block-reviewed .rating-box .rating {
+    height: 17px;
+    width: 85px;
+}
+.review-top .average-rating .rating-box{
+    height: 23px;
+    width: 120px;
+}
+.review-top .average-rating .rating-box .rating {
+    height: 23px;
+    width: 120px;
+}
+.overall-raiting .overall-raiting-value li .separate-rating-star {
+    width: 32px;
+    height: 26px;
+}
+.overall-raiting .overall-raiting-value li.active .separate-rating-star {
+
+}
+.category-products .ratings .amount {
+    float:left;
+}
+
+.block-reviewed .block-content ul {
+  position: relative;
+}
+
+.block-reviewed .block-content ul li {
+  display: block !important;
+  overflow: hidden;
+}
+
+.block-reviewed .block-content ul li .li-content {
+  padding: 4px 10px 4px 4px;
+  float: left;
+  background: #eff7fb;
+  font-size: 12px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.block-reviewed .block-content ul li .li-content .clearer {
+  height: 0;
+}
+
+.block-reviewed .block-content .rating-box {
+  width: 100px;
+  height: 16px;
+}
+
+.block-reviewed .block-content .rating-box .rating {
+  width: 100px;
+  height: 16px;
+}
+
+.block-reviewed .block-content .thumbnail {
+  float: left;
+  margin-right: 5px;
+}
+
+.block-reviewed .block-content .product-title {
+  font-size: 10px;
+  color: #3399CC;
+}
+
+.block-reviewed .block-content .review-title, .block-reviewed .block-content .nickname {
+  font-weight: bold;
+  overflow: hidden;
+  height: 16px;
+}
+
+.block-reviewed .block-content .detail {
+  overflow: hidden;
+  height: 40px;
+}
+
+.block-reviewed .block-content .nickname {
+  float: right;
+  color: #636363;
+  text-transform: uppercase;
+  margin-right: 10px;
+}
+
+.block-reviewed .block-content .spyWrapper {
+  overflow: hidden;
+}

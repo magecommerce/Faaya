@@ -1,0 +1,50 @@
+<?php
+$userStoryTitle =  get_field('user_story_title','option');
+$userStoryDescription =  get_field('user_story_description','option');
+$userStoryLabel =  get_field('user_story_label','option');
+$userStoryLink =  get_field('user_story_link','option');
+$userStoryRepeater = get_field('user_story_slider','option'); 
+$newtab = '';
+$catLink = "javascript:void(0);";
+if($userStoryLink){
+    $newtab = 'target="_blank"';
+    $catLink = check_custom_personizelink($userStoryLink);
+} ?>
+<div class="userstroy-slider">
+    <div class="description">
+        <h2><?php echo $userStoryTitle;?></h2>
+        <p><?php echo $userStoryDescription;?></p>
+        <a href="<?php echo $catLink;?>" class="readmore"><?php echo $userStoryLabel;?></a>
+    </div>
+    
+    <div class="user-story-slider owl-carousel">
+         <?php foreach($userStoryRepeater as $userStory):
+          
+            ?>
+            <?php $image = $userStory['user_story_image']['url'] ?>
+             <div class="item">
+                <div class="story-image">
+                  <img src="<?php echo $image ?>" alt=""> 
+                </div>
+             </div>
+         <?php endforeach;?>
+    </div>      
+</div>      
+<script type="text/javascript">
+    jQuery('.user-story-slider').owlCarousel({
+        loop:true,
+        margin:0,
+        items:1,
+        center: true,
+        smartSpeed:1000,
+        //mouseDrag: false,
+        responsive:{
+            0:{
+                nav:false
+            },
+            768:{
+                nav:true
+            }
+        }
+    });    
+</script>

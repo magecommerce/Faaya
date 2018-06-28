@@ -1,0 +1,50 @@
+<tr>
+    <td class="label"><label for="<?php echo $element->getHtmlId(); ?>"><?php echo $this->__('Image') ?> <br><?php echo $this->__('(Must be in PNG, GIF or JPEG format)'); ?></label></td>
+<?php $images = explode(',',$element->getEscapedValue());?>
+    <td class="value" id="add-file-input-box">
+        <ul>
+            <?php $count = 0; ?>
+            <?php foreach ($images as $image) :?>
+                <?php if (!empty($image)): ?>
+                    <?php $count++; ?>
+                <li>
+                    <a href="<?php echo $url = (Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)).$image; ?>" onclick="imagePreview('image[]'); return false;">
+                    <img src="<?php echo $url = (Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)).$image; ?>" id="image[]" title="" alt="" height="22" width="22" class="small-image-preview v-middle"></a>
+                    <input id="<?php echo $element->getHtmlId(); ?>" name="<?php echo $element->getName(); ?>[]" value="<?php echo $image; ?>" <?php echo $element->serialize($element->getHtmlAttributes()); ?> />
+                    <a href="#" class="remove-img"><?php echo $this->__('Remove'); ?></a>
+                </li>
+                <?php endif ?>
+            <?php endforeach?>
+        </ul>
+        <span class="more-images"><a href="#" id="add-more-images"><?php echo $this->__('Add More Files'); ?></a></span>
+    </td>
+</tr>
+<script type="text/javascript">
+    document.observe("dom:loaded", function() {
+        <?php if (!($imagesMaxCount = (int)Mage::getStoreConfig('detailedreview/image_options/images_max_count'))): ?>
+            <?php $imagesMaxCount = 1; ?>
+        <?php endif; ?>
+    
+        var MaxFileInputs = <?php echo $imagesMaxCount; ?>;
+        var i = <?php echo $count; ?>;
+        
+        $('add-more-images').observe('click', function (event) {
+            if (i < MaxFileInputs) {
+                var element = '<li><input id="image" type="file" name="image[]"/><a href="#" class="remove-img"><?php echo $this->__('Remove'); ?></a></li>';
+                $('add-file-input-box').select('ul')[0].insert({after: element});
+                i++;
+            } else {
+                $('add-more-images').setStyle({display: 'none'});
+                $('messages').insert('<ul class="messages"><li class="success-msg"><ul><li><span>' + 'You can upload not more than '+ (MaxFileInputs) + ' images' + '</span></li></ul></li></ul>');
+            }
+        });
+    
+        $(document.body).observe('click', function(event){
+            if(event.target.className == 'remove-img') {
+                $(event.target).up('li').remove();
+                $('add-more-images').setStyle({display: 'block'});
+                i--;
+            }
+        });
+    });
+</script>

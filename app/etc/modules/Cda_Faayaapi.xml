@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Cda_Faayaapi>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Cda_Faayaapi>
+    </modules>
+</config> 

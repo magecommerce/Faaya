@@ -1,0 +1,41 @@
+<?php
+/** @var MageWorkshop_Core_Helper_Data $drCoreHelper */
+$drCoreHelper = Mage::helper('drcore');
+
+$facebookPingResult = $drCoreHelper->pingDetailedReviewFacebook();
+?>
+
+<?php if ($facebookPingResult !== false && !isset($facebookPingResult['error'])): ?>
+    <?php $facebookAppId = Mage::helper('detailedreview/config')->getFBShareAppId(); ?>
+    <script type="text/javascript">
+        //<![CDATA[
+        var fbAppId = '<?php echo $facebookAppId; ?>';
+    
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : fbAppId,
+                status     : true,
+                cookie     : true,
+                xfbml      : true,
+                version	   : 'v2.11'
+            });
+            if (!fbAppId) {
+                new PNotify({
+                    text: '<?php echo $this->__('Please set the facebook App Id.')?>',
+                    type: 'error',
+                    hide: false
+                });
+            }
+        };
+
+        // Load the SDK Asynchronously
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+        //]]>
+    </script>
+<?php endif; ?>

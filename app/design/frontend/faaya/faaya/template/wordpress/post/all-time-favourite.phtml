@@ -1,0 +1,55 @@
+<?php
+/**
+ * @category    Fishpig
+ * @package     Fishpig_Wordpress
+ * @license     http://fishpig.co.uk/license.txt
+ * @author      Ben Tideswell <help@fishpig.co.uk>
+ */
+?>
+<?php $posts = $this->getAllTimeFavouritePostCollection() ?>
+<?php if (count($posts) > 0): ?>
+	<div class="section-title">
+		<h2><?php echo $this->__('All time <strong>Favourite</strong>'); ?></h2>
+	</div>
+	<div class="post-list alltimefavourite">
+		<div id="post-list" class="alltimefavourite-slider owl-carousel">
+			<?php foreach($posts as $post): ?>
+				<div class="item<?php if ($post->isSticky()): ?> featured is-sticky<?php endif; ?> <?php echo $post->getPostFormat() ?>">
+					<?php echo $this->getPostRenderer($post)->toHtml() ?>
+				</div>
+			<?php endforeach; ?>
+		</div>
+		<script type="text/javascript">decorateList($('post-list'));</script>
+		<?php echo $this->getPagerHtml() ?>
+	</div>
+<?php endif; ?>
+
+
+
+<script type="text/javascript">
+	jQuery(document).ready(function (){
+		
+		jQuery('.alltimefavourite-slider').owlCarousel({
+		    loop:false,
+		    margin:70,
+		    nav:true,
+		    items:1,
+		    mouseDrag:false,
+		    responsive:{
+		        0:{
+		            items:1,
+		            margin:0
+		        },
+		        600:{
+		            items:2,
+		            margin:30
+		        },
+		        1000:{
+		            items:3,
+		            margin:40
+		        }
+		    }
+		})
+
+	})
+</script>

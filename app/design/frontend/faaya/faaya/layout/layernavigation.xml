@@ -1,0 +1,9 @@
+ <?xml version="1.0"?>
+<layout version="0.1.0">
+     <layernavigation_index_index>
+        <block type="layernavigation/layernavigation" name="root" template="catalog/product/list-response.phtml" />
+    </layernavigation_index_index>
+</layout>
+
+
+

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <retailers_adminhtml_retailers_index>
+        <reference name="content">
+            <block type="retailers/adminhtml_retailers" name="retailers" />
+        </reference>
+    </retailers_adminhtml_retailers_index>
+</layout>

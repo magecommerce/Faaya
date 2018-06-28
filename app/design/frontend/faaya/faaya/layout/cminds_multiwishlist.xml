@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+        <reference name="top.links">
+            <action method="removeLinkBlock" ifconfig="wishlist/cminds_multiwishilst/enabled"><blockName>wishlist_link</blockName></action>
+            <block type="cminds_multiwishlist/links" name="multiwishlist_link" />
+            <action method="addLinkBlock" ifconfig="wishlist/cminds_multiwishilst/enabled"><blockName>multiwishlist_link</blockName></action>
+        </reference>
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>js/cminds_multiwishlist/window.js</name>
+            </action>
+            <action method="addJs">
+                <script>prototype/window.js</script>
+            </action>
+            <action method="addCss">
+                <stylesheet>css/cminds_multiwishlist/styles.css</stylesheet>
+            </action>
+        </reference>
+        <reference name="before_body_end">
+            <block type="cminds_multiwishlist/popup" name="cminds_multiwishlist_popup"
+                   after="-">
+                <block type="cminds_multiwishlist/popup_form" name="cminds_multiwishlist_popup_form"/>
+            </block>
+        </reference>
+        <reference name="wishlist_sidebar">
+            <block type="cminds_multiwishlist/customer_sidebar_multiwishlist" name="multiwishlsit_sidebar" as="multiwishlsit_sidebar" />
+            <action method="setChild" ifconfig="wishlist/cminds_multiwishilst/enabled">
+                <child>multiwishlsit_sidebar</child>
+                <alias>multiwishlsit_sidebar</alias>
+            </action>
+            <action method="setTemplate" ifconfig="wishlist/cminds_multiwishilst/enabled">
+                <template>cminds_multiwishlist/sidebar.phtml</template>
+            </action>
+        </reference>
+    </default>
+
+    <customer_account>
+        <reference name="customer_account_navigation">
+            <action method="addLink" ifconfig="wishlist/cminds_multiwishilst/enabled">
+                <name>wishlist</name><path>multiwishlist/index</path><label>My Wishlists</label>
+            </action>
+        </reference>
+    </customer_account>
+
+    <cminds_multiwishlist_index_index>
+        <update handle="customer_account"/>
+        <reference name="my.account.wrapper">
+            <block type="cminds_multiwishlist/customer_multiwishlist_list" name="multiwishlist_list"
+                   template="cminds_multiwishlist/customer/multiwishlist/list.phtml"/>
+        </reference>
+    </cminds_multiwishlist_index_index>
+
+    <cminds_multiwishlist_index_view>
+        <label>Customer My Account My Wishlist</label>
+        <!-- Mage_Wishlist -->
+        <update handle="customer_account" />
+        <reference name="my.account.wrapper">
+            <block type="cminds_multiwishlist/customer_multiwishlist" name="customer.multiwishlist" template="wishlist/view.phtml">
+                <action method="setTitle" translate="title">
+                    <title>My Wishlist</title>
+                </action>
+                <block type="wishlist/customer_wishlist_items" name="customer.wishlist.items" as="items" template="wishlist/item/list.phtml">
+                    <block type="wishlist/customer_wishlist_item_column_image" name="customer.wishlist.item.image" template="wishlist/item/column/image.phtml" />
+                    <block type="wishlist/customer_wishlist_item_column_comment" name="customer.wishlist.item.info" template="wishlist/item/column/info.phtml">
+                        <block type="cminds_multiwishlist/customer_multiwishlist_button" name="customer.wishlist.button.update" template="wishlist/button/update.phtml" />
+                    </block>
+                    <block type="cminds_multiwishlist/customer_multiwishlist_item_column_cart" name="customer.wishlist.item.quantity" template="wishlist/item/column/quantity.phtml">
+                        <action method="setTitle" translate="title">
+                            <title>Qty</title>
+                        </action>
+                        <block type="wishlist/customer_wishlist_item_options" name="customer.wishlist.item.options" />
+                    </block>
+                    <block type="cminds_multiwishlist/customer_multiwishlist_item_column_cart" name="customer.wishlist.item.price" template="wishlist/item/column/price.phtml">
+                        <action method="setTitle" translate="title">
+                            <title>Price</title>
+                        </action>
+                        <block type="wishlist/customer_wishlist_item_options" name="customer.wishlist.item.options" />
+                    </block>
+                    <block type="cminds_multiwishlist/customer_multiwishlist_item_column_cart" name="customer.wishlist.item.cart" template="wishlist/item/column/cart.phtml">
+                        <block type="wishlist/customer_wishlist_item_options" name="customer.wishlist.item.options" />
+                    </block>
+                    <block type="cminds_multiwishlist/customer_multiwishlist_item_column_remove" name="customer.wishlist.item.remove" template="wishlist/item/column/remove.phtml" />
+                </block>
+                <block type="core/text_list" name="customer.wishlist.buttons" as="control_buttons">
+                    <block type="cminds_multiwishlist/customer_multiwishlist_button" name="customer.wishlist.button.share" template="wishlist/button/share.phtml" />
+                    <block type="cminds_multiwishlist/customer_multiwishlist_button" name="customer.wishlist.button.toCart" template="wishlist/button/tocart.phtml" />
+                    <block type="cminds_multiwishlist/customer_multiwishlist_button" name="customer.wishlist.button.update" template="wishlist/button/update.phtml" />
+                </block>
+            </block>
+        </reference>
+        <reference name="right">
+            <action method="unsetChild"><name>wishlist_customer_sidebar</name></action>
+        </reference>
+    </cminds_multiwishlist_index_view>
+    <cminds_multiwishlist_index_share>
+        <label>Customer My Account Wishlist Sharing Form</label>
+        <!-- Mage_Wishlist -->
+        <update handle="customer_account" />
+        <reference name="my.account.wrapper">
+            <block type="cminds_multiwishlist/customer_sharing" name="wishlist.sharing" template="cminds_multiwishlist/sharing.phtml" />
+        </reference>
+        <reference name="right">
+            <action method="unsetChild"><name>wishlist_customer_sidebar</name></action>
+        </reference>
+    </cminds_multiwishlist_index_share>
+    <cminds_multiwishlist_index_configure translate="label">
+        <label>Configure Wishlist Item</label>
+        <update handle="catalog_product_view" />
+        <reference name="product.info">
+            <block type="cminds_multiwishlist/item_configure" name="product.info.addto" as="addto" template="cminds_multiwishlist/item/configure/addto.phtml" />
+        </reference>
+        <reference name="product.info.options.wrapper.bottom">
+            <action method="unsetChild"><name>product.info.addto</name></action>
+            <action method="append"><block>product.info.addto</block></action>
+        </reference>
+    </cminds_multiwishlist_index_configure>
+
+</layout>

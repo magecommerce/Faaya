@@ -1,0 +1,30 @@
+<?php
+/**
+ * MageWorkshop
+ * Copyright (C) 2016 MageWorkshop <info@mage-review.com>
+ *
+ * @category   MageWorkshop
+ * @package    MageWorkshop_DetailedReview
+ * @copyright  Copyright (c) 2016 MageWorkshop Co. (https://mage-review.com/)
+ * @license    http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3 (GPL-3.0)
+ * @author     MageWorkshop <info@mage-review.com>
+ */
+
+?>
+<?php if(Mage::getStoreConfig('detailedreview/social_share_optios/share_review_by_email')): ?>
+<script type="text/javascript">
+    //<![CDATA[
+    document.observe("dom:loaded", function() {
+        DRjQuery('#customer-reviews').reviewShare({
+            customerName: "<?php echo Mage::getSingleton('customer/session')->isLoggedIn() ? Mage::getSingleton('customer/session')->getCustomer()->getName() : $this->__('Guest'); ?>",
+            customerEmail: "<?php echo Mage::getSingleton('customer/session')->isLoggedIn() ? Mage::getSingleton('customer/session')->getCustomer()->getEmail() : null; ?>",
+            shareReviewByEmailUrl: "<?php echo Mage::getUrl('detailedreview/product/shareEmail', array('_secure' => Mage::app()->getStore()->isCurrentlySecure())); ?>",
+            defaultFailMessage: "<?php echo $this->__('Something went wrong.'); ?>",
+            currentRecipientCount: 1,
+            recipientMaxCount: "<?php echo Mage::helper('sendfriend')->getMaxRecipients(); ?>",
+            maxRecipientMessage: "<?php echo $this->__('Maximum %s email addresses allowed.', Mage::helper('sendfriend')->getMaxRecipients()); ?>"
+        });
+    });
+    //]]>
+</script>
+<?php endif; ?>

@@ -1,0 +1,126 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     rwd_default
+ * @copyright   Copyright (c) 2006-2017 X.commerce, Inc. and affiliates (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+/**
+ * Customer onepage checkout login form template
+ *
+ * @see app/design/frontend/base/default/template/checkout/onepage/login.phtml
+ */
+/** @var $this Mage_Checkout_Block_Onepage_Login */
+?>
+<?php echo $this->getChildHtml('login_before') ?>
+<div class="account-login">
+<div class="col2-set<?php if (!$this->helper('customer')->isRegistrationAllowed() && !$this->getQuote()->isAllowedGuestCheckout()) echo ' login-only' ?>">
+    
+    <div class="col-1">
+        <h3><?php echo $this->__('Sign in') ?></h3>
+        <?php echo $this->getMessagesBlock()->toHtml() ?>
+        <form id="login-form" action="<?php echo $this->getPostAction() ?>" method="post">
+        <div class="fieldset">
+            <?php echo $this->getBlockHtml('formkey'); ?>
+            <ul class="form-list">
+                <li>
+                    <div class="input-box username">
+                        <input type="email" autocapitalize="off" autocorrect="off" spellcheck="false" class="input-text required-entry validate-email" id="login-email" name="login[username]" placeholder="<?php echo $this->__('Username*') ?>" value="<?php echo $this->escapeHtml($this->getUsername()) ?>" />
+                    </div>
+                </li>
+                <li>
+                    <div class="input-box password">
+                        <input placeholder="<?php echo $this->__('Password*') ?>" type="password" class="input-text validate-password required-entry" id="login-password" name="login[password]" />
+                    </div>
+                </li>
+                <div class="submit-btn">
+                    <div class="buttons-set">
+                        <button type="submit" class="button" onclick="onepageLogin(this)"><span><span><?php echo $this->__('Login') ?></span></span></button>
+                    </div>
+                </div>
+                <li class="forgot-password">
+                    <?php echo $this->getChildHtml('persistent.remember.me'); ?>                
+                    <a href="<?php echo $this->getUrl('customer/account/forgotpassword') ?>" class="f-left"><?php echo $this->__('Forgot your password?') ?></a>
+                </li>
+                <?php echo $this->getChildHtml('form.additional.info'); ?>
+            </ul>
+            <?php echo $this->getChildHtml('persistent.remember.me.tooltip'); ?>
+            <input name="context" type="hidden" value="checkout" />
+        </div>
+        </form>
+        
+    </div>
+    <div class="col-2 new-users">
+        <div class="content">
+                        <h2><?php echo $this->__('New and Guest Customers') ?></h2>
+                        <p><?php echo $this->__('By using guest checkout, you agree to Faaya’s') ?></p>
+                        <p><a href="#"><?php echo $this->__('Terms and Conditions'); ?></a> <span><?php echo $this->__('and'); ?></span> <a href="#"><?php echo $this->__('Privacy Policy.'); ?></a></p>
+                    <div class="new-account">
+                        <ul class="form-list">
+                            <li class="control" style="visibility: hidden; opacity:0">
+                                <input type="radio" name="checkout_method" id="login:guest" value="guest" checked="checked" class="radio"><label for="login:guest"><?php echo $this->__('Continue as guest') ?></label>
+                            </li>
+                        </ul>
+                        <div class="buttons-set">
+                        <button id="onepage-guest-register-button" type="button" class="button" onclick="checkout.setMethod();"><span><span><?php echo $this->__('Continue as guest') ?></span></span></button>
+                            <?php /*<a title="<?php echo $this->quoteEscape($this->__('Create an Account')) ?>" class="button" href="<?php echo Mage::helper('persistent')->getCreateAccountUrl($this->getCreateAccountUrl()) ?>"><span><span><?php echo $this->__('Continue as guest') ?></span></span></a>*/?>
+                        </div>
+                    </div>
+                </div>
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+//<![CDATA[
+    var loginForm = new VarienForm('login-form', true);
+    $('login-email').observe('keypress', bindLoginPost);
+    $('login-password').observe('keypress', bindLoginPost);
+    function bindLoginPost(evt){
+        if (evt.keyCode == Event.KEY_RETURN) {
+            loginForm.submit();
+        }
+    }
+    function onepageLogin(button)
+    {
+        if(loginForm.validator && loginForm.validator.validate()){
+            button.disabled = true;
+            loginForm.submit();
+        }
+    }
+//]]>
+</script>
+<?php
+    $registerParam = $this->getRequest()->getParam('register');
+    if ($registerParam || $registerParam === ''):
+?>
+    <script type="text/javascript">
+    //<![CDATA[
+        document.observe("dom:loaded", function() {
+            if($('login:register')) {
+                $('login:register').checked = true;
+                checkout.setMethod();
+            }
+        })
+    //]]>
+    </script>
+<?php endif; ?>

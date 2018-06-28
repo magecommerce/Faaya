@@ -1,0 +1,55 @@
+<div class="video-section">
+    <div class="description">
+        <h2>The Faaya <strong> Diamond Proposal</strong></h2>
+        <p>With the diamond at the centre of the proposal, you
+            <br> choose the diamond first, propose with it and then see
+            <br> her express her inner faaya by choosing a setting later</p> <a class="readmore" href="#">Explore More</a></div>
+    <div class="video-block">
+        <div class="vi-video-1-container video-wrapper">
+            <div class='embed-container'>
+                <iframe class="vi-banner-video" src="https://player.vimeo.com/video/192828871" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+            </div>
+            <a class="video-control js-video-control paused" href="#"></a>
+        </div>
+    </div>
+</div>
+<script src='https://joekang.co/assets/cdn/jquery.vimeo.api.js'></script>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        var isVideoAutoplay = true;
+        //var isAuidoMuted = true;
+        if (isVideoAutoplay === false) {
+            jQuery('.vi-video-1-container').attr('data-video-is-playing', true);
+            jQuery('.vi-banner-video').vimeo('play');
+            jQuery(".video-control.js-video-control").removeClass('paused').addClass('playing');
+        }
+        else {
+            jQuery('.vi-video-1-container').attr('data-video-is-playing', false);
+            jQuery('.vi-banner-video').vimeo('pause');
+            jQuery('.video-control.js-video-control.paused').addClass("video-control-show");
+        }
+    });
+
+    function playVideo() {
+        videoStatus = jQuery(".vi-video-1-container").attr('data-video-is-playing');
+        if (videoStatus == 'true') {
+            console.log('trigger to false');
+            jQuery('.vi-banner-video').vimeo('pause');
+            jQuery(".video-control.js-video-control").removeClass('playing').addClass('paused');
+            jQuery('.vi-video-1-container').attr('data-video-is-playing', false);
+            jQuery('.video-control.js-video-control.paused').addClass("video-control-show");
+        }
+        else if (videoStatus == 'false') {
+            console.log('trigger to true');
+            jQuery('.vi-banner-video').vimeo('play');
+            jQuery(".video-control.js-video-control").removeClass('paused').addClass('playing');
+            jQuery('.vi-video-1-container').attr('data-video-is-playing', true);
+            jQuery('.video-control.js-video-control').css('opacity', '');
+            jQuery('.video-control.js-video-control.playing').removeClass("video-control-show");
+        }
+    }
+    jQuery(document).on('click', '.js-video-control', function (e) {
+        playVideo(jQuery(this));
+        e.preventDefault();
+    });
+</script>

@@ -1,0 +1,751 @@
+<?php
+$editid = $this->getRequest()->getParam('editid');
+$helper = Mage::Helper('wizard');
+$selected = $helper->getSelectedValue();
+$pid = ($selected)?$selected['productId']:0;
+$ringSelected = $helper->getRingSelected(true);
+$ringSelected['productId']=0;
+Mage::getSingleton('core/session')->setRingSelected($ringSelected);
+//$attribute =  $helper->getCustomAttrribute('RING');
+$attribute = Mage::helper('wizard')->getAllAttribute();
+$diamond = array('STONE_SHAPE'=>array('code'=>'STONE_SHAPE','title'=>'STONE_SHAPE','type'=>'OTHER'));
+
+$titleHelper =  $helper->getAlltitle();
+$moreContent = array('BAND_WIDTH','METAL_TYPE');
+
+$product = Mage::getModel('catalog/product')->load($pid);
+$variantId = ($product->getID())?$product->getSku():0;
+$stepOrder = ($pid > 0)?1:0;
+
+if($editid){
+    $productUrl = Mage::app()->getStore()->getUrl('wizard/ringdetail/index/editid/'.$editid);
+}else{
+    $productUrl = Mage::app()->getStore()->getUrl('wizard/ringdetail');
+}
+
+?>
+
+    <section class="main-content full-diamond">
+        <div class="col-left-side">
+            <div class="tabs">
+            <ul>
+                <?php foreach ($helper->stepList(1,$stepOrder,true) as $value) { ?>
+                    <li class="<?php echo $value['class'];?>">
+                    <a href="<?php echo Mage::app()->getStore()->getUrl($value['url'])?>">
+                        <span class="tab-info">
+                            <span class="title"><?php echo $value['title'];?></span>
+                                <?php if($value['text'] != ''){
+                                echo $value['text'];
+                                }?>
+                        </span>
+                    </a>
+                  </li>
+                <?php } ?>
+            </ul>
+            </div>
+            <div class="carat-details mobile">
+                <div class="products-list">
+                    <ul>
+                        <li class="item single-item">
+                            <div class="image"><img src="<?php echo Mage::getBaseUrl('media');?>wizard/single-item.png" alt=""></div>
+                            <div class="price-box">
+                                <span></span>
+                            </div>
+                            <div class="availability"></div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="step-block">
+                    <ul>
+                        <?php if($product->getID()){ ?>
+                            <li style="width:50%;"><a href="#">&nbsp;</a></li>
+                            <li style="width:50%;"><a href="#">&nbsp;</a></li>
+                        <?php }else{?>
+                            <li style="width:33.333%;"><a href="#">&nbsp;</a></li>
+                            <li style="width:33.333%;"><a href="#">&nbsp;</a></li>
+                            <li style="width:33.333%;"><a href="#">&nbsp;</a></li>
+                        <?php }?>
+
+                    </ul>
+                    <a class="diamond-icon" href="#"><img src="<?php echo Mage::getBaseUrl('media');?>wizard/diamond-icon.png" alt=""></a>
+                </div>
+            </div>
+            <div class="full-width-filters">
+                <div class="custom-options">
+                    <div class="left">
+                        <div class="attr shapes attr<?php echo $attribute['SUB_CATEGORY']['id'];?>"">
+                            <input type="hidden" class="attrid" value="<?php echo $attribute['SUB_CATEGORY']['code'];?>" >
+                            <h2>
+                                <span><?php echo $this->__('step 1 :'); ?></span>
+                                <?php echo $helper->getAttrTitle($attribute['SUB_CATEGORY'],$titleHelper);?>
+                                <div class="tooltip-options visible-xs">
+                                    <div class="tooltip-image">
+                                        <img src="<?php echo Mage::getBaseUrl('media');?>wizard/tootlp-icon.png" alt="" />
+                                    </div>
+                                    <div class="tooltip-content">
+                                        <a class="close-btn" href="javascript:void(0);"><img src="<?php echo Mage::getBaseUrl('media');?>wizard/close-icon2.png" alt=""></a>
+                                        <?php echo $helper->getTooltip($attribute['SUB_CATEGORY'],$titleHelper);?>
+                                    </div>
+                                </div>
+                            </h2>
+                            <div class="attribute">
+                                <ul>
+                                    <?php foreach ($helper->getChangeRingAttrribute($attribute['SUB_CATEGORY']['code']) as $option) { ?>
+                                    <li>
+                                        <input type="checkbox" class="checkbox" id="style-<?php echo $option?>" name="style[<?php echo $option?>]" value="<?php echo $option?>" />
+                                        <label for="style-<?php echo $option?>">
+                                        <span class="mobile"><?php echo $option;?></span>
+                                        <span class="image">
+                                            <?php echo $helper->getAttImage($attribute['SUB_CATEGORY'],str_replace(' ','_',$option),$titleHelper);?>
+                                            </span>
+                                        <span class="name"><?php echo $option;?></span>
+                                    </label>
+                                    </li>
+                                    <?php } ?>
+                                </ul>
+                            </div>
+                            <div class="step"></div>
+                            <div class="tooltip-options hidden-xs">
+                                <div class="tooltip-image">
+                                    <img src="<?php echo Mage::getBaseUrl('media');?>wizard/tootlp-icon.png" alt="" />
+                                </div>
+                                <div class="tooltip-content">
+                                    <a class="close-btn" href="javascript:void(0);"><img src="<?php echo Mage::getBaseUrl('media');?>wizard/close-icon2.png" alt=""></a>
+                                    <?php echo $helper->getTooltip($attribute['SUB_CATEGORY'],$titleHelper);?>
+                                </div>
+                            </div>
+                        </div>
+                        <?php if($pid == 0){ ?>
+                        <div class="attr color-grade attr<?php echo $diamond['STONE_SHAPE']['id'];?>">
+                            <input type="hidden" class="attrid" value="<?php echo $diamond['STONE_SHAPE']['code'];?>" >
+                            <h2>
+                                <span><?php echo $this->__('step 2 :'); ?></span>
+                                <?php echo $helper->getAttrTitle($diamond['STONE_SHAPE'],$titleHelper);?>
+                                <div class="tooltip-options visible-xs">
+                                    <div class="tooltip-image">
+                                        <img src="<?php echo Mage::getBaseUrl('media');?>wizard/tootlp-icon.png" alt="" />
+                                    </div>
+                                    <div class="tooltip-content">
+                                        <a class="close-btn" href="javascript:void(0);"><img src="<?php echo Mage::getBaseUrl('media');?>wizard/close-icon2.png" alt=""></a>
+                                        <?php echo $helper->getTooltip($diamond['STONE_SHAPE'],$titleHelper);?>
+                                    </div>
+                                </div>
+                            </h2>
+                            <div class="attribute">
+                                <ul>
+                                    <?php foreach ($helper->getChangeAttrribute($diamond['STONE_SHAPE']['code']) as $option) { ?>
+                                    <li>
+                                        <input type="checkbox" class="checkbox" id="shape-<?php echo $option?>" name="shape[<?php echo $option?>]" value="<?php echo $option?>" />
+                                        <label for="shape-<?php echo $option?>">
+                                            <span class="mobile"><?php echo $option;?></span>
+                                            <?php echo $helper->getAttImage($diamond['STONE_SHAPE'],$option,$titleHelper);?>
+                                            <span><?php echo $option;?></span>
+                                        </label>
+                                    </li>
+                                    <?php } ?>
+                                </ul>
+                            </div>
+                            <div class="step"></div>
+                            <div class="tooltip-options hidden-xs">
+                                    <div class="tooltip-image">
+                                        <img src="<?php echo Mage::getBaseUrl('media');?>wizard/tootlp-icon.png" alt="" />
+                                    </div>
+                                    <div class="tooltip-content">
+                                        <a class="close-btn" href="javascript:void(0);"><img src="<?php echo Mage::getBaseUrl('media');?>wizard/close-icon2.png" alt=""></a>
+                                        <?php echo $helper->getTooltip($diamond['STONE_SHAPE'],$titleHelper);?>
+                                    </div>
+                                </div>
+                        </div>
+                        <?php } ?>
+                        <div class="attr clarity metal-color attr<?php echo $attribute['METAL_COLOR']['id'];?>">
+                            <input type="hidden" class="attrid" value="<?php echo $attribute['METAL_COLOR']['code'];?>" >
+                            <h2><span><?php echo $this->__('step 3 :'); ?></span>
+                                <?php echo $helper->getAttrTitle($attribute['METAL_COLOR'],$titleHelper);?>
+                                <div class="tooltip-options visible-xs">
+                                    <div class="tooltip-image">
+                                        <img src="<?php echo Mage::getBaseUrl('media');?>wizard/tootlp-icon.png" alt="" />
+                                    </div>
+                                    <div class="tooltip-content">
+                                        <a class="close-btn" href="javascript:void(0);"><img src="<?php echo Mage::getBaseUrl('media');?>wizard/close-icon2.png" alt=""></a>
+                                        <?php echo $helper->getTooltip($attribute['METAL_COLOR'],$titleHelper);?>
+                                    </div>
+                                </div>
+                            </h2>
+                            <?php
+                            $metalKarat = array();
+                            foreach ($helper->getChangeRingAttrribute($attribute['KARAT']['code']) as $optionKarat) {
+                                if($optionKarat == "14K"){
+                                    $metalKarat[0] = $optionKarat;
+                                }elseif ($optionKarat == "18K") {
+                                  $metalKarat[1] = $optionKarat;
+                                }else{
+                                    $metalKarat[2] = $optionKarat;
+                                }
+                            }
+                            ksort($metalKarat);
+                            ?>
+                            <div class="attribute">
+                                <ul>
+                                    <?php foreach ($helper->getChangeRingAttrribute($attribute['METAL_COLOR']['code']) as $option) {
+                                        if($option != 'PLATINUM'){
+                                        ?>
+                                        <?php foreach ($metalKarat as $optionKarat) {
+                                                if($optionKarat == 'PLAT'){
+                                                    continue;
+                                                }
+                                            ?>
+                                                <li>
+                                                    <input type="checkbox" class="checkbox" id="color-<?php echo $option?>-<?php echo $optionKarat?>" value="<?php echo $option?>-<?php echo $optionKarat?>" />
+                                                    <label for="color-<?php echo $option?>-<?php echo $optionKarat?>">
+                                                    <span class="image"><img src="<?php echo Mage::getBaseUrl('media');?>wizard/<?php echo strtolower(str_replace(' ', '_', $option)).'_'.$optionKarat?>.png" alt="">
+                                                    <img class="device-img" src="<?php echo Mage::getBaseUrl('media');?>wizard/metal-device/<?php echo strtolower(str_replace(' ', '_', $option)).'_'.$optionKarat?>.png" alt="">
+                                                    </span>
+                                                    <span class="name"><?php echo $option;?></span>
+                                                </label>
+                                                </li>
+                                        <?php }
+                                        } ?>
+                                    <?php } ?>
+                                    <?php foreach ($helper->getChangeRingAttrribute($attribute['METAL_COLOR']['code']) as $option) {
+                                        if($option == 'PLATINUM'){
+                                        ?>
+                                        <?php foreach ($metalKarat as $optionKarat) {
+                                                if($optionKarat != 'PLAT'){
+                                                    continue;
+                                                }
+                                            ?>
+                                                <li>
+                                                    <input type="checkbox" class="checkbox" id="color-<?php echo $option?>-<?php echo $optionKarat?>" value="<?php echo $option?>-<?php echo $optionKarat?>" />
+                                                    <label for="color-<?php echo $option?>-<?php echo $optionKarat?>">
+                                                    <span class="image">
+                                                        <img src="<?php echo Mage::getBaseUrl('skin');?>frontend/faaya/faaya/css/images/platinum_PLAT.png" alt="">
+                                                        <img class="device-img" src="<?php echo Mage::getBaseUrl('media');?>wizard/metal-device/<?php echo strtolower(str_replace(' ', '_', $option)).'_'.$optionKarat?>.png" alt="">
+                                                    </span>
+                                                    <span class="name"><?php echo $option;?></span>
+                                                </label>
+                                                </li>
+                                        <?php }
+                                        }?>
+                                    <?php } ?>
+
+                                </ul>
+                            </div>
+                            <div class="step"></div>
+                            <div class="tooltip-options hidden-xs">
+                                <div class="tooltip-image">
+                                    <img src="<?php echo Mage::getBaseUrl('media');?>wizard/tootlp-icon.png" alt="" />
+                                </div>
+                                <div class="tooltip-content">
+                                    <a class="close-btn" href="javascript:void(0);"><img src="<?php echo Mage::getBaseUrl('media');?>wizard/close-icon2.png" alt=""></a>
+                                    <?php echo $helper->getTooltip($attribute['METAL_COLOR'],$titleHelper);?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="more-filters" style="display: none;">
+                        <div class="more-options">
+                            <button type="button" class="btn filter-btn">More filters</button>
+                            <div class="more-content">
+								<a class="close-btn" href="javascript:void(0);">
+                                    <img src="<?php echo Mage::getBaseUrl('media');?>wizard/close-icon2.png" alt="">
+                                </a>
+                                <div class="more-content-wrapper">
+                                <?php foreach ($moreContent as $more) { ?>
+                                    <div class="more-opt attr bandwith attr<?php echo $attribute[$more]['id'];?>">
+                                        <input type="hidden" class="attrid" value="<?php echo $attribute[$more]['code'];?>" >
+                                        <h2><?php echo $helper->getAttrTitle($attribute[$more],$titleHelper);?>
+                                            <div class="step"></div>
+                                            <div class="tooltip-options">
+                                                <div class="tooltip-image">
+                                                    <img src="<?php echo Mage::getBaseUrl('media');?>wizard/tootlp-icon.png" alt="">
+                                                </div>
+                                                <div class="tooltip-content">
+                                                    <a class="close-btn" href="javascript:void(0);"><img src="<?php echo Mage::getBaseUrl('media');?>wizard/close-icon2.png" alt=""></a>
+                                                    <?php echo $helper->getTooltip($attribute[$more],$titleHelper);?>
+                                                </div>
+                                            </div>
+
+                                        </h2>
+                                        <div class="attribute">
+                                            <ul>
+                                                <?php foreach ($helper->getChangeRingAttrribute($attribute[$more]['code']) as $option) { ?>
+                                                    <li>
+                                                        <input type="checkbox" class="checkbox" id="band-<?php echo $option?>" value="<?php echo $option?>">
+                                                        <label for="band-<?php echo $option?>">
+                                                        <span><?php echo $option;?></span>
+                                                    </label>
+                                                    </li>
+                                                <?php } ?>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                <?php } ?>
+                                <div class="more-opt attr bandwith ring-size">
+                                     <input type="hidden" class="attrid" value="<?php echo $attribute['PRODUCT_SIZE']['code'];?>" >
+                                    <h2><?php echo $helper->getAttrTitle($attribute['PRODUCT_SIZE'],$titleHelper);?>
+                                        <div class="tooltip-options">
+                                            <div class="tooltip-image">
+                                                <img src="<?php echo Mage::getBaseUrl('media');?>wizard/tootlp-icon.png" alt="">
+                                            </div>
+                                            <div class="tooltip-content">
+                                                <a class="close-btn" href="javascript:void(0);"><img src="<?php echo Mage::getBaseUrl('media');?>wizard/close-icon2.png" alt=""></a>
+                                                <h3><?php echo $helper->getAttrTitle($attribute['PRODUCT_SIZE'],$titleHelper);?></h3>
+                                                <?php echo $helper->getTooltip($attribute['PRODUCT_SIZE'],$titleHelper);?>
+                                            </div>
+                                        </div>
+                                        <div class="step selected"></div>
+                                    </h2>
+                                    <div class="ring-size">
+                                        <input type="hidden" value="4" class="price-field" id="min-ring-size">
+                                        <input type="hidden" value="9" class="price-field" id="max-ring-size">
+                                        <div class="size-slider"></div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn reset-btn" id="ring-reset"><?php echo $this->__('Reset');?></button>
+                    </div>
+                    </div>
+                    <div class="right">
+
+                </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-right-side loading-box">
+            <div class="carat-details">
+                <h2><?php echo $this->__('Well Done,');?><br><?php echo $this->__('one step closer to the perfect ring!');?></h2>
+                <div class="products-list">
+                    <ul></ul>
+                </div>
+                <div class="step-block">
+                    <ul>
+                        <?php if($product->getID()){ ?>
+                            <li style="width:50%;"><a href="#">&nbsp;</a></li>
+                            <li style="width:50%;"><a href="#">&nbsp;</a></li>
+                        <?php }else{?>
+                            <li style="width:33.333%;"><a href="#">&nbsp;</a></li>
+                            <li style="width:33.333%;"><a href="#">&nbsp;</a></li>
+                            <li style="width:33.333%;"><a href="#">&nbsp;</a></li>
+                        <?php }?>
+
+                    </ul>
+                    <a class="diamond-icon" href="#"><img src="<?php echo Mage::getBaseUrl('media');?>wizard/diamond-icon.png" alt=""></a>
+                </div>
+                <div class="product-label"><span><?php echo $this->__('Next step: ');?><?php echo $this->__('Styles');?></span></div>
+                <div class="product-message"><span></span></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="wizard-toolbar setting-grid-toolbar">
+        <div class="totalitem"></div>
+        <div class="sortby">
+            <select class="selectpicker sortbyring">
+                <option>Sort By</option>
+                <option value="price">Price</option>
+                <option value="item">item</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="top-filter-btn" style="display: none;"><button type="button" class="btn filter-btn topFilters">filters</button></div>
+    <section class="setting-grid">
+        <ul class="grid"></ul>
+    </section>
+    <input type="hidden" name="pagenumber" value="1">
+<script type="text/javascript">
+
+    var totalCount = 0;
+    var pageCount = 0;
+    var BASE_URL='<?php echo preg_replace('/(.*?)(index.php\/?)?/','\1',Mage::getBaseURL());?>';
+    var selected = <?php echo json_encode($shapeValue);?>;
+    var ringSelected = <?php echo json_encode($ringSelected);?>;
+    var variantId = <?php echo json_encode($variantId);?>;
+    var editid = '<?php echo $editid;?>';
+    if(variantId == 0){
+        var titleArr = {"SUB_CATEGORY":"Styles","STONE_SHAPE":'Shapes',"METAL_COLOR":'Metal Color'};
+    }else{
+        var titleArr = {"SUB_CATEGORY":"Styles","METAL_COLOR":'Metal Color'};
+    }
+    var productUrl ='<?php echo $productUrl;?>';
+    var media ='<?php echo Mage::getBaseUrl('media');?>';
+    var placeholderImg = '<?php echo Mage::getSingleton('catalog/product_media_config')->getBaseMediaUrl(). '/placeholder/' .Mage::getStoreConfig("catalog/placeholder/small_image_placeholder");?>';
+
+    jQuery(document).ready(function(){
+
+            settingOffset();
+
+
+            jQuery('.top-toolbar .close-icon').click(function() {
+                jQuery('.compare-content').removeClass('active');
+                jQuery('.compare-sidebar-window').removeClass('fullwidth');
+                jQuery('html').removeClass('fullwidth-window');
+            })
+            jQuery('.top-toolbar .minimize-icon').click(function() {
+                jQuery('.compare-sidebar-window').removeClass('fullwidth');
+                jQuery('html').removeClass('fullwidth-window');
+            })
+            jQuery('.top-toolbar .fullscreen-icon').click(function() {
+                jQuery('.compare-sidebar-window').removeClass('fullwidth');
+                jQuery('.compare-sidebar-window').addClass('fullwidth');
+                jQuery('html').addClass('fullwidth-window');
+
+            })
+            getCompareHtml();
+
+
+            jQuery('.compare-min-icon').click(function() {
+                jQuery(this).next().toggleClass('active')
+                 jQuery('.compare-sidebar-window').addClass('fullwidth');
+                jQuery('html').addClass('fullwidth-window');
+            })
+
+
+
+
+
+        jQuery(document).on('click', '.setting-grid .product-zoom a img', function () {
+            jQuery('.popup-main-image').slick('resize');
+            jQuery('.popup-thumb-image').slick('resize');
+        })
+        jQuery('.custom-options ul li input').click(function(){
+            loadAjaxList(0,1);
+        })
+        if(ringSelected != null && typeof(ringSelected.value) !== 'undefined'){
+            for(var i in ringSelected.value){
+                for (var k = 0; k < ringSelected.value[i].length; k++) {
+                    jQuery("input[value='"+ringSelected.value[i][k]+"']").prop( "checked", true );
+                }
+            }
+            loadAjaxList(0,1);
+        }else{
+            /*if(variantId == 0){
+                jQuery(".custom-options ul li input").eq(0).click();
+            }else{
+                loadAjaxList(0,1);
+            }*/
+            if(jQuery("#style-Solitaires").length > 0){
+                jQuery("#style-Solitaires").trigger('click');
+            }else{
+              loadAjaxList(0,1);
+            }
+        }
+        jQuery(".sortbyring").change(function(){
+            if(this.value == 'item'){
+                getSortItem('order');
+            }else{
+                getSortItem('price');
+            }
+            //console.log(this.value);
+        })
+
+        var lastScrollTop = 0;
+        jQuery(document).scroll(function(e){
+            var st = jQuery(this).scrollTop();
+            if (st > lastScrollTop){
+                var scrollAmount = jQuery(window).scrollTop();
+                var documentHeight = jQuery(document).height();
+                var scrollPercent = (scrollAmount / documentHeight) * 100;
+                var pagenumber = jQuery('input[name=pagenumber]').val();
+                var currentLength = jQuery('.setting-grid ul').find('li').length;
+                if(currentLength < parseInt(totalCount) && scrollPercent > 70 && parseInt(pagenumber) > parseInt(pageCount)) {
+                    console.log(scrollPercent);
+                    pageCount = parseInt(pagenumber);
+                       loadAjaxList(0,parseInt(pagenumber));
+                }
+            }
+            lastScrollTop = st;
+        });
+
+
+
+       var sticky = jQuery('.top-filter-btn').offset().top;
+       jQuery(window).scroll(function(){
+            if (jQuery(window).scrollTop() >= sticky) {
+               jQuery('.setting-grid').addClass('fixed-setting-grid');
+            }
+            else {
+               jQuery('.setting-grid').removeClass('fixed-setting-grid');
+            }
+        });
+
+       if (jQuery('.top-filter-btn').length) {
+            var scrollTrigger = sticky, // px
+                backToTop = function () {
+                    var scrollTop = jQuery(window).scrollTop();
+                    if (scrollTop > scrollTrigger) {
+                        jQuery('.topFilters').addClass('show');
+                        jQuery('.top-filter-btn').addClass('active');
+                    } else {
+                        jQuery('.topFilters').removeClass('show');
+                        jQuery('.top-filter-btn').removeClass('active');
+                    }
+                };
+            backToTop();
+            jQuery(window).on('scroll', function () {
+                backToTop();
+            });
+            jQuery('.topFilters').on('click', function (e) {
+                e.preventDefault();
+                jQuery('html,body').animate({
+                    scrollTop: 0
+                }, 200);
+            });
+        }
+
+    })
+
+     jQuery(window).resize(function(){
+        settingOffset();
+     });
+
+      function settingOffset(){
+        var settingOffset = jQuery('.setting-grid').offset().top
+        jQuery('.compare-sidebar-window').css({'top':settingOffset - 50});
+    }
+
+
+    function loadAjaxList(pid,page){
+        if(page == 1){
+            jQuery(".col-right-side").addClass('loading-box');
+        }
+        jQuery(".setting-grid").addClass('loading-more');
+        var postAr = {};
+        var moreopt = 0;
+            var shapeValue = '';
+            var ringValueId = '';
+            jQuery(".custom-options .attr").each(function( index ) {
+                var aValue = jQuery(this).closest('div.attr').find('input').eq(0).val();
+                var attrClass =  jQuery(this).attr('class');
+                if(jQuery.inArray( "diamondshape", attrClass.split(" ")) >= 0){
+                    shapeValue = aValue;
+                }
+                if(jQuery.inArray( "ring-size", attrClass.split(" ")) >= 0){
+                    var ringMinMax = jQuery(this).find('#min-ring-size').val()+'_'+jQuery(this).find('#max-ring-size').val();
+                    var values = [ringMinMax];
+                    ringValueId = aValue;
+                }else{
+                    var values = jQuery(this).closest('div.attr').find('ul li input:visible:checkbox:checked').map(function () {
+                        return this.value;
+                    }).get();
+                }
+                console.log(values);
+
+
+                if(values.length){
+                    postAr[aValue] = values;
+                    jQuery(this).find('.step').addClass('selected');
+                }else{
+                    jQuery(this).find('.step').removeClass('selected');
+                }
+
+                if(jQuery.inArray( "more-opt", attrClass.split(" ")) >= 0){
+                    if((aValue in postAr)){
+                        moreopt++;
+                    }
+                }
+            });
+
+
+            var titleKey = Object.keys(titleArr);
+            var blankValue = {};
+            var selectedIndex = 0;
+            for (var i = 0; i < titleKey.length; i++) {
+                if(titleKey[i] in postAr){
+                    selectedIndex = i;
+                }else{
+                    blankValue[i] = titleArr[titleKey[i]];
+                }
+            }
+            var setTitle = '';
+            if(Object.keys(blankValue).length > 0 && Object.keys(blankValue).length < titleKey.length){
+                if(selectedIndex >= 0 && selectedIndex < titleKey.length){
+                    if((selectedIndex+1) < titleKey.length){
+                        var setFrom = (selectedIndex+1);
+                    }else{
+                        var setFrom = 0;
+                    }
+                    for (var i = setFrom; i < titleKey.length; i++) {
+                        if(i in blankValue){
+                            setTitle = blankValue[i];
+                            break;
+                        }
+                    }
+                }else{
+                    setTitle = blankValue[0];
+                }
+            }else{
+                if(Object.keys(blankValue).length > 0){
+                    setTitle = blankValue[0];
+                }
+            }
+            if(setTitle != ''){
+                jQuery('.product-label span').text('Next step: '+setTitle);
+            }else{
+                jQuery('.product-label span').text('Choose Style from list');
+            }
+
+
+            console.log(postAr);
+            jQuery('.step-block ul li:visible').removeClass('active');
+            for (var i = 0; i < (Object.keys(postAr).length) - moreopt; i++) {
+                 jQuery('.step-block ul li:visible').eq(i).addClass('active');
+             }
+
+
+            jQuery.ajax({
+                url: BASE_URL+"wizard/index/ringselection",
+                type: "POST",
+                data: { value: postAr,shapeValue:shapeValue,productId:pid,variantId:variantId,ringValueId:ringValueId,page:page,editid:editid},
+                success: function(redata){
+                    redata = JSON.parse(redata);
+                    console.log(redata);
+                    if(pid > 0){
+                        window.location = productUrl;
+                    }else{
+                        var newPage = page+1;
+                        $html = '';
+                        jQuery.each(redata.product,function(index,item){
+                            $html += '<li class="item" data-order="'+item.pid+'" data-price="'+item.sortprice+'"><div class="title-block"><h2 class="title"><a href="javascript:loadAjaxList('+item.pid+')">'+item.variant_remark+'</a></h2><a class="compare-icon '+item.comparecls+'" data-compare="compare-'+item.pid+'" href="javascript:compareProduct('+item.pid+')"></a></div><div class="product-image"><a href="javascript:loadAjaxList('+item.pid+')"><img src="'+item.image+'" alt=""></a></div><div class="product-zoom"><a data-fancybox data-type="ajax" data-src="'+BASE_URL+'popuphtml/ringpopup.php?pid='+item.pid+'" href="javascript:;"><img src="'+media+'wizard/zoom-icon.png" alt=""></a></div><div class="product-info"><div class="price-box"><span class="price"><span class="price">'+item.price+'</span></span></div></div><a class="compare-icon mobile" href="javascript:void(0);"></a></li>';
+                        });
+                        if(page == 1){
+                            dataCount = redata.count;
+                            jQuery(".products-list .price-box span").html(redata.price);
+                            jQuery(".availability").html(redata.count+' styles available');
+                            jQuery(".setting-grid ul").html($html);
+                            totalCount = redata.count;
+                            pageCount = 1;
+
+                            if(redata.count == 0){
+                                jQuery('.product-message span').text('no styles available');
+                            }
+                        //jQuery(".setting-grid .loadmore").html('<a href="javascript:loadAjaxList(0,'+newPage+')">Loadmore</a>');
+                            jQuery('input[name=pagenumber]').val(parseInt(page)+1);
+                            jQuery(".products-list ul:visible").html(redata.option);
+                        }else{
+                            jQuery('.setting-grid ul').find('li.item').last().after($html);
+                            //jQuery(".setting-grid .loadmore").html('<a href="javascript:loadAjaxList(0,'+newPage+')">Loadmore</a>');
+                            jQuery('input[name=pagenumber]').val(parseInt(page)+1);
+                        }
+
+                    }
+
+                    setTimeout(function(){
+                        itemEquealHeight();
+                    }, 500);
+                    jQuery(".totalitem").text(jQuery('.setting-grid ul').find('li.item').length+ ' items');
+                    jQuery(".col-right-side").removeClass('loading-box');
+                    jQuery(".setting-grid").removeClass('loading-more');
+
+                },error: function(xhr){
+                    redata = JSON.parse(xhr.responseText);
+                    if(pid > 0){
+                        window.location = productUrl;
+                    }else{
+                        var newPage = page+1;
+                        $html = '';
+                        jQuery.each(redata.product,function(index,item){
+                            $html += '<li class="item" data-order="'+item.pid+'" data-price="'+item.sortprice+'"><div class="title-block"><h2 class="title"><a href="javascript:loadAjaxList('+item.pid+')">'+item.variant_remark+'</a></h2><a class="compare-icon '+item.comparecls+'" data-compare="compare-'+item.pid+'" href="javascript:compareProduct('+item.pid+')"></a></div><div class="product-image"><a href="javascript:loadAjaxList('+item.pid+')"><img src="'+item.image+'" alt=""></a></div><div class="product-zoom"><a data-fancybox data-type="ajax" data-src="'+BASE_URL+'popuphtml/ringpopup.php?pid='+item.pid+'" href="javascript:;"><img src="'+media+'wizard/zoom-icon.png" alt=""></a></div><div class="product-info"><div class="price-box"><span class="price"><span class="price">'+item.price+'</span></span></div></div><a class="compare-icon mobile" href="javascript:void(0);"></a></li>';
+                        });
+                        if(page == 1){
+                            dataCount = redata.count;
+                            jQuery(".products-list .price-box span").html(redata.price);
+                            jQuery(".availability").html(redata.count+' styles available');
+                            jQuery(".setting-grid ul").html($html);
+                            jQuery(".products-list ul:visible").html(redata.option);
+                            totalCount = redata.count;
+                            pageCount = 1;
+                            if(redata.count == 0){
+                                jQuery('.product-message span').text('no styles available');
+                            }
+                            jQuery('input[name=pagenumber]').val(parseInt(page)+1);
+                        }else{
+                            jQuery('.setting-grid ul').find('li.item').last().after($html);
+                            jQuery('input[name=pagenumber]').val(parseInt(page)+1);
+                        }
+
+                    }
+                    setTimeout(function(){
+                        itemEquealHeight();
+                    }, 500);
+                    jQuery(".totalitem").text(jQuery('.setting-grid ul').find('li.item').length+ ' items');
+                    jQuery(".col-right-side").removeClass('loading-box');
+                    jQuery(".setting-grid").removeClass('loading-more');
+                }
+            });
+    }
+
+    function getSortItem(attrName) {
+        var items = jQuery('.setting-grid ul li');
+        items.sort(function(a, b){
+            return +jQuery(a).data(attrName) - +jQuery(b).data(attrName);
+        });
+        items.appendTo('.setting-grid ul');
+    }
+
+    function compareProduct(pid){
+        jQuery.ajax({
+            url: BASE_URL+"wizard/index/compareproduct",
+            type: "POST",
+            data: {pid:pid},
+                success: function(redata){
+                    redata = JSON.parse(redata);
+                    getCompareHtml();
+                    jQuery(".setting-grid").find("[data-compare=compare-" + redata.pid + "]").addClass('added-to-compare');
+                }
+        })
+    }
+    function blankHtml() {
+        var blank = jQuery('.more-content').html();
+        blank = jQuery.trim(blank);
+        if(blank == ''){
+            jQuery('.compare-min-icon').addClass('blank');
+        } else {
+            jQuery('.compare-min-icon').removeClass('blank');
+        }
+    }
+
+
+    function getCompareHtml(){
+        jQuery('.compare-min-icon').addClass('loading');
+        jQuery.get( BASE_URL+"wizard/compare", function( data ) {
+          jQuery( ".more-content" ).html( data );
+          jQuery('.compare-min-icon').removeClass('loading');
+          blankHtml();
+        });
+    }
+    function removeItem(url) {
+        new Ajax.Request(url, {
+            parameters: {
+                isAjax: 1
+                , method: 'POST'
+            }
+            , onLoading: function () {
+                jQuery('.compare-window').addClass('loading');
+            }
+            , onSuccess: function (transport) {
+                getCompareHtml();
+                jQuery('.compare-window').removeClass('loading');
+            }
+        });
+    }
+
+</script>
+<div class="compare-sidebar-window">
+    <div class="compare-min-icon">
+        <a href="javascript:void(0);"><img src="<?php echo $this->getSkinUrl('images/compare-sidebar-icon.gif'); ?>" alt="" /></a>
+    </div>
+    <div class="compare-content">
+        <div class="top-toolbar">
+            <a class="close-icon" href="javascript:void(0);"><img src="<?php echo $this->getSkinUrl('images/close-icon1.png'); ?>" width="19" alt=""></a>
+            <a class="minimize-icon" href="javascript:void(0);"><img src="<?php echo $this->getSkinUrl('images/minimize-icon.png'); ?>" alt=""></a>
+            <a class="fullscreen-icon" href="javascript:void(0);"><img src="<?php echo $this->getSkinUrl('images/fullscreen-icon.png'); ?>" alt=""></a>
+        </div>
+        <div class="more-content">
+
+        </div>
+
+    </div>
+</div>

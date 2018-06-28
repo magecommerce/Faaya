@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+  <modules>
+    <Cda_Customproductlist>
+      <active>true</active>
+      <codePool>local</codePool>
+    </Cda_Customproductlist>
+  </modules>
+</config>

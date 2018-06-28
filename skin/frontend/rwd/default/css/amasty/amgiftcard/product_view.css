@@ -1,0 +1,26 @@
+.amgiftcard-image {
+    width: 96px;
+    /*height: 96px;*/
+    float: left;
+    padding: 3px;
+}
+
+.amgiftcard-image:hover {
+    width: 98px;
+    /*height: 98px;*/
+    float: left;
+    padding: 2px;
+    -moz-box-shadow: 0 0 10px #ccc;
+    -webkit-box-shadow: 0 0 10px #ccc;
+}
+
+.amgiftcard-image.selected {
+    width: 104px;
+    /*height: 104px;*/
+    float: left;
+    padding: 2px;
+}
+
+.input-box img {
+    display: inline;
+}

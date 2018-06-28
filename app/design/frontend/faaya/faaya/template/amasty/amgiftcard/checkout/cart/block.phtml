@@ -1,0 +1,66 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @package Amasty_GiftCard
+ */
+?>
+<?php
+if(Mage::helper('amgiftcard')->isEnableGiftFormInCart()):
+?>
+<form id="amgiftcard-form" action="<?php echo $this->getFormActionUrl() ?>" method="post">
+	<div class="discount">
+		<div id="amgiftcard_info"></div>
+		<h2><?php echo $this->__('Gift Cards') ?></h2>
+		<div class="discount-form">
+			<div class="field-wrapper">
+				<input class="input-text" type="text" id="am_giftcard_code" name="am_giftcard_code" value="" placeholder="<?php echo $this->__('Enter Gift Cards Code') ?>" />
+				<div class="button-wrapper">
+					<button type="button" title="<?php echo $this->__('Add Gift Card') ?>" class="button2" onclick="amgiftcardForm.submit()" value="<?php echo $this->__('Add Gift Card') ?>">
+						<span>
+							<span><?php echo $this->__('Add Gift Card') ?></span>
+						</span>
+					</button>
+				 	<button type="button" onclick="amCheckGiftCard();" title="<?php echo $this->__('Check Gift Card status') ?>" class="button2 cancel-coupon" value="<?php echo $this->__('Check Gift Card status') ?>">
+						<span>
+							<span><?php echo $this->__('Check Gift Card status') ?></span>
+						</span>
+					</button>
+				</div>
+				<span id="span_message_please_wait" class="please-wait" style="display:none;">
+					<img src="<?php echo $this->getSkinUrl('images/opc-ajax-loader.gif') ?>" class="v-middle" /> <?php echo $this->__('Please wait, loading...') ?>
+				</span>
+			</div>
+		</div>
+	</div>
+</form>
+
+<script type="text/javascript">
+	//<![CDATA[
+	var amgiftcardForm = new VarienForm('amgiftcard-form');
+	function amCheckGiftCard()
+	{
+		if (amgiftcardForm.validator && !amgiftcardForm.validator.validate()) {
+			return false;
+		}
+		$('am_giftcard_code').value = $('am_giftcard_code').value.trim();
+		new Ajax.Updater(
+			'amgiftcard_info',
+			'<?php echo $this->getCheckCardAjaxUrl() ?>',
+			{
+				onCreate: function() {
+					$('span_message_please_wait').show();
+				},
+				onComplete: function() {
+					$('span_message_please_wait').hide();
+				},
+				parameters : {
+					code : $('am_giftcard_code').value
+				}
+			}
+		);
+	}
+	//]]>
+</script>
+
+<?php endif;?>

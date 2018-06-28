@@ -1,0 +1,71 @@
+<?php 
+/*$attributeCode = 'metal_clor';
+
+$product = Mage::getModel('catalog/product');
+
+$productCollection = Mage::getResourceModel('eav/entity_attribute_collection')
+   ->setEntityTypeFilter($product->getResource()->getTypeId())
+   ->addFieldToFilter('attribute_code', $attributeCode);
+
+$attribute = $productCollection->getFirstItem()->setEntity($product->getResource());
+print_r($attribute->getData()); // print out the available attributes
+
+$options = $attribute->getSource()->getAllOptions(false);
+print_r($options);*/
+$ringAttribute = array('metal_color','chain_length','chain_type','karat','sub_category'); ?>
+<div class="block block-layered-nav block-layered-nav--no-filters">
+    <div class="block-content toggle-content">
+        <div id="narrow-by-list">
+        <?php foreach($ringAttribute as $attr){
+            $options = Mage::getBlockSingleton('layernavigation/layernavigation')->getAttributeOption($attr); ?>
+            <div class="filter-options <?php echo $attr;?>">
+              <div class="filter-label">
+                <?php echo $this->__(str_replace("_",' ',$attr));?>
+              </div>
+              <div class="list">
+                  <?php if ($options){ ?>
+                      <a class="selectAll" href="javascript:void(0)">Show all</a>
+                      <ol>
+                        <?php foreach($options as $option){ ?>
+                          <li data-value="<?php echo $option["value"];?>" >                           
+                             <input type="checkbox" name="<?php echo $attr;?>" id="<?php echo $option["value"];?>" value="<?php echo $option["value"];?>" class="shopby-attr" data-attname="<?php echo $attr;?>" data-id="<?php echo $option["value"];?>"/>
+                             <label for="<?php echo $option["value"];?>">
+                                <!-- <div class="attr-img">
+                                  <img src="<?php echo $this->getSkinUrl('images/metal-1.png'); ?>" alt="">
+                                </div> -->
+                                <span><?php echo $option["label"];?></span>
+                             </label>
+                          </li>
+                        <?php }?>
+                      </ol>
+                  <?php } ?>
+              </div>
+            </div>
+        <?php } ?>
+        <div class="filter-options sort-by">
+          <div class="filter-label">
+            <?php echo $this->__('Sort by');?>
+          </div>
+          <div class="list">
+             <ol>
+               <li><a href="http://developmentbox.online/faaya/jewelry/ring.html?dir=asc&amp;order=name">Name(Ascending Direction)</a></li>
+               <li><a href="http://developmentbox.online/faaya/jewelry/ring.html?dir=desc&amp;order=name">Name(Descending Direction)</a></li>
+               <li><a href="http://developmentbox.online/faaya/jewelry/ring.html?dir=asc&amp;order=bestseller">Best Sellers</a></li>
+             </ol>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery(".filter-options .filter-label").click(function () {
+      jQuery(this).toggleClass('active');
+      jQuery('.hidden').hide();
+      jQuery(this).next().toggle();
+      equelItems();
+    });
+});
+</script>

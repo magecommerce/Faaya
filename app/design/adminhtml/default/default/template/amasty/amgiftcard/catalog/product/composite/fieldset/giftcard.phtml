@@ -1,0 +1,290 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @package Amasty_GiftCard
+ */
+?>
+<?php /* @var $this Amasty_GiftCard_Block_Adminhtml_Catalog_Product_Composite_Fieldset_Giftcard */?>
+<?php /* @var $_helper Amasty_GiftCard_Helper_Data */?>
+<?php /* @var $_helperCore Mage_Core_Helper_Data */?>
+<?php $_helper = Mage::helper('amgiftcard');?>
+<?php $_helperCore = Mage::helper('core');?>
+<?php $_product = $this->getProduct(); ?>
+<?php $_storeId = $_product->getStoreId(); ?>
+<?php $_skipSaleableCheck = Mage::helper('catalog/product')->getSkipSaleableCheck(); ?>
+<?php $_currencyShortName = Mage::app()->getLocale()->currency(Mage::app()->getStore($_storeId)->getCurrentCurrencyCode())->getShortName();?>
+<script>
+//<![CDATA[
+productConfigure.giftcardConfig = {};
+//]]>
+</script>
+<div id="catalog_product_composite_configure_fields_downloadable" class="amgiftcard-form <?php echo $this->getIsLastFieldset() ? 'last-fieldset' : '' ?>">
+
+	<?php if (!$_product->isAvailable() && !$_skipSaleableCheck): ?>
+		<p class="availability out-of-stock"><?php echo $this->helper('catalog')->__('Availability:') ?> <span><?php echo $this->helper('catalog')->__('Out of stock') ?></span></p>
+	<?php endif; ?>
+
+	<div class="product-options">
+		<?php if (($_product->isSaleable() || $_skipSaleableCheck) && $this->isConfigured($_product)): ?>
+			<?php if(!$this->isMultiAmount()): ?>
+				<?php $_amount = $this->getListAmounts($_product); $_amount = array_shift($_amount); ?>
+				<label><?php echo $this->__('Amount'); ?></label>
+				<div class="input-box">
+					<span class="regular-price">
+						<span class="price" id="product-price-<?php echo $_product->getId(); ?><?php echo $this->getIdSuffix() ?>">
+							<?php echo Mage::helper('core')->currencyByStore($_amount, $_storeId, true, false); ?>
+						</span>
+					</span>
+				</div>
+
+			<?php else: ?>
+				<script>
+					function changeAmount(event)
+					{
+						var value = event.element().value;
+						if(value == "custom" || value == "") {
+							return;
+						}
+						var productPriceElem = $('min-product-price-<?php echo $_product->getId(); ?>');
+						var productPriceElemClone = $('min-product-price-<?php echo $_product->getId(); ?>_clone');
+						var percentPrice = <?php echo $this->getPricePercent();?>;
+						var value = parseFloat(parseAmount(value)) * percentPrice / 100;
+						productPriceElem.innerHTML = optionsPrice.formatPrice(value);
+						productPriceElemClone.innerHTML = optionsPrice.formatPrice(value);
+					}
+
+					function parseAmount(value) {
+						value = value.replace('\'', '').replace(' ', '').replace(/,/g, '.');
+						countDots = (value.split('.').length - 1);
+						for(var i= 1; i<countDots; i++) {
+							value.replace('.', '');
+						}
+
+						return parseFloat(value);
+					}
+				</script>
+
+				<div class="amgiftcard-amount-form">
+					<dl>
+							<div class="field">
+								<dt><label class="required" for="amgiftcard_amount"><em>*</em><?php echo $_helper->__('Card Value in %s', $_currencyShortName); ?></label></dt>
+
+
+								<?php if($this->isPredefinedAmount()): ?>
+									<dd><div class="input-box">
+										<select id="am_giftcard_amount" name="am_giftcard_amount" class="required-entry">
+											<option value=""><?php echo $_helper->__('Choose an Amount...'); ?></option>
+											<?php foreach($this->getListAmounts() as $_amount):?>
+												<option value="<?php echo $_amount;?>"><?php echo $_helperCore->currency($_amount, true, false);?></option>
+											<?php endforeach; ?>
+											<?php if($_product->getAmAllowOpenAmount()): ?>
+												<option value="custom"><?php echo $_helper->__('Custom Amount'); ?></option>
+											<?php endif; ?>
+										</select>
+									</div></dd>
+
+									<?php if($_product->getAmAllowOpenAmount()): ?>
+										<script>
+											$('am_giftcard_amount').observe('change', function(event){
+												//changeAmount(event);
+												var elem = event.element();
+												if(elem.value == "custom") {
+													$('amgiftcard_amount_custom_block').show();
+												} else {
+													$('amgiftcard_amount_custom_block').hide();
+												}
+											});
+										</script>
+									<?php endif; ?>
+								<?php endif; ?>
+							</div>
+
+							<?php if($_product->getAmAllowOpenAmount()): ?>
+								<dd><div class="input-box" id="amgiftcard_amount_custom_block" style="display: <?php if($this->isPredefinedAmount()): ?>none<?php endif;?>">
+									<span class="v-fix">
+										<input id="am_giftcard_amount_custom" name="am_giftcard_amount_custom" class="validate-number required-entry input-text amgiftcard-min-amount amgiftcard-max-amount" value="" type="text">
+									</span>
+									<?php if($_product->getAmOpenAmountMin() || $_product->getAmOpenAmountMax()): ?>
+										<p class="notice">
+											<?php $_min = $_helperCore->currency($_product->getAmOpenAmountMin(), true, false); ?>
+											<?php $_max = $_helperCore->currency($_product->getAmOpenAmountMax(), true, false); ?>
+											<?php if($_product->getAmOpenAmountMin()): ?>
+												<span><?php echo $_helper->__('Minimum: %s', $_min); ?></span>
+											<?php endif; ?>
+
+											<?php if($_product->getAmOpenAmountMax()): ?>
+												<span><?php echo $_helper->__('Maximum: %s', $_max); ?></span>
+											<?php endif; ?>
+										</p>
+
+										<script type="text/javascript">
+											minAllowedAmount = <?php echo $_helperCore->currency($_product->getAmOpenAmountMin(), false, false) ?>;
+											maxAllowedAmount = <?php echo $_helperCore->currency($_product->getAmOpenAmountMax(), false, false) ?>;
+											Validation.add(
+												'amgiftcard-min-amount',
+												'<?php echo Mage::helper('amgiftcard')->__('Entered amount is too low'); ?>',
+												function(v) {
+													return (parseAmount(v) >= minAllowedAmount);
+												}
+											);
+											Validation.add(
+												'amgiftcard-max-amount',
+												'<?php echo Mage::helper('amgiftcard')->__('Entered amount is too high'); ?>',
+												function(v) {
+													if (maxAllowedAmount == 0) {
+														return true;
+													}
+													return (parseAmount(v) <= maxAllowedAmount);
+												}
+											);
+
+											//$('am_giftcard_amount_custom').observe('change', changeAmount);
+										</script>
+									<?php endif; ?>
+								</div>
+								</dd>
+							<?php endif; ?>
+					</dl>
+				</div>
+			<?php endif; ?>
+
+			<?php echo $this->getChildHtml('product.composite.giftcard.qty') ?>
+
+
+			<?php if($_product->getAmGiftcardType() == Amasty_GiftCard_Model_GiftCard::TYPE_COMBINED): ?>
+				<div class="amgiftcard-send-form">
+					<dl>
+
+							<dt><label for="am_giftcard_type" class="required"><em>*</em><?php echo $_helper->__('Choose card type'); ?></label></dt>
+								<dd><div class="input-box">
+									<select id="am_giftcard_type" name="am_giftcard_type" class="required-entry">
+										<option value=""><?php echo $_helper->__('-- Please Select --'); ?></option>
+										<?php foreach($this->getListCardTypes() as $_cardType):?>
+											<option value="<?php echo $_cardType['value'];?>"><?php echo $_cardType['label'];?></option>
+										<?php endforeach; ?>
+									</select>
+									<p class="note am-giftcard-delivery-info" style="display: none">
+										<?php echo $_helper->__('Please be aware that printed gift card will be sent to the shipping address you specify during checkout.'); ?>
+									</p>
+								</div></dd>
+								<script>
+									var listShowHideElementsWithType = null;
+									$('am_giftcard_type').observe('change', function(event){
+										listShowHideElementsWithType = listShowHideElementsWithType || $$('.am-giftcard-delivery-info');
+										var elem = event.element();
+										if(elem.value == "<?php echo Amasty_GiftCard_Model_GiftCard::TYPE_COMBINED?>" || elem.value == "<?php echo Amasty_GiftCard_Model_GiftCard::TYPE_PRINTED?>") {
+											for(var i=0; i<listShowHideElementsWithType.length; i++) {
+												listShowHideElementsWithType[i].show();
+											}
+										} else {
+											for(var i=0; i<listShowHideElementsWithType.length; i++) {
+												listShowHideElementsWithType[i].hide();
+											}
+										}
+									});
+								</script>
+					</dl>
+				</div>
+			<?php endif; ?>
+
+
+
+			<?php if($_images = $this->getImages()):?>
+				<dl><dt><label for="am_giftcard_image" class="required"><em>*</em><?php echo $_helper->__('Choose card Image'); ?></label></dt>
+						<dd><div class="input-box">
+							<input type="hidden" id="am_giftcard_image" name="am_giftcard_image" class="required-entry "/>
+							<?php foreach($_images as $_image): ?>
+								<img class="amgiftcard-image" data-id="<?php echo $_image->getId()?>" src="<?php echo $_image->getThumbUrl()?>"/>
+							<?php endforeach; ?>
+						</div></dd></dl>
+				<script>
+					var images = $$('.amgiftcard-image');
+					var image_id_field = $('am_giftcard_image');
+					for(var i=0; i<images.length; i++)
+					{
+						$(images[i]).observe('click', function(event){
+							amRemoveClassNames();
+							var elem = event.element();
+							Element.addClassName(elem, 'selected');
+							image_id_field.value = elem.getAttribute('data-id');
+						});
+
+					}
+
+					function amRemoveClassNames()
+					{
+						image_id_field.value = '';
+						for(var i=0; i<images.length; i++)
+						{
+							Element.removeClassName(images[i], 'selected');
+
+						}
+					}
+				</script>
+			<?php endif; ?>
+			<dl>
+				<dt>
+					<label for="am_giftcard_sender_name" class="required"><em>*</em><?php echo $_helper->__('Sender Name'); ?></label>
+				</dt>
+				<dd>
+					<div class="input-box">
+						<input type="text" id="am_giftcard_sender_name" name="am_giftcard_sender_name" class="required-entry input-text" value="<?php echo $this->getCustomerName(); ?>" />
+					</div>
+				</dd>
+
+				<dt><label for="am_giftcard_sender_email" class="required"><em>*</em><?php echo $_helper->__('Sender Email'); ?></label></dt>
+				<dd><input type="text" id="am_giftcard_sender_email" name="am_giftcard_sender_email" class="validate-email required-entry input-text" value="<?php echo $this->getCustomerEmail(); ?>"/></dd>
+
+				<dt><label for="am_giftcard_recipient_name" class="required"><em>*</em><?php echo $_helper->__('Recipient Name'); ?></label></dt>
+				<dd><div class="input-box">
+						<input type="text" id="am_giftcard_recipient_name" name="am_giftcard_recipient_name" class="required-entry input-text" value="" />
+					</div></dd>
+
+				<dt><label for="am_giftcard_recipient_email" class="required"><em>*</em><?php echo $_helper->__('Recipient Email'); ?></label>
+				</dt>
+				<dd><div class="input-box">
+						<input type="text" id="am_giftcard_recipient_email" name="am_giftcard_recipient_email" class="validate-email required-entry input-text" value="" />
+					</div></dd>
+
+
+				<?php if(Mage::getStoreConfig('amgiftcard/card/choose_delivery_date')): ?>
+				<dt><label for="am_giftcard_date_delivery" class="required"><em>*</em><?php echo $_helper->__('Date of certificate delivery'); ?></label></dt>
+				<dd><div class="input-box">
+
+						<input name="am_giftcard_date_delivery" id="am_giftcard_date_delivery" value="" class="required-entry product-custom-option datetime-picker input-text validate-date" type="text">
+						<img src="<?php echo $this->getSkinUrl('images/grid-cal.gif');?>" alt="Select Date" class="v-middle" title="Select Date" id="am_giftcard_date_delivery_trig">
+
+
+						<p class="note am-giftcard-delivery-info" style="display:none;">
+							<?php echo $_helper->__('Please be aware that delivery date of printed certificates may be different due to post.'); ?>
+						</p>
+
+						<script type="text/javascript">
+							//<![CDATA[
+							var calendarSetupObject = {
+								inputField  : "am_giftcard_date_delivery",
+								ifFormat    : "%m/%e/%Y",
+								showsTime   : false,
+								button      : "am_giftcard_date_delivery_trig",
+								align       : "Bl",
+								singleClick : true
+							}
+							Calendar.setup(calendarSetupObject);
+							//]]>
+						</script>
+					</div></dd>
+				<?php endif; ?>
+
+
+				<?php if ($this->isMessageAvailable($_product)): ?>
+				<dt><label for="am_giftcard_message"><?php echo $_helper->__('Message'); ?></label></dt>
+				<dd><div class="input-box">
+						<textarea name="am_giftcard_message" id="am_giftcard_message" class="input-text" cols="5" rows="3"></textarea>
+					</div></dd>
+
+				<?php endif;?>
+			</dl>
+		<?php endif; ?>
+	</div>
+</div>

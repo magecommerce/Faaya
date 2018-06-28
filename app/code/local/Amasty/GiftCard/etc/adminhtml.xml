@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @package Amasty_GiftCard
+ */
+-->
+<config>
+    <menu>
+        <customer>
+            <children>
+                <amgiftcard translate="title" module="amgiftcard">
+                    <title>Gift Cards</title>
+                    <sort_order>120</sort_order>
+                    <children>
+                        <amgiftcard translate="title" module="amgiftcard">
+                            <title>Gift Card Codes</title>
+                            <sort_order>10</sort_order>
+                            <action>adminhtml/amgiftcard/codes</action>
+                        </amgiftcard>
+                        <amgiftcard2 translate="title" module="amgiftcard">
+                            <title>Gift Code Accounts</title>
+                            <sort_order>20</sort_order>
+                            <action>adminhtml/amgiftcardacc/</action>
+                        </amgiftcard2>
+                        <amgiftcard3 translate="title" module="amgiftcard">
+                            <title>Gift Card Images</title>
+                            <sort_order>30</sort_order>
+                            <action>adminhtml/amgiftcardimg/</action>
+                        </amgiftcard3>
+                    </children>
+                </amgiftcard>
+            </children>
+        </customer>
+    </menu>
+    <acl>
+        <resources>
+            <all>
+                <title>Allow Everything</title>
+            </all>
+            <admin>
+                <children>
+                    <customer>
+                        <children>
+                            <amgiftcard translate="title" module="amgiftcard">
+                                <title>Gift Cards</title>
+                                <children>
+                                    <amgiftcard translate="title" module="amgiftcard">
+                                        <title>Gift Card Codes</title>
+                                    </amgiftcard>
+                                    <amgiftcard2 translate="title" module="amgiftcard">
+                                        <title>Gift Code Accounts</title>
+                                    </amgiftcard2>
+                                    <amgiftcard3 translate="title" module="amgiftcard">
+                                        <title>Gift Card Images</title>
+                                    </amgiftcard3>
+                                </children>
+                            </amgiftcard>
+                        </children>
+                    </customer>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <amgiftcard translate="title" module="amgiftcard">
+                                        <title>Gift Card Section</title>
+                                    </amgiftcard>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                 </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

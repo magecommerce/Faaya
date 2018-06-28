@@ -1,0 +1,232 @@
+<?php
+class Faaya_Layernavigation_Block_Layernavigation extends Mage_Catalog_Block_Product_List{   
+    public function getAttributeOption($attribute){
+        $attributeOption = array();
+        $attribute = Mage::getSingleton('eav/config')->getAttribute('catalog_product', $attribute); 
+        if ($attribute->usesSource()) {
+            $options = $attribute->getSource()->getAllOptions(false);
+            foreach($options as $option) {
+                $attributeOption[] = $option;
+            }
+        }
+        return $attributeOption;
+    }
+    public function getLoadedProductCollection($categoryId = null){        
+        $limit = 5;  
+        $_productCollection = array();        
+        $collection = array(); 
+        $totalRec = $getminPrice = $getmaxPrice = 0;       
+        $getupperLimit = (int)$this->getRequest()->getParam('limit'); 
+        $getCategoryId = (int)$this->getRequest()->getParam('categotyId');
+        $orderBy = "created_at";
+        $sortBy = "desc";
+        $getOrderBy = $this->getRequest()->getParam('orderby');
+        $getSortBy = $this->getRequest()->getParam('sortby');
+        $minPrice = $this->getRequest()->getParam('minPrice');
+        $maxPrice = $this->getRequest()->getParam('maxPrice');
+        $orderBy = ($getOrderBy)?$getOrderBy:$orderBy;
+        $sortBy = ($getSortBy)?$getSortBy:$sortBy;
+        $sort = $this->getRequest()->getParam('sort'); 
+        //echo "sort" . $sort;
+        if($getCategoryId){
+           $categoryId = $getCategoryId;
+        }
+        $upperLimit  = $limit * $getupperLimit;
+        $lowerLimit = $upperLimit -  $limit;  
+        if(!$sort || (array_key_exists("sub_category",$sort))){       
+            $resource = Mage::getSingleton('core/resource'); 
+            $readConnection = $resource->getConnection('core_read');
+            $tableName = $resource->getTableName('wizardrelation');
+            $query = 'SELECT DISTINCT a.pid FROM wizardrelation AS a INNER JOIN wizardrelation AS b ON a.id = b.id WHERE a.variant_id = b.base_variant_id';
+            $pids = $readConnection->fetchAll($query);
+            //echo count($pids);exit;
+            $_productCollection = Mage::getModel('catalog/product')->getCollection()
+             ->joinField('category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null, 'left')
+             ->addAttributeToSelect('*')
+             ->addAttributeToFilter('category_id',$categoryId)
+             ->addAttributeToFilter('construction','PRESET')
+             ->addFieldToFilter('entity_id', array('in'=> $pids));
+              if($minPrice && $maxPrice > 0){
+                $_productCollection->addFieldToFilter('price',array('gteq'=>$minPrice))
+                ->addFieldToFilter('price',array('lteq'=>$maxPrice));
+              }
+              if($sort){
+                   foreach($sort as $sortop => $value):
+                      $_productCollection->addAttributeToFilter($sortop,array('in' => $value));
+                   endforeach;
+              }
+             $_productCollection->addAttributeToSort($orderBy,$sortBy);
+              //echo $_productCollection->getSelect();
+             $totalRec = $this->getTotalProductCollection($categoryId,$orderBy,$sortBy,$minPrice,$maxPrice);  
+             $getminPrice = $this->getMinPrice($categoryId,$sort,$minPrice,$maxPrice);                           
+             $getmaxPrice = $this->getMaxPrice($categoryId,$sort,$minPrice,$maxPrice);                    
+        }else{  
+            $_productCollection = Mage::getModel('catalog/product')->getCollection()
+             ->joinField('category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null, 'left')
+             ->addAttributeToSelect('*')
+             ->addAttributeToFilter('category_id',$categoryId)
+             ->addAttributeToFilter('construction','PRESET');
+            // ->addAttributeToFilter('default_ind',"1");
+              if($minPrice && $maxPrice > 0){
+              $_productCollection->addFieldToFilter('price',array('gteq'=>$minPrice))
+                           ->addFieldToFilter('price',array('lteq'=>$maxPrice));
+              }
+             foreach($sort as $sortop => $value):
+               $_productCollection->addAttributeToFilter($sortop,array('in' => $value));
+             endforeach;
+             $_productCollection->addAttributeToSort($orderBy,$sortBy);
+             //echo $_productCollection->getSelect();
+             $totalRec = $this->getFiltercount($sort,$categoryId,$orderBy,$sortBy,$minPrice,$maxPrice);
+             $getminPrice = $this->getMinPrice($categoryId,$sort,$minPrice,$maxPrice);                           
+             $getmaxPrice = $this->getMaxPrice($categoryId,$sort,$minPrice,$maxPrice);                           
+        }  
+        if($getupperLimit){
+            $_productCollection->getSelect()->limit($limit,$upperLimit); 
+        }else{
+             $_productCollection->getSelect()->limit($limit);  
+        }
+         //echo $_productCollection->getSelect();
+         $collection = array('totalRec' => $totalRec."-".$getmaxPrice."-".$getminPrice,'collection' => $_productCollection->getData());
+         return json_encode($collection);
+    }  
+    public function getTotalProductCollection($categoryId = null,$orderBy,$sortBy,$minPrice=null,$maxPrice=null){   
+      /*  $orderBy = "created_at";
+        $sortBy = "desc";*/                      
+        $resource = Mage::getSingleton('core/resource'); 
+        $readConnection = $resource->getConnection('core_read');
+        $tableName = $resource->getTableName('wizardrelation');
+        $query = 'SELECT DISTINCT a.pid FROM wizardrelation AS a INNER JOIN wizardrelation AS b ON a.id = b.id WHERE a.variant_id = b.base_variant_id';
+        $pids = $readConnection->fetchAll($query);
+        $_productCollection = Mage::getModel('catalog/product')
+         ->getCollection()
+         ->joinField('category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null, 'left')
+         ->addAttributeToSelect('*')
+         ->addAttributeToFilter('category_id',$categoryId)
+         ->addAttributeToFilter('construction','PRESET')
+         ->addFieldToFilter('entity_id', array('in'=> $pids));
+         if($minPrice && $maxPrice > 0){
+           $_productCollection ->addFieldToFilter('price',array('gteq'=>$minPrice))
+            ->addFieldToFilter('price',array('lteq'=>$maxPrice));
+         }
+         if($sort){
+               foreach($sort as $sortop => $value):
+                  $_productCollection->addAttributeToFilter($sortop,array('in' => $value));
+               endforeach;
+         }
+         $_productCollection->addAttributeToSort($orderBy,$sortBy);
+         //$getmaxPrice = $this->getMaxPrice($_productCollection);   
+         //return count($_productCollection)."-".$getmaxPrice;
+         return count($_productCollection);
+    } 
+    public function getFiltercount($sort,$categoryId,$orderBy,$sortBy,$minPrice=null,$maxPrice=null){
+        $_productCollection = Mage::getModel('catalog/product')->getCollection()
+             ->joinField('category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null, 'left')
+             ->addAttributeToSelect('*')
+             ->addAttributeToFilter('category_id',$categoryId)
+             ->addAttributeToFilter('construction','PRESET');
+             //->addAttributeToFilter('default_ind',"1");
+             if($minPrice && $maxPrice > 0){
+               $_productCollection ->addFieldToFilter('price',array('gteq'=>$minPrice))
+                ->addFieldToFilter('price',array('lteq'=>$maxPrice));
+             } 
+             foreach($sort as $sortop => $value):
+               $_productCollection->addAttributeToFilter($sortop,array('in' => $value));
+             endforeach;
+             $_productCollection->addAttributeToSort($orderBy,$sortBy);
+             //$getmaxPrice = $this->getMaxPrice($_productCollection);
+             //return count($_productCollection)."-".$getmaxPrice;
+             $_productCollection->getSelect(); 
+             return count($_productCollection);
+    }
+    public function getMinPrice($categoryId,$sort,$minPrice=null,$maxPrice=null){
+        if(!$sort || (array_key_exists("sub_category",$sort))){        
+            $resource = Mage::getSingleton('core/resource'); 
+            $readConnection = $resource->getConnection('core_read');
+            $tableName = $resource->getTableName('wizardrelation');
+            $query = 'SELECT DISTINCT a.pid FROM wizardrelation AS a INNER JOIN wizardrelation AS b ON a.id = b.id WHERE a.variant_id = b.base_variant_id';
+            $pids = $readConnection->fetchAll($query);
+            //echo count($pids);exit;
+            $_productCollection = Mage::getModel('catalog/product')->getCollection()
+             ->joinField('category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null, 'left')
+             ->addAttributeToSelect('*')
+             ->addAttributeToFilter('category_id',$categoryId)
+             ->addAttributeToFilter('construction','PRESET')
+             ->addFieldToFilter('entity_id', array('in'=> $pids));
+             if($minPrice && $maxPrice > 0){
+               $_productCollection ->addFieldToFilter('price',array('gteq'=>$minPrice))
+                ->addFieldToFilter('price',array('lteq'=>$maxPrice));
+             }
+             if($sort){
+               foreach($sort as $sortop => $value):
+                  $_productCollection->addAttributeToFilter($sortop,array('in' => $value));
+               endforeach;
+             }
+             $product = $_productCollection->setOrder('price', 'ASC')->getFirstItem();
+             //echo $_productCollection->getSelect();
+             return $product->getPrice();
+             
+        }else{  
+            $_productCollection = Mage::getModel('catalog/product')->getCollection()
+             ->joinField('category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null, 'left')
+             ->addAttributeToSelect('*')
+             ->addAttributeToFilter('category_id',$categoryId)
+             ->addAttributeToFilter('construction','PRESET');
+            // ->addAttributeToFilter('default_ind',"1");
+              if($minPrice && $maxPrice > 0){
+               $_productCollection ->addFieldToFilter('price',array('gteq'=>$minPrice))
+                ->addFieldToFilter('price',array('lteq'=>$maxPrice));
+             }
+             foreach($sort as $sortop => $value):
+               $_productCollection->addAttributeToFilter($sortop,array('in' => $value));
+             endforeach;
+             $product = $_productCollection->setOrder('price', 'ASC')->getFirstItem();
+             //echo $_productCollection->getSelect();
+             return $product->getPrice();
+        }          
+    }
+    public function getMaxPrice($categoryId,$sort,$minPrice=null,$maxPrice=null){
+        if(!$sort || (array_key_exists("sub_category",$sort))){        
+            $resource = Mage::getSingleton('core/resource'); 
+            $readConnection = $resource->getConnection('core_read');
+            $tableName = $resource->getTableName('wizardrelation');
+            $query = 'SELECT DISTINCT a.pid FROM wizardrelation AS a INNER JOIN wizardrelation AS b ON a.id = b.id WHERE a.variant_id = b.base_variant_id';
+            $pids = $readConnection->fetchAll($query);
+            $_productCollection = Mage::getModel('catalog/product')->getCollection()
+             ->joinField('category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null, 'left')
+             ->addAttributeToSelect('*')
+             ->addAttributeToFilter('category_id',$categoryId)
+             ->addAttributeToFilter('construction','PRESET')
+             ->addFieldToFilter('entity_id', array('in'=> $pids));
+             if($minPrice && $maxPrice > 0){
+               $_productCollection ->addFieldToFilter('price',array('gteq'=>$minPrice))
+                ->addFieldToFilter('price',array('lteq'=>$maxPrice));
+             }
+             if($sort){
+               foreach($sort as $sortop => $value):
+                  $_productCollection->addAttributeToFilter($sortop,array('in' => $value));
+               endforeach;
+             }
+             $product = $_productCollection->setOrder('price', 'DESC')->getFirstItem();
+             //echo $_productCollection->getSelect();
+             return $product->getPrice();
+             
+        }else{  
+            $_productCollection = Mage::getModel('catalog/product')->getCollection()
+             ->joinField('category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null, 'left')
+             ->addAttributeToSelect('*')
+             ->addAttributeToFilter('category_id',$categoryId)
+             ->addAttributeToFilter('construction','PRESET');
+             //->addAttributeToFilter('default_ind',"1");
+              if($minPrice && $maxPrice > 0){
+               $_productCollection ->addFieldToFilter('price',array('gteq'=>$minPrice))
+                ->addFieldToFilter('price',array('lteq'=>$maxPrice));
+             }
+             foreach($sort as $sortop => $value):
+               $_productCollection->addAttributeToFilter($sortop,array('in' => $value));
+             endforeach;
+             //echo $_productCollection->getSelect();
+             $product = $_productCollection->setOrder('price', 'DESC')->getFirstItem();
+             return $product->getPrice();
+        }
+    }
+}

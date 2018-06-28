@@ -1,0 +1,47 @@
+<?php
+/**
+ * @var Cminds_Multiwishlist_Helper_Data $helper
+ * @var Cminds_Multiwishlist_Block_Popup $this
+ */
+$helper = Mage::helper('cminds_multiwishlist');
+$isCartPage = $this->getIsCartPage();
+?>
+    <div id="cminds-wishlist-popup" style="display:none;">
+        <?php echo $this->getChildHtml('cminds_multiwishlist_popup_form'); ?>
+    </div>
+<?php if ($helper->isEnabled()): ?>
+    <script type="text/javascript">
+        //<![CDATA[
+       /* $$('.link-wishlist').each(function(a) {
+            a.setAttribute('onclick', '');
+            a.addEventListener('click', function () {
+                ShowWishlistPopup('cminds-wishlist-popup', getIdParam(a));
+            });
+        });*/
+        jQuery(document).ready(function() {
+            jQuery(document).on('click','.link-wishlist',function(event){
+                ShowWishlistPopup('cminds-wishlist-popup', getIdParam(this));
+                event.preventDefault();
+                //e.stopPropagation();
+            })
+        })
+
+        function getIdParam(a)
+        {
+            var isCartPage = "<?php echo $isCartPage; ?>";
+
+            var href = a.href;
+            var searchString = 'wishlist/index/add/product/';
+
+            if(isCartPage) {
+                searchString = 'wishlist/index/fromcart/item/';
+            }
+
+            var productString = href.slice(href.indexOf(searchString) + searchString.length);
+            var endProductIdIndex = productString.indexOf('/');
+
+            return productString.slice(0,endProductIdIndex);
+        }
+        //]]>
+    </script>
+<?php endif; ?>

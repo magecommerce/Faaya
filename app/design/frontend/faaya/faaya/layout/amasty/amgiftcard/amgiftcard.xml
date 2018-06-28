@@ -1,0 +1,308 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @package Amasty_GiftCard
+ */
+-->
+
+<layout version="0.1.0">
+   <!--  <customer_account>
+        <reference name="customer_account_navigation">
+            <action ifconfig="amgiftcard/general/active" method="addLink" translate="label" module="amgiftcard" >
+                <name>amgiftcard</name>
+                <path>amgiftcard/acc</path>
+                <label>Gift Cards</label>
+            </action>
+        </reference>
+    </customer_account> -->
+
+    <amgiftcard_acc_index>
+        <reference name="head">
+            <action method="addCss"><stylesheet>css/amasty/amgiftcard/amgiftcard.css</stylesheet></action>
+        </reference>
+
+        <update handle="customer_account"/>
+        <reference name="content">
+            <block type="amgiftcard/customer_cardForm" name="amgiftcard.customer.cardForm" template="amasty/amgiftcard/customer/card_form.phtml"/>
+            <block type="amgiftcard/customer_cards" name="amgiftcard.customer.cards" template="amasty/amgiftcard/customer/cards.phtml"/>
+        </reference>
+    </amgiftcard_acc_index>
+
+    <PRODUCT_TYPE_amgiftcard translate="label" module="amgiftcard">
+        <label>Catalog Product View (Amasty Gift Card)</label>
+        <reference name="head">
+            <action method="addItem"><type>js_css</type><name>calendar/calendar-win2k-1.css</name><params/></action>
+            <action method="addItem"><type>js</type><name>calendar/calendar.js</name></action>
+            <action method="addItem"><type>js</type><name>calendar/calendar-setup.js</name></action>
+            <action method="addCss"><stylesheet>css/amasty/amgiftcard/product_view.css</stylesheet></action>
+            <block type="core/html_calendar" name="head.calendar" as="calendar" template="page/js/calendar.phtml"/>
+        </reference>
+        <reference name="product.info">
+            <block type="amgiftcard/catalog_product_view_type_giftCard" name="product.info.amgiftcard" as="product_type_data" before="-" template="amasty/amgiftcard/catalog/product/view/type/giftcard.phtml">
+                <action method="addPriceBlockType">
+                    <type>amgiftcard</type>
+                    <block>amgiftcard/catalog_product_price</block>
+                    <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+                </action>
+                <block type="cataloginventory/stockqty_default" name="product.info.giftcard.extra" as="product_type_data_extra" template="cataloginventory/stockqty/default.phtml"/>
+            </block>
+        </reference>
+
+        <reference name="product.clone_prices">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+    </PRODUCT_TYPE_amgiftcard>
+
+    <catalog_category_default>
+        <reference name="product_list">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+    </catalog_category_default>
+
+    <catalog_category_view>
+        <reference name="product_list">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+    </catalog_category_view>
+
+    <catalog_category_layered>
+        <reference name="product_list">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+    </catalog_category_layered>
+
+    <catalog_product_compare_index>
+        <reference name="catalog.compare.list">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+    </catalog_product_compare_index>
+
+    <catalogsearch_result_index>
+        <reference name="search_result_list">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+    </catalogsearch_result_index>
+
+    <catalogsearch_advanced_result>
+        <reference name="search_result_list">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+    </catalogsearch_advanced_result>
+
+    <tag_product_list>
+        <reference name="search_result_list">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+    </tag_product_list>
+
+    <default>
+        <reference name="wishlist_sidebar">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+        <reference name="catalog_product_price_template">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+    </default>
+
+    <catalog_product_view>
+        <reference name="catalog.product.related">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+    </catalog_product_view>
+
+    <checkout_cart_index>
+        <reference name="head">
+            <action ifconfig="amgiftcard/general/active"  method="addCss"><stylesheet>css/amasty/amgiftcard/cart.css</stylesheet></action>
+
+            <action method="addCss"><stylesheet>css/amasty/amgiftcard/product_view.css</stylesheet></action>
+
+            <action method="addItem"><type>js_css</type><name>calendar/calendar-win2k-1.css</name><params/></action>
+            <action method="addItem"><type>js</type><name>calendar/calendar.js</name></action>
+            <action method="addItem"><type>js</type><name>calendar/calendar-setup.js</name></action>
+            <block type="core/html_calendar" name="head.calendar" as="calendar" template="page/js/calendar.phtml"/>
+        </reference>
+        <reference name="checkout.cart" >
+            <block type="core/text_list" name="checkout.cart.extra" translate="label">
+                <label>Checkout Forms Extra</label>
+            </block>
+        </reference>
+        <reference name="checkout.cart.extra">
+            <block ifconfig="amgiftcard/general/active" type="amgiftcard/checkout_cart_giftCard" template="amasty/amgiftcard/checkout/cart/block.phtml" name="checkout.cart.amgiftcard.block" as="amgiftcards" />
+        </reference>
+
+        <reference name="checkout.cart">
+            <action method="addItemRender">
+                <type>amgiftcard</type>
+                <block>amgiftcard/checkout_cart_item_renderer</block>
+                <template>checkout/cart/item/default.phtml</template>
+            </action>
+        </reference>
+
+        <reference name="checkout.cart.crosssell">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+
+    </checkout_cart_index>
+
+    <rss_catalog_category>
+        <reference name="rss.catalog.category">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+    </rss_catalog_category>
+
+    <rss_catalog_new>
+        <reference name="rss.catalog.new">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+    </rss_catalog_new>
+
+    <rss_catalog_tag>
+        <reference name="rss.catalog.tag">
+            <action method="addPriceBlockType">
+                <type>amgiftcard</type>
+                <block>amgiftcard/catalog_product_price</block>
+                <template>amasty/amgiftcard/catalog/product/price.phtml</template>
+            </action>
+        </reference>
+    </rss_catalog_tag>
+
+
+    <amgiftcard_cart_ajax>
+        <block type="amgiftcard/check" template="amasty/amgiftcard/check.phtml" name="root"/>
+    </amgiftcard_cart_ajax>
+
+
+
+
+
+
+    <sales_order_view>
+        <reference name="order_totals">
+            <block ifconfig="amgiftcard/general/active" type="amgiftcard/sales_order_giftCards" name="amgiftcards" template="amasty/amgiftcard/order/giftcards.phtml" />
+        </reference>
+    </sales_order_view>
+
+    <sales_order_print>
+        <reference name="order_totals">
+            <!--<block type="amgiftcard/sales_order_giftCards" name="amgiftcards" template="amasty/amgiftcard/order/giftcards.phtml" after="-" />-->
+            <block ifconfig="amgiftcard/general/active"  type="amgiftcard/sales_order_giftCards" name="amgiftcards" template="amasty/amgiftcard/order/giftcards.phtml" />
+        </reference>
+    </sales_order_print>
+    <sales_email_order_items>
+        <reference name="order_totals">
+            <!--<block type="amgiftcard/sales_order_giftCards" name="amgiftcards" template="amasty/amgiftcard/order/giftcards.phtml" after="-" />-->
+            <block ifconfig="amgiftcard/general/active"  type="amgiftcard/sales_order_giftCards" name="amgiftcards" template="amasty/amgiftcard/order/giftcards.phtml" />
+        </reference>
+    </sales_email_order_items>
+
+    <sales_order_invoice>
+        <reference name="invoice_totals">
+            <block ifconfig="amgiftcard/general/active"  type="amgiftcard/sales_order_giftCards" name="amgiftcards" template="amasty/amgiftcard/order/giftcards.phtml" />
+        </reference>
+    </sales_order_invoice>
+    <sales_order_printinvoice>
+        <reference name="invoice_totals">
+            <block ifconfig="amgiftcard/general/active"  type="amgiftcard/sales_order_giftCards" name="amgiftcards" template="amasty/amgiftcard/order/giftcards.phtml" />
+        </reference>
+    </sales_order_printinvoice>
+    <sales_email_order_invoice_items>
+        <reference name="invoice_totals">
+            <block ifconfig="amgiftcard/general/active"  type="amgiftcard/sales_order_giftCards" name="amgiftcards" template="amasty/amgiftcard/order/giftcards.phtml" />
+        </reference>
+    </sales_email_order_invoice_items>
+
+    <sales_order_creditmemo>
+        <reference name="creditmemo_totals">
+            <block ifconfig="amgiftcard/general/active"  type="amgiftcard/sales_order_giftCards" name="amgiftcards" template="amasty/amgiftcard/order/giftcards.phtml" />
+        </reference>
+    </sales_order_creditmemo>
+    <sales_order_printcreditmemo>
+        <reference name="creditmemo_totals">
+            <block ifconfig="amgiftcard/general/active"  type="amgiftcard/sales_order_giftCards" name="amgiftcards" template="amasty/amgiftcard/order/giftcards.phtml" />
+        </reference>
+    </sales_order_printcreditmemo>
+    <sales_email_order_creditmemo_items>
+        <reference name="creditmemo_totals">
+            <block ifconfig="amgiftcard/general/active" type="amgiftcard/sales_order_giftCards" name="amgiftcards" template="amasty/amgiftcard/order/giftcards.phtml" />
+        </reference>
+    </sales_email_order_creditmemo_items>
+
+
+    <paypal_express_review>
+        <reference name="paypal.express.review.details">
+            <action method="addItemRender">
+                <type>amgiftcard</type>
+                <block>amgiftcard/checkout_cart_item_renderer</block>
+                <template>checkout/onepage/review/item.phtml</template>
+            </action>
+        </reference>
+    </paypal_express_review>
+
+    <paypal_express_review_details>
+        <reference name="root">
+            <action method="addItemRender">
+                <type>amgiftcard</type>
+                <block>amgiftcard/checkout_cart_item_renderer</block>
+                <template>checkout/onepage/review/item.phtml</template>
+            </action>
+        </reference>
+    </paypal_express_review_details>
+</layout>

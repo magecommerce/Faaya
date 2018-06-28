@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @package Amasty_GiftCard
+ */
+-->
+
+<layout version="0.1.0">
+    <adminhtml_catalog_product_amgiftcard>
+        <reference name="head">
+            <action method="addItem">
+                <type>js</type>
+                <name>amasty/amgiftcard/gift_card_prices_options.js</name>
+            </action>
+        </reference>
+        <reference name="product_tabs">
+            <!--<action method="addTab"><name>amgiftcard_info</name><block>amgiftcard/adminhtml_catalog_product_edit_tab_giftCard</block></action>-->
+        </reference>
+
+        <reference name="js">
+            <block type="core/template" template="amasty/amgiftcard/catalog/product/new/js.phtml"/>
+        </reference>
+    </adminhtml_catalog_product_amgiftcard>
+
+    <adminhtml_amgiftcardimg_edit>
+        <reference name="head">
+            <action method="addItem">
+                <type>js</type>
+                <name>amasty/amgiftcard/jquery-1.11.2.min.js</name>
+            </action>
+            <action method="addItem">
+                <type>js</type>
+                <name>amasty/amgiftcard/jquery-ui.min.js</name>
+            </action>
+            <action method="addCss"><stylesheet>css/amasty/amgiftcard/jquery-ui.min.css</stylesheet></action>
+        </reference>
+    </adminhtml_amgiftcardimg_edit>
+
+
+
+
+
+    <adminhtml_sales_order_view>
+        <reference name="order_items">
+            <action method="addColumnRender">
+                <column>name</column>
+                <block>amgiftcard/adminhtml_sales_items_column_name_giftcard</block>
+                <template>sales/items/column/name.phtml</template>
+                <type>amgiftcard</type>
+            </action>
+        </reference>
+        <reference name="order_totals">
+            <block type="adminhtml/sales_order_totals_item" name="amgiftcard" template="amasty/amgiftcard/sales/order/totals/giftcards.phtml">
+                <action method="setBeforeCondition"><param>customerbalance</param></action>
+            </block>
+        </reference>
+    </adminhtml_sales_order_view>
+
+    <adminhtml_sales_order_invoice_new>
+        <reference name="order_items">
+            <action method="addColumnRender">
+                <column>name</column>
+                <block>amgiftcard/adminhtml_sales_items_column_name_giftcard</block>
+                <template>sales/items/column/name.phtml</template>
+                <type>amgiftcard</type>
+            </action>
+        </reference>
+        <reference name="invoice_totals">
+            <block type="adminhtml/sales_order_totals_item" name="amgiftcard" template="amasty/amgiftcard/sales/totals/giftcards.phtml">
+                <action method="setBeforeCondition"><param>customerbalance</param></action>
+            </block>
+        </reference>
+    </adminhtml_sales_order_invoice_new>
+
+    <adminhtml_sales_order_invoice_updateqty>
+        <reference name="order_items">
+            <action method="addColumnRender">
+                <column>name</column>
+                <block>amgiftcard/adminhtml_sales_items_column_name_giftcard</block>
+                <template>sales/items/column/name.phtml</template>
+                <type>amgiftcard</type>
+            </action>
+        </reference>
+        <reference name="invoice_totals">
+            <block type="adminhtml/sales_order_totals_item" name="amgiftcard" template="amasty/amgiftcard/sales/totals/giftcards.phtml">
+                <action method="setBeforeCondition"><param>customerbalance</param></action>
+            </block>
+        </reference>
+    </adminhtml_sales_order_invoice_updateqty>
+
+    <adminhtml_sales_order_invoice_view>
+        <reference name="order_items">
+            <action method="addColumnRender">
+                <column>name</column>
+                <block>amgiftcard/adminhtml_sales_items_column_name_giftcard</block>
+                <template>sales/items/column/name.phtml</template>
+                <type>amgiftcard</type>
+            </action>
+        </reference>
+        <reference name="invoice_totals">
+            <block type="adminhtml/sales_order_totals_item" name="amgiftcard" template="amasty/amgiftcard/sales/totals/giftcards.phtml" />
+        </reference>
+    </adminhtml_sales_order_invoice_view>
+
+    <adminhtml_sales_order_creditmemo_new>
+        <reference name="order_items">
+            <action method="addColumnRender">
+                <column>name</column>
+                <block>amgiftcard/adminhtml_sales_items_column_name_giftcard</block>
+                <template>sales/items/column/name.phtml</template>
+                <type>amgiftcard</type>
+            </action>
+        </reference>
+        <reference name="creditmemo_totals">
+            <block type="adminhtml/sales_order_totals_item" name="amgiftcard" template="amasty/amgiftcard/sales/totals/giftcards.phtml" after="-">
+                <action method="setBeforeCondition"><param>customerbalance</param></action>
+            </block>
+        </reference>
+
+        <reference name="submit_before">
+            <block type="amgiftcard/adminhtml_sales_order_creditmemo_controls" name="amgiftcard.refund_form" template="amasty/amgiftcard/sales/creditmemo/refund.phtml" />
+        </reference>
+    </adminhtml_sales_order_creditmemo_new>
+
+    <adminhtml_sales_order_creditmemo_updateqty>
+        <reference name="order_items">
+            <action method="addColumnRender">
+                <column>name</column>
+                <block>amgiftcard/adminhtml_sales_items_column_name_giftcard</block>
+                <template>sales/items/column/name.phtml</template>
+                <type>amgiftcard</type>
+            </action>
+        </reference>
+        <reference name="invoice_totals">
+            <block type="adminhtml/sales_order_totals_item" name="amgiftcard" template="amasty/amgiftcard/sales/totals/giftcards.phtml" after="-">
+                <action method="setBeforeCondition"><param>customerbalance</param></action>
+            </block>
+        </reference>
+
+        <reference name="submit_before">
+            <block type="amgiftcard/adminhtml_sales_order_creditmemo_controls" name="amgiftcard.refund_form" template="amasty/amgiftcard/sales/creditmemo/refund.phtml" />
+        </reference>
+    </adminhtml_sales_order_creditmemo_updateqty>
+
+    <adminhtml_sales_order_creditmemo_view>
+        <reference name="order_items">
+            <action method="addColumnRender">
+                <column>name</column>
+                <block>amgiftcard/adminhtml_sales_items_column_name_giftcard</block>
+                <template>sales/items/column/name.phtml</template>
+                <type>amgiftcard</type>
+            </action>
+        </reference>
+        <reference name="invoice_totals">
+            <block type="adminhtml/sales_order_totals_item" name="amgiftcard" template="amasty/amgiftcard/sales/totals/giftcards.phtml" after="-">
+                <action method="setBeforeCondition"><param>customerbalance</param></action>
+            </block>
+        </reference>
+    </adminhtml_sales_order_creditmemo_view>
+
+
+    <PRODUCT_TYPE_amgiftcard>
+        <reference name="product.composite.fieldset">
+            <remove name="product.composite.fieldset.qty"/>
+            <block type="amgiftcard/adminhtml_catalog_product_composite_fieldset_giftcard" name="product.composite.fieldset.giftcard" before="product.composite.fieldset.options" template="amasty/amgiftcard/catalog/product/composite/fieldset/giftcard.phtml">
+                <block type="adminhtml/catalog_product_composite_fieldset_qty" name="product.composite.giftcard.qty" template="amasty/amgiftcard/catalog/product/composite/fieldset/qty.phtml"/>
+            </block>
+        </reference>
+    </PRODUCT_TYPE_amgiftcard>
+
+
+
+    <adminhtml_sales_order_create_load_block_items>
+        <reference name="items_grid">
+            <block type="amgiftcard/adminhtml_sales_order_create_payment" template="amasty/amgiftcard/sales/order/create/items.phtml" name="amgiftcard" after="-" />
+        </reference>
+    </adminhtml_sales_order_create_load_block_items>
+
+    <adminhtml_sales_order_create_load_block_data>
+        <reference name="items_grid">
+            <block type="amgiftcard/adminhtml_sales_order_create_payment" template="amasty/amgiftcard/sales/order/create/items.phtml" name="amgiftcard" after="-" />
+        </reference>
+    </adminhtml_sales_order_create_load_block_data>
+
+    <adminhtml_sales_order_create_index>
+        <reference name="js">
+            <block type="adminhtml/template" template="amasty/amgiftcard/sales/order/create/js.phtml" name="giftcardaccount_js" />
+        </reference>
+        <reference name="items_grid">
+            <block type="amgiftcard/adminhtml_sales_order_create_payment" template="amasty/amgiftcard/sales/order/create/items.phtml" name="amgiftcard" after="-" />
+        </reference>
+    </adminhtml_sales_order_create_index>
+
+</layout>
