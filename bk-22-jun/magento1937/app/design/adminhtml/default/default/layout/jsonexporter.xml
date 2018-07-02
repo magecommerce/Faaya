@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<layout version="0.1.0">
-    <jsonexporter_adminhtml_jsonexporter_index>
-        <reference name="content">
-            <block type="jsonexporter/adminhtml_jsonexporter" name="jsonexporter" />
-        </reference>
-    </jsonexporter_adminhtml_jsonexporter_index>
-</layout>

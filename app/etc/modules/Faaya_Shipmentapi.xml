@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<config>
-    <modules>
-        <Faaya_Shipmentapi>
-            <active>true</active>
-            <codePool>local</codePool>
-        </Faaya_Shipmentapi>
-    </modules>
-</config>

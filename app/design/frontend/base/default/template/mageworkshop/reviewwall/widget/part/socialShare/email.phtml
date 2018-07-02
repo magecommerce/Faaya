@@ -1,7 +1,0 @@
-<?php if (Mage::getStoreConfig('reviewwall/share_review_by_email/enabled')): ?>
-    <?php $review = $this->getReview(); ?>
-    <?php $shareUrl = $this->getShareUrl(); ?>
-    <?php if ($review && $shareUrl): ?>
-        <div class="drw-share-email" data-email-subject="<?php echo $this->escapeHtml($review->getTitle()); ?>" data-share-url="<?php echo $shareUrl;?>"></div>
-    <?php endif; ?>
-<?php endif; ?>

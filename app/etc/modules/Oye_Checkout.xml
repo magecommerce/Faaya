@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<config>
-    <modules>
-        <Oye_Checkout>
-            <active>false</active>
-            <codePool>community</codePool>
-        </Oye_Checkout>
-    </modules>
-</config>

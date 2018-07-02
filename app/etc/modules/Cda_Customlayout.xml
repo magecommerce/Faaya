@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<config>
-    <modules>
-        <Cda_Customlayout>
-            <active>true</active>
-            <codePool>local</codePool>
-        </Cda_Customlayout>
-    </modules>
-</config> 

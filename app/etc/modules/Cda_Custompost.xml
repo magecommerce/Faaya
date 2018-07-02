@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<config>
-  <modules>
-    <Cda_Custompost>
-      <active>true</active>
-      <codePool>local</codePool>
-    </Cda_Custompost>
-  </modules>
-</config>
