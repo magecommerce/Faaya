@@ -379,7 +379,7 @@ class Cda_Wizard_Helper_Data extends Mage_Core_Helper_Abstract
 
             $ringData = $this->_readConnection->fetchRow("select karat,metal_color,sub_category,price from wizardmaster where pid=".$promiseSet['promise']);
             $price = Mage::helper('core')->currency($ringData['price'], true, false);
-            $ringText = '<span class="tab-subtitle">'.$ringData['karat'].' '.$ringData['metal_color'].' '.$ringData['sub_category'].' <strong class="price">'.$price.'</strong></span>';
+            $ringText = '<span class="tab-subtitle">'.$ringData['metal_color'].' '.$ringData['sub_category'].' <strong class="price">'.$price.'</strong></span>';
         }
 
         $stepList = array();
