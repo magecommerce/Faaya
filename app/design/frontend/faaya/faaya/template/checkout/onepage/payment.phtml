@@ -1,0 +1,278 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2006-2017 X.commerce, Inc. and affiliates (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+ ?>
+<script type="text/javascript">
+//<![CDATA[
+    var quoteBaseGrandTotal = <?php echo (float)$this->getQuoteBaseGrandTotal(); ?>;
+    var checkQuoteBaseGrandTotal = quoteBaseGrandTotal;
+    var quoteGrandTotalClean = quoteBaseGrandTotal;
+    var payment = new Payment('co-payment-form', '<?php echo $this->getUrl('checkout/onepage/savePayment') ?>');
+    var lastPrice;
+//]]>
+</script>
+
+<?php
+    $itemArray = array();
+    $cart = Mage::getModel('checkout/cart')->getQuote()->getAllVisibleItems();
+ //$this->getItems()
+foreach ($cart as $_item) {
+    $additionalOption = $_item->getProduct()->getCustomOption('setting');
+    if($additionalOption){
+        $additionalOptions =  unserialize($additionalOption->getValue());
+            $groupOption = $additionalOptions['group']['option'];
+            $ringSize = $groupOption['size'];
+            $text = $groupOption['text'];
+            $fontFamily = $groupOption['fontfamily'];
+            $sid = $additionalOptions['group']['sid'];
+            $_item->setGroupType($additionalOptions['group']['type']);
+            $_item->setSmryid($additionalOptions['group']['smryid']);
+            $_item->setGroupOrderdate($additionalOptions['group']['orderdate']);
+            $_item->setGroupConstruction($additionalOptions['group']['construction']);
+            $_item->setGroupRing($additionalOptions['group']['ring']);
+            $_item->setGroupPendant($additionalOptions['group']['pendant']);
+            $_item->setGroupEarring($additionalOptions['group']['earring']);
+            $_item->setGroupBracelets($additionalOptions['group']['bracelets']);
+            $_item->setGroupDiamond($additionalOptions['group']['diamond']);
+            $_item->setGroupChain($additionalOptions['group']['chain']);
+            $_item->setGroupSide1($additionalOptions['group']['side1']);
+            $_item->setGroupSide2($additionalOptions['group']['side2']);
+            $_item->setGroupPromise($additionalOptions['group']['promise']);
+            $_item->setGroupMatchpair($additionalOptions['group']['matchpair']);
+            $_item->setGroupRingSize($ringSize);
+            $itemArray[$sid][$_item->getProduct()->getId()] = $_item;
+    }else{
+        $randomInt = strtotime("now");
+        $itemArray[$randomInt][$_item->getProduct()->getId()] = $_item;
+    }
+}
+?>
+
+<div class="payment-method">
+<?php /* <p class="back-link"><a href="#" onclick="checkout.back(); return false;"><i class="fa fa-angle-left"></i><?php echo $this->__('Back') ?></a></p> */ ?>
+<div class="payment-form">
+  <img src="<?php echo $this->getSkinUrl('images/opc-ajax-loader.gif') ?>" alt="<?php echo Mage::helper('core')->quoteEscape($this->__('Please wait...')) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Loading next step...')) ?>" class="v-middle loading" />
+  <div class="payment-left">
+  <form action="" id="co-payment-form">
+      <fieldset>
+          <?php echo $this->getChildHtml('methods') ?>
+      </fieldset>
+      <?php echo $this->getBlockHtml('formkey') ?>
+
+  </form>
+  <div class="tool-tip" id="payment-tool-tip" style="display:none;">
+      <div class="btn-close"><a href="#" id="payment-tool-tip-close" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Close')) ?>"><?php echo $this->__('Close') ?></a></div>
+      <div class="tool-tip-content"><img src="<?php echo $this->getSkinUrl('images/cvv.gif') ?>" alt="<?php echo Mage::helper('core')->quoteEscape($this->__('Card Verification Number Visual Reference')) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Card Verification Number Visual Reference')) ?>" /></div>
+  </div>
+</div>
+<div class="payment-right">
+
+
+<div class="payment-product card-right-details">
+
+
+            <?php foreach($itemArray as $randomkey=>$_items): ?>
+                    <?php
+                        $firstItem = array_keys($_items);
+                        $price = $discountAmount = 0.0;
+                        $diamondDetail = $ringDetail = $pendantDetail = $earringDetail = $braceletsDetail= $chainDetail = $sidestone1 = $sidestone2 = $chaindata = $promiseDetail = $ringSize = $matchpair = "";
+                        $receiveDay ="";
+                        $flag=0;
+                        $i = 1;
+                        foreach($firstItem as $itm){
+                            $cnt = count($_items);
+                            $type = $_items[$itm]->getGroupType();
+                            $orderDate = $_items[$itm]->getGroupOrderdate();
+                            if($_items[$itm]->getGroupRing()){
+                                $ringDetail = $_items[$itm]->getGroupRing();
+                            }
+                            if($_items[$itm]->getGroupPendant()){
+                                $pendantDetail = $_items[$itm]->getGroupPendant();
+                            }
+                            if($_items[$itm]->getGroupEarring()){
+                                $earringDetail = $_items[$itm]->getGroupEarring();
+                            }
+                            if($_items[$itm]->getGroupBracelets()){
+                                $braceletsDetail = $_items[$itm]->getGroupBracelets();
+                            }
+                            if($_items[$itm]->getGroupDiamond()){
+                                $diamondDetail = $_items[$itm]->getGroupDiamond();
+                            }
+                            if($_items[$itm]->getGroupChain()){
+                                $chainDetail = $_items[$itm]->getGroupChain();
+                            }
+                            if($_items[$itm]->getGroupSide1()){
+                                $sidestone1 = $_items[$itm]->getGroupSide1();
+                            }
+                            if($_items[$itm]->getGroupSide2()){
+                                $sidestone2 = $_items[$itm]->getGroupSide2();
+                            }
+                            if($_items[$itm]->getGroupPromise()){
+                                $promiseDetail = $_items[$itm]->getGroupPromise();
+                            }
+                             if($_items[$itm]->getGroupRingSize()){
+                                $ringSize = $_items[$itm]->getGroupRingSize();
+                            }
+                            if($_items[$itm]->getGroupMatchpair()){
+                                $matchpair = $_items[$itm]->getGroupMatchpair();
+                            }
+                            $price += $_items[$itm]->getProduct()->getPrice();
+                             if($type == "chain" && $flag==0){
+                                $receiveDay =  $orderDate;
+                                $flag = 1;
+                            }
+                            elseif($type == "sid" && $flag==0){
+                                $receiveDay =  $orderDate;
+                                $flag = 1;
+                            }
+                            elseif($type == "did" && $flag==0){
+                                $receiveDay =  $orderDate;
+                                $flag = 1;
+                            }
+                            if($cnt == 1 && $type =="wedding"){
+                                $receiveDay =  $orderDate;
+                            }
+                            //$discountAmount = $discountAmount + $_items[$itm]->getDiscountAmount();
+
+                        }
+                        $firstItem = $_items[$firstItem[0]]->getProduct();
+                        $isVisibleProduct = $firstItem->isVisibleInSiteVisibility();
+
+                        $_product = Mage::getSingleton('catalog/product')->load($firstItem->getId());
+                        $smryItemType = $_product->getResource()->getAttribute('smry_item_type')->getFrontend()->getValue($_product);
+                    ?>
+                    <div class="cart-product">
+                           <div class="image">
+                                <img src="<?php echo Mage::helper('catalog/image')->init($firstItem, 'small_image')->constrainOnly(false)->keepAspectRatio(true)->keepFrame(false)->resize(160, 210); ?>" alt="<?php echo $this->htmlEscape($this->getImageLabel($firstItem, 'small_image')) ?>" />
+                          </div>
+                          <div class="details">
+                          <h3 class="product-name">
+                            <?php if(strtolower($smryItemType) == "style"): ?>
+                                <span class="name"><?php echo $_product->getVariantRemark();?></span>
+                            <?php else: ?>
+                                <span class="name"><?php echo $_product->getDescription();?></span>
+                            <?php endif; ?>
+                                <?php $rowTotal = $price - $discountAmount;?>
+                                <span class="price"><?php echo $this->helper('checkout')->formatPrice($rowTotal);?></span>
+                                <?php /*<span class="price"><?php echo $this->helper('checkout')->formatPrice($price); ?></span> */ ?>
+                          </h3>
+                          <?php if($ringDetail): ?>
+                                     <p>
+                                          <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/ringicon.png'); ?>" alt=""></span> */ ?>
+                                          <strong><?php echo $this->__('Setting : ');?></strong>
+                                          <?php echo $this->__($ringDetail); ?>
+                                     </p>
+                                 <?php endif; ?>
+                                 <?php if($pendantDetail): ?>
+                                     <p>
+                                      <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/pendanticon.png'); ?>" alt=""></span> */ ?>
+                                      <strong><?php echo $this->__('Pendent : ');?></strong>
+                                      <?php echo $this->__($pendantDetail); ?>
+                                     </p>
+                                 <?php endif; ?>
+                                 <?php if($braceletsDetail): ?>
+                                     <p>
+                                      <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/braceletsicon.png'); ?>" alt=""></span> */ ?>
+                                      <strong><?php echo $this->__('Bracelet : ');?></strong>
+                                      <?php echo $this->__($braceletsDetail); ?>
+                                     </p>
+                                 <?php endif; ?>
+                                 <?php if($earringDetail): ?>
+                                     <p>
+                                      <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/earringicon.png'); ?>" alt=""></span> */ ?>
+                                      <strong><?php echo $this->__('Earring : ');?></strong>
+                                      <?php echo $this->__($earringDetail); ?>
+                                     </p>
+                                 <?php endif; ?>
+                                 <?php if($promiseDetail): ?>
+                                     <p>
+                                        <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/promiseicon.png'); ?>" alt=""></span> */ ?>
+                                        <strong><?php echo $this->__('Setting : ');?></strong>
+                                      <?php echo $this->__($promiseDetail); ?>
+                                     </p>
+                                 <?php endif; ?>
+                                 <?php if($chainDetail): ?>
+                                     <p>
+                                      <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/chainicon.png'); ?>" alt=""></span> */ ?>
+                                      <strong><?php echo $this->__('Chain : ');?></strong>
+                                      <?php echo $this->__($chainDetail); ?>
+                                     </p>
+                                 <?php endif; ?>
+                                 <?php if($diamondDetail): ?>
+                                     <p>
+                                      <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/diamondicon.png'); ?>" alt=""></span> */ ?>
+                                      <strong><?php echo $this->__('Diamond : ');?></strong>
+                                      <?php echo $this->__($diamondDetail); ?>
+                                     </p>
+                                 <?php endif; ?>
+                                 <?php if($matchpair): ?>
+                                     <p>
+                                          <strong><?php echo $this->__('Match Pair : ');?></strong>
+                                          <?php echo $this->__($matchpair); ?>
+                                     </p>
+                                 <?php endif; ?>
+                    </div>
+            </div>
+            <?php endforeach ?>
+      <script type="text/javascript">
+        jQuery( document ).ready(function() {
+              jQuery(".payment-product.card-right-details").mCustomScrollbar({
+                 setHeight: false,
+                 scrollbarPosition: "outside"
+              });
+          });
+      </script>
+</div>
+<div class="order-summary">
+    <?php echo $this->getChildHtml('totals');?>
+</div>
+ </div>
+ <div class="payment-card-info visible-xs">
+     <?php /* <p><?php echo $this->__('<span>Pay with multiple credit cards:</span> If you would like to pay for your purchase with more than one credit card, please call customer service at 1-800-242-2728 for more information.'); ?></p>
+     <p class="mobile-gift-certificate"><?php echo $this->__('<span>Gift Certificate</span> If you have a Gift Certificate, you can enter it below. Check your balance.'); ?></p> */ ?>
+     <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('payment-card-info')->toHtml(); ?>
+     <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('payment-mobile-gift-certificate')->toHtml(); ?>
+  </div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+    function toggleToolTip(event){
+        if($('payment-tool-tip')){
+            $('payment-tool-tip').setStyle({
+                top: (Event.pointerY(event)-560)+'px'//,
+                //left: (Event.pointerX(event)+100)+'px'
+            })
+            $('payment-tool-tip').toggle();
+        }
+        Event.stop(event);
+    }
+    if($('payment-tool-tip-close')){
+        Event.observe($('payment-tool-tip-close'), 'click', toggleToolTip);
+    }
+
+    payment.currentMethod = "<?php echo $this->getChild('methods')->getSelectedMethodCode() ?>";
+//]]>
+</script>

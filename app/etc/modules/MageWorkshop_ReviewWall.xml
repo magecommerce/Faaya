@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <MageWorkshop_ReviewWall>
+            <active>true</active>
+            <codePool>local</codePool>
+            <depends>
+                <Mage_Widget />
+                <MageWorkshop_Core />
+                <MageWorkshop_DetailedReview />
+            </depends>
+        </MageWorkshop_ReviewWall>
+    </modules>
+</config>

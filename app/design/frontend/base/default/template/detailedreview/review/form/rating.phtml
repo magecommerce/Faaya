@@ -1,0 +1,37 @@
+<?php /** @var MageWorkshop_DetailedReview_Block_Review_Form_Rating|MageWorkshop_DRCategoryRatings_Block_Review_Form_Rating $this*/ ?>
+
+<?php $ratings = $this->getRatings();?>
+<?php if ($ratings->getSize()): ?>
+    <div class="overall-raiting with-border">
+        <div class="overall-rating-text">
+            <div class="title"><span><?php echo $this->__("Overall Rating") ?></span> <em class="required">*</em></div>
+            <p class="desc"><?php echo $this->__("Select the number of stars that reflect your overall item rating") ?></p>
+        </div>
+    </div>
+    <div class="overall-raiting select-stars">
+        <div id="product-review-block" class="overall-raiting-value">
+            <?php $countRatings = count($ratings); ?>
+            <?php /** @var Mage_Rating_Model_Rating $_rating */ ?>
+            <?php foreach ($ratings as $_rating): ?>
+                <div class="overall-rating-inline">
+                    <div class="rating-code"><?php echo $_rating->getRatingCode(); ?>:</div>
+                    <ul>
+                        <?php foreach ($_rating->getOptions() as $_option): ?>
+                            <li class="star">
+                                <div class="separate-rating-star"></div>
+                                <input type="radio"
+                                       name="ratings[<?php echo $_rating->getId() ?>]"
+                                       id="<?php echo $this->escapeHtml($_rating->getRatingCode()) ?>_<?php echo $_option->getValue() ?>"
+                                       value="<?php echo $_option->getId() ?>"
+                                       class="radio"
+                                />
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endforeach; ?>
+            <input type="hidden" name="validate_rating" class="validate-rating" value=""/>
+        </div>
+        <div class="clearboth"></div>
+    </div>
+<?php endif; ?>

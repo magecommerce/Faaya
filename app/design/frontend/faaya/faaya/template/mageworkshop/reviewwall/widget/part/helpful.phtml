@@ -1,0 +1,22 @@
+<?php $review = $this->getReview(); ?>
+<?php if ($review): ?>
+    <div class="drw-helpful-block">
+        <form class="drw-helpful-form" action="<?php echo Mage::getUrl('mageworkshop_reviewwall/ajax/vote', array('_secure' => Mage::app()->getStore()->isCurrentlySecure())); ?>" method="post" >
+            <div class="drw-js-helpful-voting">
+                <input type="hidden" name="review_id" value="<?php echo $review->getId()?>"/>
+                <div class="drw-rating-wrapper">
+                    <a class="drw-review-vote-rating helpful-btn"  title="<?php echo $this->__('Helpful')?>" href="javascript:void(0)" onclick="return false;">
+                        <span></span>
+                    </a>
+                    <span class="drw-helpful-qty voting-qty"><?php echo $review->getCountHelpful() ?></span>
+                </div>
+                <div class="drw-rating-wrapper">
+                    <a class="drw-review-vote-rating unhelpful-btn" title="<?php echo $this->__('Unhelpful')?>" href="javascript:void(0)" onclick="return false;">
+                        <span></span>
+                    </a>
+                    <span class="drw-unhelpful-qty voting-qty"><?php echo $review->getCountUnhelpful() ?></span>
+                </div>
+            </div>
+        </form>
+    </div>
+<?php endif; ?>

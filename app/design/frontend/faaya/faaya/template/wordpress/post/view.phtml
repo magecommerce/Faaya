@@ -1,0 +1,64 @@
+<?php
+/**
+ * @category    Fishpig
+ * @package     Fishpig_Wordpress
+ * @license     http://fishpig.co.uk/license.txt
+ * @author      Ben Tideswell <help@fishpig.co.uk>
+ */
+?>
+<?php $post = $this->getPost() ?>
+<?php if ($post): ?>
+	<?php $helper = $this->helper('wordpress') ?>
+	<?php $author = $post->getAuthor() ?>
+
+	<div class="post-view">
+		<?php echo $this->getBeforePostContentHtml() ?>
+		<div class="post-entry entry std<?php if ($post->getFeaturedImage()): ?> post-entry-with-image<?php endif; ?>">
+			<?php if ($post->isViewableForVisitor()): ?>
+				<?php if ($featuredImage = $post->getFeaturedImage()): ?>
+					<div class="featured-image left">
+						<img src="<?php echo $featuredImage->getAvailableImage() ?>" alt="<?php echo $this->escapeHtml($post->getPostTitle()) ?>"/>
+					</div>
+				<?php endif; ?>
+				<div class="sharethis desktop">
+					<div class="sharethis-inline-share-buttons"></div>
+					<script type="text/javascript" src="//platform-api.sharethis.com/js/sharethis.js#property=5aa7706835937200136183e9&product=inline-share-buttons"></script>
+				</div>
+				<div class="post-date desktop">
+					<div class="date"><?php echo $post->getPostDate() ?></div>
+				</div>
+				<div class="post-view-container">
+				<div class="post-title">
+					<h1><?php echo $this->escapeHtml($post->getPostTitle()) ?></h1>
+				</div>
+				<div class="category-name">
+					<?php
+						$cate = wp_get_post_categories($post->getId());
+						if(!empty($cate)){
+							$catArg =  get_term_by('id', $cate[0], 'category');
+							echo $catArg->name;
+						}
+					?>
+				</div>
+				<div class="post-date mobile">
+					<div class="date"><?php echo $post->getPostDate() ?></div>
+				</div>
+				<div class="author-name">
+					 By <span><?php echo $post->getAuthor()->getDisplayName() ?></span>
+				</div>
+				<div class="sharethis mobile">
+					<div class="sharethis-inline-share-buttons"></div>
+					<script type="text/javascript" src="//platform-api.sharethis.com/js/sharethis.js#property=5aa7706835937200136183e9&product=inline-share-buttons"></script>
+				</div>
+				<div class="description">
+						<?php echo $post->getPostContent() ?>
+				</div>
+				</div>
+			<?php else: ?>
+				<?php echo $this->getPasswordProtectHtml() ?>
+			<?php endif; ?>
+		</div>
+		<?php //echo $this->getAfterPostContentHtml() ?>
+		<?php //echo $this->getCommentsHtml() ?>
+	</div>
+<?php endif; ?>

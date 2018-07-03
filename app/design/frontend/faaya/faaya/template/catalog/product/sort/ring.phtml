@@ -1,0 +1,215 @@
+<?php
+/*$attributeCode = 'metal_clor';
+
+$product = Mage::getModel('catalog/product');
+
+$productCollection = Mage::getResourceModel('eav/entity_attribute_collection')
+   ->setEntityTypeFilter($product->getResource()->getTypeId())
+   ->addFieldToFilter('attribute_code', $attributeCode);
+
+$attribute = $productCollection->getFirstItem()->setEntity($product->getResource());
+print_r($attribute->getData()); // print out the available attributes
+
+$options = $attribute->getSource()->getAllOptions(false);
+print_r($options);*/
+/*$maxprice = Mage::getSingleton('catalog/layer')->setCurrentCategory(Mage::registry('current_category'))->getProductCollection()->getMaxPrice();
+$minprice = Mage::getSingleton('catalog/layer')->setCurrentCategory(Mage::registry('current_category'))->getProductCollection()->getMinPrice();  */
+?>
+<?php
+$currentCategory = Mage::registry('current_category');
+$categoryId = $currentCategory->getId();
+$diamondSize = Mage::getBlockSingleton('layernavigation/layernavigation')->getDiamondSize($categoryId);
+//$getFilterAttribute = Mage::getBlockSingleton('layernavigation/layernavigation')->getRingFilterAttribute($categoryId);
+$getDiamondFilterAttribute = Mage::getBlockSingleton('layernavigation/layernavigation')->getDiamondFilterAttribute($categoryId);
+/*echo '<pre>';
+print_R($getFilterAttribute);*/
+$metalColor = $diamondSize['metal'];
+$karat = $diamondSize['karat'];
+$stoneShape = $getDiamondFilterAttribute['shape'];
+$subCategory = $diamondSize['sub_category'];
+
+//exit;
+ $_caratCollection = Mage::getModel('catalog/product')->getCollection()
+             ->joinField('category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null, 'left')
+             ->addAttributeToSelect('*')
+             ->addAttributeToFilter('category_id',$categoryId)
+             ->addAttributeToFilter('sub_category',array("neq"=>""))
+             ->addAttributeToFilter('metal_color',array("neq"=>""));
+
+//echo '<pre>';
+//print_r($_caratCollection->getData());
+/*$subCategory = $metalColor = array();
+foreach($_caratCollection as $col){
+    $subCategory[]= $col->getSubCategory();
+    $metalColor[]= $col->getMetalColor();
+}
+$subCategory = array_unique($subCategory);
+$metalColor = array_unique($metalColor);
+
+print_r($subCategory);
+print_r($metalColor);*/
+
+/*echo '<prE>';
+print_r($diamondSize);exit;*/
+
+ ?>
+<?php
+$changeAttributeName = array('metal color'=>'metal','karat'=>'metal karat','sub category'=>'ring style');
+$ringAttribute = array('metal_color','karat','sub_category'); ?>
+<div class="block block-layered-nav block-layered-nav--no-filters">
+    <div class="block-content toggle-content">
+        <div id="narrow-by-list">
+        <div class="filter-options diamond_size">
+          <div class="filter-label">
+            <?php echo $this->__('Diamond Size');?>
+          </div>
+          <div class="list">
+            <a class="selectAll" href="javascript:void(0)"><?php echo $this->__('Show all');?></a>
+             <ol>
+               <?php $i=1;foreach($diamondSize['diamond_size'] as $range => $size):?>
+                    <li><input type="checkbox" name="diamond_size" data-optionval="<?php echo $size;?>" id="<?php echo "size-".$i;?>" value="<?php echo $range;?>" class="shopby-attr" data-attname="diamond_size" data-id="<?php echo "size-".$i;?>">
+                    <label for="<?php echo "size-".$i;?>"><span><?php echo $size;?></span></label>
+                    </li>
+               <?php $i++; endforeach;?>
+             </ol>
+          </div>
+        </div>
+        <?php // Metal Color ?>
+        <?php if(count($metalColor) > 0):?>
+            <div class="filter-options metal">
+              <div class="filter-label">
+                <?php echo $this->__('Metal');?>
+              </div>
+              <div class="list">
+                <a class="selectAll" href="javascript:void(0)"><?php echo $this->__('Show all');?></a>
+                 <ol>
+                   <?php foreach($metalColor as $metalId =>$metal):?>
+                    <?php $imageName = strtolower(str_replace(' ',"_",$metal)).".png"; ?>
+                    <?php $imagePath = Mage::getBaseUrl('media')."wizard". DS."category-listing" . DS .$imageName;?>
+                        <li><input type="checkbox" name="metal" data-optionval="<?php echo $metal;?>" id="<?php echo $metalId;?>" value="<?php echo $metalId;?>" class="shopby-attr" data-attname="metal" data-id="<?php echo $metalId;?>">
+                        <label for="<?php echo $metalId;?>"><span><?php echo $metal;?></span>
+                        <img src="<?php echo $imagePath; ?>" alt="<?php echo $imageName;?>"/>
+                        </label>
+
+
+                        </li>
+                   <?php endforeach;?>
+                 </ol>
+              </div>
+            </div>
+        <?php endif; ?>
+        <?php // Karat ?>
+        <?php if(count($karat) > 0):?>
+            <div class="filter-options metal_karat">
+              <div class="filter-label">
+                <?php echo $this->__('Metal Karat');?>
+              </div>
+              <div class="list">
+                <a class="selectAll" href="javascript:void(0)"><?php echo $this->__('Show all');?></a>
+                 <ol>
+                   <?php foreach($karat as $karatId =>$karatVal):?>
+                        <li><input type="checkbox" name="metal_karat" data-optionval="<?php echo $karatVal;?>" id="<?php echo $karatId;?>" value="<?php echo $karatId;?>" class="shopby-attr" data-attname="metal_karat" data-id="<?php echo $karatId;?>">
+                        <label for="<?php echo $karatId;?>"><span><?php echo $karatVal;?></span></label>
+                        </li>
+                   <?php endforeach;?>
+                 </ol>
+              </div>
+            </div>
+        <?php endif; ?>
+        <?php // StoneShape ?>
+        <?php if(count($stoneShape) > 0):?>
+            <div class="filter-options shape">
+              <div class="filter-label">
+                <?php echo $this->__('Shape');?>
+              </div>
+              <div class="list">
+                <a class="selectAll" href="javascript:void(0)"><?php echo $this->__('Show all');?></a>
+                 <ol>
+                   <?php foreach($stoneShape as $shapeId => $shape):?>
+                        <li><input type="checkbox" name="shape" data-optionval="<?php echo $shape;?>" id="<?php echo $shapeId;?>" value="<?php echo $shapeId;?>" class="shopby-attr" data-attname="shape" data-id="<?php echo $shapeId;?>">
+                        <label for="<?php echo $shapeId;?>"><span><?php echo $shape;?></span></label>
+                        </li>
+                   <?php endforeach;?>
+                 </ol>
+              </div>
+            </div>
+        <?php endif;  ?>
+        <?php // Sub Category ?>
+        <?php if(count($subCategory) > 0):?>
+            <div class="filter-options ring_style">
+              <div class="filter-label">
+                <?php echo $this->__('Ring Style');?>
+              </div>
+              <div class="list">
+                <a class="selectAll" href="javascript:void(0)"><?php echo $this->__('Show all');?></a>
+                 <ol>
+                   <?php foreach($subCategory as $styleId=>$style):?>
+                        <li><input type="checkbox" name="ring_style" data-optionval="<?php echo $style;?>" id="<?php echo $styleId;?>" value="<?php echo $styleId;?>" class="shopby-attr" data-attname="sub_category" data-id="<?php echo $styleId;?>">
+                        <label for="<?php echo $styleId;?>"><span><?php echo $style;?></span></label>
+                        </li>
+                   <?php endforeach;?>
+                 </ol>
+              </div>
+            </div>
+        <?php endif; ?>
+
+        <?php /*foreach($ringAttribute as $attr){
+            $options = Mage::getBlockSingleton('layernavigation/layernavigation')->getAttributeOption($attr); ?>
+                <?php $attributeClass = $attr;?>
+                <?php $AttributeLabel =  $this->__(str_replace("_",' ',$attr));?>
+                <?php if (array_key_exists($AttributeLabel,$changeAttributeName)):?>
+                        <?php $AttributeLabel = $changeAttributeName[$AttributeLabel];?>
+                        <?php $attributeClass = str_replace(" ",'_',$AttributeLabel)?>
+                <?php endif;?>
+            <div class="filter-options <?php echo $attributeClass;?>">
+              <div class="filter-label">
+                <?php echo ucwords($AttributeLabel);?>
+              </div>
+              <div class="list">
+                  <?php if ($options){ ?>
+                      <a class="selectAll" href="javascript:void(0)"><?php echo $this->__('Show all');?></a>
+                      <ol>
+                        <?php foreach($options as $option){ ?>
+                          <li data-value="<?php echo $option["value"];?>" >
+                             <input type="checkbox" name="<?php echo $attributeClass;?>" data-optionval="<?php echo $option["label"];?>" id="<?php echo $option["value"];?>" value="<?php echo $option["value"];?>" class="shopby-attr" data-attname="<?php echo $attr;?>" data-id="<?php echo $option["value"];?>"/>
+                             <label for="<?php echo $option["value"];?>">
+                                <!-- <div class="attr-img">
+                                  <img src="<?php echo $this->getSkinUrl('images/metal-1.png'); ?>" alt="">
+                                </div> -->
+                                <span><?php echo $option["label"];?></span>
+                             </label>
+                          </li>
+                        <?php }?>
+                      </ol>
+                  <?php } ?>
+              </div>
+            </div>
+        <?php }*/ ?>
+        <div class="filter-options sort-by">
+          <div class="filter-label">
+            <?php echo $this->__('Sort by');?>
+          </div>
+          <div class="list">
+             <ol>
+               <li><a href="javascript:void(0);" class="shopby-attr sort-by" data-sort="asc" data-order="price"><?php echo $this->__("Price(Ascending Direction)");?></a></li>
+               <li><a href="javascript:void(0);" class="shopby-attr sort-by" data-sort="desc" data-order="price"><?php echo $this->__("Price(Descending Direction)");?></a></li>
+               <li><a href="javascript:void(0);" class="shopby-attr sort-by" data-sort="asc" data-order="bestseller"><?php echo $this->__("Best Sellers");?></a></li>
+             </ol>
+          </div>
+        </div>
+
+        <div class="filter-options price_range_filter">
+          <div class="filter-label">
+            <?php echo $this->__('Price');?>
+          </div>
+          <div class="list">
+            <input type="text" id="min-priceval" class="updateclass" style="border:0; color:#f6931f; font-weight:bold;">
+            <input type="text" id="max-priceval" class="updateclass" style="border:0; color:#f6931f; font-weight:bold;">
+          <div id="price_range_filter"></div>
+          </div>
+        </div>
+        <input type="hidden" name="min-priceval" id="min-priceval" value=""/>
+        <input type="hidden" name="max-priceval" id="max-priceval" value=""/>
+    </div>
+  </div>
+</div>

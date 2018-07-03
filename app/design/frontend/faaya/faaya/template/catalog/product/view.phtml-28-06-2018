@@ -1,0 +1,653 @@
+<?php
+$helper = Mage::Helper('wizard');
+$editid = ($this->getRequest()->getParam('editid'))?$this->getRequest()->getParam('editid'):0;
+ $did = $this->getRequest()->getParam('did');
+ $side = $this->getRequest()->getParam('side');
+if($did):
+ $diamondProduct = mage::getModel('catalog/product')->load($did);
+ $diamondPrice = $diamondProduct->getPrice();
+ $diamondSpecialPrice = $diamondProduct->getSpecialPrice();
+endif;
+
+$_helper = $this->helper('catalog/output');
+$_product = $this->getProduct();
+
+$pid = $_product->getId();
+
+$chainlength = Mage::Helper('wizard')->getChainlength($pid);
+if(!empty($chainlength)){
+    $chainType = Mage::Helper('wizard')->getChainType($pid,$chainlength[0]);
+}
+if(!empty($chainlength) && !empty($chainType)){
+    $chainData = Mage::Helper('wizard')->getChainId($pid,$chainlength[0],$chainType[0]['chain_type']);
+    $chainid = $chainData['pid'];
+    $chainPrice = $chainData['price'];
+}else{
+    $chainid = 0;
+    $chainPrice = 0;
+}
+
+
+$productType = Mage::Helper('wizard')->getProductType($pid);
+
+$stylePrice = $_product->getPrice();
+$styleSpecialPrice = $_product->getSpecialPrice();
+
+$ringData = Mage::getSingleton('core/session')->getRingData();
+
+if($ringData != '' && isset($ringData[$pid]['size'])){
+    $ringSize =  $ringData[$pid]['size'];
+}else{
+    $ringSize =  Mage::Helper('wizard')->getAttributeValue('product_size',$_product->getData('product_size'));
+    $ringData[$pid]['size'] = $ringSize;
+    Mage::getSingleton('core/session')->setRingData($ringData);
+}
+
+$resource = Mage::getSingleton('core/resource');
+$readConnection = $resource->getConnection('core_read');
+
+$pinfo = $readConnection->fetchCol("select pinfo from wizardmaster where pid=".$pid." and pinfo!=''");
+$sidestone = mage::getModel('catalog/product')->load($side);
+
+if($did):
+ $diamondProduct = mage::getModel('catalog/product')->load($did);
+ $diamondPrice = $diamondProduct->getPrice();
+ $diamondSpecialPrice = $diamondProduct->getSpecialPrice();
+endif;
+
+$specialPrice = $_product->getSpecialPrice();
+$isSpecial = 0;
+if($specialPrice && $diamondSpecialPrice): $isSpecial = 1; endif;
+
+$sid = $_product->getId();
+$sideGroup = array();
+$sidestoneArr = array();
+$checkOutDisable = false;
+if($side != ''){
+    $sideGroup = $readConnection->fetchCol("select pid from wizardmaster where group_code IN (select group_code from wizardmaster where pid=".$side.")");
+    $sidestoneArr = $readConnection->fetchRow("select SUM(price) as price,SUM(weight) as weight,stone_color,stone_quality from wizardmaster where pid IN (".implode(',', $sideGroup).")");
+}else{
+    $matchPair = $readConnection->fetchCol('select id from wizardrelation where variant_id = '.$_product->getVariantId().' and type="diamondinfo" and special_character ="M"');
+    if(count($matchPair)>0){
+        $checkOutDisable = true;
+    }
+}
+$url = Mage::getUrl('wizard/index/addtocart');
+
+$attribute = Mage::helper('wizard')->getAllAttribute();
+
+$mainPrice  = $stylePrice+$diamondPrice;
+$mainPrice = (!empty($sidestoneArr))?($sidestoneArr['price']+$mainPrice):$mainPrice;
+$ids = $_product->getCategoryIds();
+$category = Mage::getModel("catalog/category")->load($ids[0]);
+$categoryLink = $category->getUrl();
+$categoryName = $category->getName();
+if($editid){
+    $categoryLink = $categoryLink.'?editid='.$editid;
+}
+?>
+            <div id="messages_product_view">
+                <?php echo $this->getMessagesBlock()->toHtml() ?>
+            </div>
+            <div class="product-view">
+
+                <div class="backtolist-btn backlink">
+                   <a href="<?php echo $categoryLink;?>" class="button btn-cart"><?php echo $this->__('View other ').$categoryName;?></a>
+                </div>
+
+                <div class="product-essential">
+                    <form action="<?php echo $url; ?>" method="post" id="product_addtocart_form" <?php if($_product->getOptions()): ?> enctype="multipart/form-data"
+                        <?php endif; ?>>
+
+                            <?php if($sid):?>
+                                <input type="hidden" name="sid" value="<?php echo $sid."-".$isSpecial;?>">
+                            <?php endif;?>
+                             <input type="hidden" name="product" value="<?php echo $_product->getId();?>">
+                            <input type="hidden" name="editid" value="<?php echo $editid;?>">
+                            <input type="hidden" name="productprice" value="<?php echo $mainPrice;?>">
+                            <?php if(!empty($chainlength) && !empty($chainType)){ ?>
+                                <input type="hidden" name="chain" value="<?php echo $chainid;?>">
+                            <?php } ?>
+
+                            <?php if($did):?>
+                                <input type="hidden" name="did" value="<?php echo $did."-".$isSpecial;?>">
+                            <?php endif;?>
+                            <?php if(!empty($sideGroup) && count($sideGroup) > 1):?>
+                                <input type="hidden" name="side1" value="<?php echo $sideGroup[0];?>">
+                                <input type="hidden" name="side2" value="<?php echo $sideGroup[1];?>">
+                            <?php endif;?>
+                            <?php echo $this->getBlockHtml('formkey') ?>
+                                <div class="product-img-box">
+                                    <div class="product-name">
+                                        <h1><?php echo $_helper->productAttribute($_product, $_product->getVariantRemark(), 'variant_remark') ?></h1>
+                                    </div>
+                                    <?php echo $this->getChildHtml('media') ?>
+                                </div>
+                                <div class="product-shop">
+                                    <div class="product-name">
+                                        <span class="h1"><?php echo $_helper->productAttribute($_product, $_product->getVariantRemark(), 'variant_remark') ?></span>
+
+                                    </div>
+                                    <p><?php echo $_helper->productAttribute($_product, nl2br($_product->getShortDescription()), 'short_description') ?></p>
+                                    <div class="price-info">
+                                        <?php //echo $this->getPriceHtml($_product); ?>
+                                            <?php if(!$styleSpecialPrice || !$diamondSpecialPrice): ?>
+                                                    <?php $styleTotal = $stylePrice + $diamondPrice; ?>
+                                                    <?php $styleTotal = (!empty($sidestoneArr))?($sidestoneArr['price']+$styleTotal):$styleTotal;  ?>
+                                                    <?php //$styleTotal = ($chainPrice > 0)?($chainPrice+$styleTotal):$styleTotal;  ?>
+
+                                                 <div class="price-box">
+                                                    <span class="regular-price" id="product-price-<?php echo $pid;?>">
+                                                        <span class="price"><?php echo Mage::helper('core')->currency($styleTotal, true, false);?></span>
+                                                    </span>
+                                                </div>
+                                            <?php else: ?>
+                                                <?php
+                                                    $styleTotal = $stylePrice + $diamondPrice;
+                                                    $styleSpecialTotal = $styleSpecialPrice + $diamondSpecialPrice;
+                                                ?>
+                                                 <div class="price-box">
+                                                    <p class="old-price">
+                                                        <span class="price" id="old-price-<?php echo $pid;?>"><?php echo Mage::helper('core')->currency($styleTotal, true, false);?></span>
+                                                    </p>
+                                                    <p class="special-price">
+                                                        <span class="price" id="product-price-<?php echo $pid;?>"><?php echo Mage::helper('core')->currency($styleSpecialTotal, true, false);?></span>
+                                                    </p>
+                                                </div>
+                                            <?php endif;?>
+
+                                            <?php echo $this->getChildHtml('bundle_prices') ?>
+                                                <?php echo $this->getTierPriceHtml() ?>
+                                    </div>
+                                    <div class="extra-info">
+                                        <?php
+                                            //$summaryData = Mage::getModel('review/review_summary')->setStoreId(Mage::app()->getStore()->getId())->load($_product->getId());
+                                            //$summaryData->getReviewsCount()
+
+                                        ?>
+                                        <?php echo $this->getReviewsSummaryHtml($_product, 'default', false)?>
+                                            <?php //echo $this->getChildHtml('product_type_availability'); ?>
+                                    </div>
+                                    <?php echo $this->getChildHtml('alert_urls') ?>
+                                        <?php if ($_product->getShortDescription()):?>
+                                            <div class="short-description">
+                                                <?php
+                                                    // Ring Attribute
+                                                    $styleId = $_product->getResource()->getAttribute('sub_category')->getFrontend()->getValue($_product);
+                                                    $metalType = $_product->getResource()->getAttribute('metal_type')->getFrontend()->getValue($_product);
+                                                    $karat = $_product->getResource()->getAttribute('karat')->getFrontend()->getValue($_product);
+                                                    $maxumumWidth = $_product->getResource()->getAttribute('maximum_width')->getFrontend()->getValue($_product);
+
+                                                    // End Ring Attribute
+                                                    // ===========================================
+                                                    // Diamond Attribute
+                                                    $pdfCerti = "";
+                                                    $stoneCut = $carat = $metalColor = $stoneQuality = "N/A";
+                                                    if($diamondProduct):
+                                                        $stoneCut = $_product->getResource()->getAttribute('stone_cut')->getFrontend()->getValue($diamondProduct);
+                                                        $carat = $_product->getResource()->getAttribute('carat')->getFrontend()->getValue($diamondProduct);
+                                                        $stoneColor = $_product->getResource()->getAttribute('stone_color')->getFrontend()->getValue($diamondProduct);
+                                                        $stoneQuality = $_product->getResource()->getAttribute('stone_quality')->getFrontend()->getValue($diamondProduct);
+                                                        $pdfCerti = $diamondProduct->getCertificatePdf();
+                                                    endif;
+                                                    // End Diamond Attribute
+                                                ?>
+                                                <div class="info-table">
+                                                    <table border="0" width="100%" cellpadding="0" cellspacing="0">
+                                                    <tr>
+                                                        <th><?php echo ucfirst(strtolower($productType)).' '.$this->__('Information');?></th>
+                                                    </tr>
+                                                    <?php if($productType == 'RINGS' || $productType == 'Bracelets'): ?>
+                                                    <tr>
+                                                        <td><?php echo $this->__('Style: ').($styleId ? $styleId : 'N/A');?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><?php echo $this->__('Metal: ').($karat && $metalType ? $karat." ".$metalType : 'N/A');?></td>
+                                                    </tr>
+
+                                                    <?php endif;?>
+
+                                                    <?php if($productType == 'Band' || $productType == 'Bracelets'): ?>
+                                                    <tr>
+                                                        <td><?php echo $this->__('Style: ').($styleId ? $styleId : 'N/A');?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><?php echo $this->__('Metal: ').($karat && $metalType ? $karat." ".$metalType : 'N/A');?></td>
+                                                    </tr>
+
+                                                    <?php endif;?>
+
+                                                    <?php if($productType == 'PENDANTS'): ?>
+                                                    <tr>
+                                                        <td><?php echo $this->__('Stock Number: ');?><?php echo $_product->getItemName();?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><?php echo $this->__('Metal: ').($karat && $metalType ? $karat." ".$metalType : 'N/A');?></td>
+                                                    </tr>
+
+
+
+
+
+                                                    <?php endif;?>
+
+                                                    <?php if($productType == 'EARRINGS'): ?>
+                                                    <tr>
+                                                        <td><?php echo $this->__('Stock Number: ');?><?php echo $_product->getItemName();?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><?php echo $this->__('Metal: ').($karat && $metalType ? $karat." ".$metalType : 'N/A');?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><?php echo $this->__('Backing: ')?><?php echo ($_product->getBackType() && $_product->getBackType() != ""? $_product->getBackType() : 'N/A');?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><?php echo $this->__('Clarity: ').($stoneQuality ? $stoneQuality : 'N/A');?></td>
+                                                    </tr>
+                                                    <?php endif;?>
+                                                    <?php if($productType == 'RINGS' || $productType == 'Band'): ?>
+                                                        <?php //if($ringSize == $size):?>
+                                                    <tr>
+                                                        <th><?php //echo $this->__('Ring Size -');?>
+                                                            <select name="ring-size" id="ring-size" class="validate-select sizeSelectpicker">
+                                                                <option value=""><?php echo $this->__('Select size') ?></option>
+                                                                <?php foreach(Mage::getModel('wizard/wizardrelation')->getAvailbleSizes($_product,false) as $size):?>
+                                                                <option value="<?php echo $size;?>" data-val="size_<?php echo $size;?>"><?php echo $size;?></option>
+                                                                <?php endforeach;?>
+                                                            </select>
+                                                        </th>
+                                                        <td>
+                                                        <?php if($_product->getSizeGuide()):?>
+                                                            <a class="size-guide" href="#size-guide" data-fancybox><span class="underline"><?php echo $this->__('Size Guide');?></span></a>
+                                                        <?php endif;?>
+                                                        </td>
+                                                    </tr>
+                                                    <?php endif;?>
+                                                    </table>
+                                                    <?php if($did):?>
+                                                    <table border="0" cellpadding="0" cellspacing="0">
+                                                    <tr><th><?php echo $this->__('Diamond Details');?></th></tr>
+                                                    <tr><td><?php echo $this->__('Cut: ').($stoneCut && $stoneCut != "No"? $stoneCut : 'N/A');?></td></tr>
+                                                    <tr><td><?php echo $this->__('Carat: ').($carat ? $carat : 'N/A');?></td></tr>
+                                                    <tr><td><?php echo $this->__('Color: ').($stoneColor ? $stoneColor : 'N/A');?></td></tr>
+                                                    <tr><td><?php echo $this->__('Clarity: ').($stoneQuality ? $stoneQuality : 'N/A');?></td></tr>
+                                                    <?php if(Mage::helper('wizard')->checkRemoteFile($pdfCerti)):?><tr><td class="certificate_link"><a href="<?php echo $pdfCerti;?>" target="_blank"><?php echo $this->__('Download Certificate'); ?></a></td></tr><?php endif;?>
+                                                    </table>
+                                                    <?php endif;?>
+                                                    <?php if($productType == 'PENDANTS'): ?>
+                                                    <table class="chain-attributes">
+                                                         <tr>
+                                                            <?php if(!empty($chainlength)): ?>
+                                                            <td>
+                                                                <div class="attribute">
+                                                                    <h4><?php echo $this->__('Chain Length: ')?></h4>
+                                                                    <ul class="chain_length">
+                                                                        <?php foreach ($chainlength as $key=>$option) { ?>
+                                                                        <li>
+                                                                            <input type="radio" class="radio validate-one-required-by-name" id="chain_length-<?php echo $option?>" name="chain_length[]" value="<?php echo $option?>"  />
+                                                                            <label for="chain_length-<?php echo $option?>">
+                                                                                <span><?php echo $option;?></span>
+                                                                            </label>
+                                                                        </li>
+                                                                        <?php } ?>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                            <?php endif; ?>
+                                                            <?php if(!empty($chainType)): ?>
+                                                            <td>
+
+                                                                <div class="attribute">
+                                                                    <h4><?php echo $this->__('Chain type')?></h4>
+                                                                    <ul class="chain_type">
+                                                                        <?php foreach ($chainType as $key=>$option) { ?>
+                                                                        <li>
+                                                                            <input type="radio" class="radio validate-one-required-by-name" id="chain_type-<?php echo $option['chain_type']?>" name="chain_type[]" value="<?php echo $option['chain_type']?>" />
+                                                                            <label for="chain_type-<?php echo $option['chain_type']?>">
+                                                                                <span class="image">
+                                                                                    <img src="<?php echo Mage::getBaseUrl('media');?>catalog/product/<?php echo $option['image'];?>">
+                                                                                </span>
+                                                                                <span><?php echo $option['chain_type'];?></span>
+                                                                            </label>
+                                                                        </li>
+                                                                        <?php } ?>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                            <?php endif; ?>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td></td>
+                                                            <td class="chainprice"><?php echo $this->__('Chain price: ')?><span><?php echo Mage::helper('core')->currency($chainPrice, true, false);?></span></td>
+                                                        </tr>
+                                                    </table>
+                                                    <?php endif;?>
+                                                </div>
+                                            </div>
+                                            <?php endif;?>
+                                                <?php echo $this->getChildHtml('other');?>
+                                                    <?php if ($_product->isSaleable() && $this->hasOptions()):?>
+                                                        <?php echo $this->getChildChildHtml('container1', '', true, true) ?>
+                                                    <?php endif;?>
+                                                    <?php if(!$checkOutDisable): ?>
+                                                    <div class="add-to-cart-wrapper">
+                                                        <?php echo $this->getChildHtml('product_type_data') ?>
+                                                        <?php echo $this->getChildHtml('extrahint') ?>
+                                                        <?php if (!$this->hasOptions()):?>
+                                                            <div class="add-to-box">
+                                                                <?php if($_product->isSaleable()): ?>
+                                                                    <?php echo $this->getChildHtml('addtocart') ?>
+                                                                        <?php if( $this->helper('wishlist')->isAllow() || $_compareUrl=$this->helper('catalog/product_compare')->getAddUrl($_product)): ?> <span class="or">    <?php echo $this->__('OR') ?></span>
+                                                                        <?php endif; ?>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                            <?php echo $this->getChildHtml('extra_buttons') ?>
+                                                        <?php elseif (!$_product->isSaleable()): ?>
+                                                                <div class="add-to-box">
+                                                                    <?php echo $this->getChildHtml('sharing') ?>
+                                                                </div>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    <?php else:?>
+                                                        <div class="add-to-cart-wrapper">
+                                                            <?php echo $this->__('Matchpair is not available at this moment please try after some time');?>
+                                                        </div>
+                                                    <?php endif;?>
+                                    <div class="shipping-box">
+                                        <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('shipping-offer')->toHtml(); ?>
+                                    </div>
+                                </div>
+                                <?php echo $this->getChildHtml('related_products') ?>
+                                <div class="clearer"></div>
+                                <?php if ($_product->isSaleable() && $this->hasOptions()):?>
+                                    <?php echo $this->getChildChildHtml('container2', '', true, true) ?>
+                                <?php endif;?>
+                    </form>
+
+                </div>
+                <section class="p_diamond_section">
+                    <?php if(!empty($sidestoneArr)){ ?>
+                    <div class="block">
+                        <h2><?php echo $this->__('Side Diamond <span>information</span>'); ?></h2>
+                        <div class="details-tbl">
+                           <ul>
+                              <li>
+                                 <span class="title"><?php echo $this->__('Minimum number of round diamonds'); ?>
+                                 </span>
+                                 <span class="value"><?php echo $this->__('2'); ?></span>
+                              </li>
+                              <li>
+                                 <span class="title"><?php echo $this->__('Minimum carat total weight (CT. W.)'); ?>
+                                    <div class="tooltip-options">
+                                       <div class="tooltip-image">
+                                          <img width="20" src="<?php echo $this->getSkinUrl('images/tooltip-info.png'); ?>" alt="">
+                                       </div>
+                                       <div class="tooltip-content">
+                                          <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+                                          <?php echo $helper->getTooltip($attribute['WEIGHT']);?>
+                                       </div></div>
+                                 </span>
+                                 <span class="value"><?php echo $sidestoneArr['weight']; ?></span>
+                              </li>
+                              <li>
+                                 <span class="title"><?php echo $this->__('Average Colour'); ?>
+                                    <div class="tooltip-options">
+                                       <div class="tooltip-image">
+                                          <img width="20" src="<?php echo $this->getSkinUrl('images/tooltip-info.png'); ?>" alt="">
+                                       </div>
+                                       <div class="tooltip-content">
+                                          <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+                                          <?php echo $helper->getTooltip($attribute['STONE_COLOR']);?>
+                                       </div></div>
+                                 </span>
+                                 <span class="value"><?php echo $sidestoneArr['stone_color']; ?></span>
+                              </li>
+                              <li>
+                                 <span class="title"><?php echo $this->__('Average Clarity'); ?>
+                                     <div class="tooltip-options">
+                                       <div class="tooltip-image">
+                                          <img width="20" src="<?php echo $this->getSkinUrl('images/tooltip-info.png'); ?>" alt="">
+                                       </div>
+                                       <div class="tooltip-content">
+                                          <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+                                          <?php echo $helper->getTooltip($attribute['STONE_QUALITY']);?>
+                                       </div></div>
+                                 </span>
+                                 <span class="value"><?php echo $sidestoneArr['stone_quality'];  ?></span>
+                              </li>
+                           </ul>
+                        </div>
+                    </div>
+                    <?php } ?>
+                    <?php if(!empty($pinfo)){ ?>
+                        <?php
+                        $pinfo = unserialize($pinfo[0]);
+                        $pieces = 0;
+                        $piecesweight = 0;
+                        if(count($pinfo) > 0){
+                          foreach ($pinfo as $pinfoitem) {
+                            $pieces += $pinfoitem['PIECES'];
+                            $piecesweight += $pinfoitem['WEIGHT'];
+                          }
+                          $pinfo[0]['PIECES'] = $pieces;
+                          $pinfo[0]['WEIGHT'] = $piecesweight;
+                          $pinfo = $pinfo[0];
+                        }else{
+                            $pinfo = $pinfo[0];
+                        }
+                        ?>
+                    <div class="block">
+                        <h2><?php echo $this->__('Pave Set <span>information</span>'); ?></h2>
+                        <div class="details-tbl">
+                           <ul>
+                              <li>
+                                 <span class="title"><?php echo $this->__('Minimum number of round diamonds'); ?>
+                                 </span>
+                                 <span class="value"><?php echo $pinfo['PIECES']; ?></span>
+                              </li>
+                              <li>
+                                 <span class="title"><?php echo $this->__('Minimum carat total weight (CT. W.)'); ?>
+                                    <div class="tooltip-options">
+                                       <div class="tooltip-image">
+                                          <img width="20" src="<?php echo $this->getSkinUrl('images/tooltip-info.png'); ?>" alt="">
+                                       </div>
+                                       <div class="tooltip-content">
+                                          <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+                                          <?php echo $helper->getTooltip($attribute['WEIGHT']);?>
+                                       </div></div>
+                                 </span>
+                                 <span class="value"><?php echo $pinfo['WEIGHT']; ?></span>
+                              </li>
+                              <li>
+                                 <span class="title"><?php echo $this->__('Average Colour'); ?>
+                                    <div class="tooltip-options">
+                                       <div class="tooltip-image">
+                                          <img width="20" src="<?php echo $this->getSkinUrl('images/tooltip-info.png'); ?>" alt="">
+                                       </div>
+                                       <div class="tooltip-content">
+                                          <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+                                          <?php echo $helper->getTooltip($attribute['STONE_COLOR']);?>
+                                       </div></div>
+                                 </span>
+                                 <span class="value"><?php echo $pinfo['STONE_COLOR']; ?></span>
+                              </li>
+                              <li>
+                                 <span class="title"><?php echo $this->__('Average Clarity'); ?>
+                                     <div class="tooltip-options">
+                                       <div class="tooltip-image">
+                                          <img width="20" src="<?php echo $this->getSkinUrl('images/tooltip-info.png'); ?>" alt="">
+                                       </div>
+                                       <div class="tooltip-content">
+                                          <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+                                          <?php echo $helper->getTooltip($attribute['STONE_QUALITY']);?>
+                                       </div></div>
+                                 </span>
+                                 <span class="value"><?php echo $pinfo['QUALITY']; ?></span>
+                              </li>
+                           </ul>
+                        </div>
+                    </div>
+                    <?php } ?>
+                        <div class="text-center">
+                            <?php if(Mage::helper('wizard')->checkRemoteFile($sidestone->getCertificatePdf())){ ?>
+                                <a class="readmore" href="<?php echo $sidestone->getCertificatePdf();?>" target="_blank"><?php echo $this->__('Download Diamond Certificate'); ?></a>
+                            <?php } ?>
+                        </div>
+                </section>
+
+
+                    <section class="shipping-details">
+                        <div class="section-title">
+                            <h3><span>Shipping</span> Details</h3> </div>
+                        <div class="shipping-banner">
+                            <?php if($_product->getShippingImage() && $_product->getShippingImage() != "no_selection"):?>
+                            <img src="<?php echo Mage::helper('catalog/image')->init($_product, 'shipping_image'); ?>
+                            <?php //echo $this->getSkinUrl('images/media/shipping-banner.jpg') ?>" />
+                            <?php endif;?>
+                        </div>
+
+                          <?php echo $this->getLayout()->createBlock('core/template')->setTemplate('catalog/product/shipping_detail.phtml')->toHtml(); ?>
+                    </section>
+
+            </div>
+            <div id="size-guide" style="display: none;">
+            <?php echo $_product->getSizeGuide();?>
+            </div>
+
+
+
+<script type="text/javascript">
+    //<![CDATA[
+    var optionsPrice = new Product.OptionsPrice(<?php echo $this->getJsonConfig() ?>);
+    var BASE_URL='<?php echo Mage::getBaseURL();?>';
+    var pid='<?php echo $pid;?>';
+    var did='<?php echo $did;?>';
+    var variantid='<?php echo $_product->getData("variant_id");?>';
+    var productAddToCartForm = new VarienForm('product_addtocart_form');
+    var editid = '<?php echo $editid;?>';
+    productAddToCartForm.submit = function (button, url) {
+        if (this.validator.validate()) {
+            var form = this.form;
+            if(did == 0){
+                form.submit();
+                return true;
+            }
+            jQuery.ajax({
+                url: BASE_URL+"wizard/index/checkdiamond",
+                type: "POST",
+                data: {did:did,variantid:variantid,editid:editid},
+                success: function(redata){
+                    var responseId = JSON.parse(redata);
+                    if(responseId > 0){
+                        jQuery.fancybox.open({
+                            baseClass: 'simplepopup',
+                            toolbar:false,
+                            autoSize: false,
+                            src: BASE_URL+'popuphtml/presetpopup.php?pid='+responseId+'&oid='+did,
+                            type: 'ajax'
+                        });
+                    }else if(responseId == '00'){
+                        jQuery.fancybox.open({
+                            baseClass: 'simplepopup',
+                            toolbar:false,
+                            autoSize: false,
+                            src: BASE_URL+'popuphtml/presetpopup.php?pid=0',
+                            type: 'ajax'
+                        });
+                    }else{
+                        form.submit();
+                        return true;
+                    }
+                }
+            })
+            return false;
+        }
+    }.bind(productAddToCartForm);
+
+
+    productAddToCartForm.submitLight = function (button, url) {
+        if (this.validator) {
+            var nv = Validation.methods;
+            delete Validation.methods['required-entry'];
+            delete Validation.methods['validate-one-required'];
+            delete Validation.methods['validate-one-required-by-name'];
+            // Remove custom datetime validators
+            for (var methodName in Validation.methods) {
+                if (methodName.match(/^validate-datetime-.*/i)) {
+                    delete Validation.methods[methodName];
+                }
+            }
+            if (this.validator.validate()) {
+                if (url) {
+                    this.form.action = url;
+                }
+                this.form.submit();
+            }
+            Object.extend(Validation.methods, nv);
+        }
+    }.bind(productAddToCartForm);
+    //]]>
+    jQuery(document).ready(function(){
+        jQuery('input[name="chain_length[]"]').click(function(){
+            jQuery('.chain-attributes').addClass('loadingprice');
+            var length = jQuery(this).val();
+            var productprice = jQuery('input[name="productprice"]').val();
+            jQuery.ajax({
+                url: BASE_URL+"wizard/index/chain",
+                type: "POST",
+                data: {pid:pid,length:length,productprice:productprice},
+                success: function(response){
+                    response = JSON.parse(response);
+                    jQuery('.chain_type').html(response.html);
+                    jQuery('input[name="chain"]').val(response.id);
+                    jQuery('.regular-price').find('span').text(response.price);
+                    jQuery('.chain-attributes').removeClass('loadingprice');
+                },error: function(xhr){
+                    response = JSON.parse(xhr.responseText);
+                    jQuery('.chain_type').html(response.html);
+                    jQuery('input[name="chain"]').val(response.id);
+                    jQuery('.regular-price').find('span').text(response.price);
+                    jQuery('.chain-attributes').removeClass('loadingprice');
+                }
+            })
+        })
+        jQuery(document).on('click','input[name="chain_type[]"]',function () {
+            jQuery('.chain-attributes').addClass('loadingprice');
+            var length = jQuery('input[name="chain_length[]"]').val();
+            var type = jQuery(this).val();
+            var productprice = jQuery('input[name="productprice"]').val();
+            jQuery.ajax({
+                url: BASE_URL+"wizard/index/setchainid",
+                type: "POST",
+                data: {pid:pid,length:length,type:type,productprice:productprice},
+                success: function(response){
+                    response = JSON.parse(response);
+                    jQuery('input[name="chain"]').val(response.id);
+                    jQuery('.chainprice').find('span').text(response.price);
+                    jQuery('.chain-attributes').removeClass('loadingprice');
+                },error: function(xhr){
+                    response = JSON.parse(xhr.responseText);
+                    jQuery('input[name="chain"]').val(response.id);
+                    jQuery('.chainprice').find('span').text(response.price);
+                    jQuery('.chain-attributes').removeClass('loadingprice');
+                }
+            })
+        })
+
+
+        jQuery('#ring-size').change(function(){
+            var ringsize = jQuery(this).find(':selected').data('val');
+            jQuery.ajax({
+                url: BASE_URL+"wizard/index/setringdata",
+                type: "POST",
+                data: {id:ringsize,pid:pid,metaloption:false,shapeoption:false}
+            })
+        })
+    })
+    function addcart(did){
+        jQuery('input[name="did"]').val(did);
+        jQuery('#product_addtocart_form').submit();
+    }
+
+</script>

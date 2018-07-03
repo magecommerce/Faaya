@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<config>
+	 <modules>
+    <Cda_Magewordpress>
+        <version>1.0.0</version>
+    </Cda_Magewordpress>
+    </modules>
+    <frontend>
+        <routers>
+            <wordpress>
+                <args>
+                    <modules>
+                        <Cda_Magewordpress before="Fishpig_Wordpress">Cda_Magewordpress</Cda_Magewordpress>
+                    </modules>
+                </args>
+            </wordpress>
+        </routers>
+    </frontend>
+    <global>
+    <page>
+     <layouts>
+		<custom_carouselpage>
+			<label>Carousel Page</label>
+			<template>page/carousel-page.phtml</template>
+		</custom_carouselpage>
+
+ 		<custom_history>
+			<label>Wordpress Page</label>
+			<template>wordpress/page/wordpress.phtml</template>
+		</custom_history>
+
+		 <custom_wordpressright>
+			<label>Wordpress right sidebar </label>
+			<template>wordpress/page/wordpress-sidebar.phtml</template>
+		</custom_wordpressright>
+      </layouts>
+    </page>
+        <models>
+            <magewordpress>
+                <class>Cda_Magewordpress_Model</class>
+            </magewordpress>
+        </models>
+        <events>
+            <adminhtml_cms_page_edit_tab_content_prepare_form>
+                <observers>
+                    <magewordpress_page_edit_tab_content>
+                        <type>singleton</type>
+                        <class>Cda_Magewordpress_Model_Observer</class>
+                        <method>cmsField</method>
+
+                    </magewordpress_page_edit_tab_content>
+                </observers>
+            </adminhtml_cms_page_edit_tab_content_prepare_form>
+        </events>
+		<events>
+            <cms_page_save_after>
+                <observers>
+                    <kgn_magewordpress_Observer>
+                        <type>singleton</type>
+                        <class>Cda_Magewordpress_Model_Observer</class>
+                        <method>saveCmsCustomDetail</method>
+                    </kgn_magewordpress_Observer>
+                </observers>
+            </cms_page_save_after>
+        </events>
+		<resources>
+            <customcms_setup>
+                <setup>
+                    <module>Cda_Magewordpress</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </customcms_setup>
+        </resources>
+    </global>
+</config>

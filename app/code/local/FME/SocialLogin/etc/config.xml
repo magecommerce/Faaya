@@ -1,0 +1,184 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+ * @category   FME
+ * @package    FME_SocialLogin
+ * @author     FARMAN ULLAH
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+ -->
+<config>
+    <modules>
+        <FME_SocialLogin>
+            <version>0.1.0</version>
+        </FME_SocialLogin>
+    </modules>
+
+    <frontend>
+       <routers>
+            <sociallogin>
+                <use>standard</use>
+                <args>
+                    <module>FME_SocialLogin</module>
+                    <frontName>sociallogin</frontName>
+                </args>
+            </sociallogin>
+        </routers>
+        <layout>
+            <updates>
+                <sociallogin>
+                    <file>sociallogin.xml</file>
+                </sociallogin>
+            </updates>
+        </layout>
+    </frontend>
+    <admin>
+        <routers>
+            <sociallogin>
+                <use>admin</use>
+                <args>
+                    <module>FME_SocialLogin</module>
+                    <frontName>sociallogin</frontName>
+                </args>
+            </sociallogin>
+        </routers>
+    </admin>
+    <adminhtml>
+        <menu>
+            <sociallogin module="sociallogin">
+                <title>FME Extensions</title>
+                <sort_order>71</sort_order>               
+                <children>
+                <config module="sociallogin">
+                        <title>Social Login</title>
+                        <sort_order>0</sort_order>
+                        <action>adminhtml/system_config/edit/section/config_options</action>
+                    </config>
+                </children>
+            </sociallogin>
+        </menu>
+         <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <config_options module="sociallogin">
+                                        <title>FME Extensions</title>
+                                    </config_options>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+            <sociallogin module="sociallogin">
+                <title>FME Social login</title>
+                <sort_order>71</sort_order>               
+                <children>
+                    <config translate="title" module="sociallogin">
+                        <title>Configuration</title>
+                        <sort_order>2</sort_order>
+                    </config>
+                </children>
+            </sociallogin>
+                 </children>
+            </admin>
+        </resources>
+    </acl>
+        <acl>
+            <resources>
+                <all>
+                    <title>Allow Everything</title>
+                </all>
+                <admin>
+                    <children>
+                        <FME_SocialLogin>
+                            <title>SocialLogin Module</title>
+                            <sort_order>10</sort_order>
+                        </FME_SocialLogin>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+        <layout>
+            <updates>
+                <sociallogin>
+                    <file>sociallogin.xml</file>
+                </sociallogin>
+            </updates>
+        </layout>
+    </adminhtml>   
+    <global>
+        <rewrite>
+            <fme_sociallogin>
+               
+                              <from><![CDATA[#^/customer/account/#]]></from>
+                              
+                               <to><![CDATA[/sociallogin/account/]]></to>
+            </fme_sociallogin>
+         </rewrite>
+        <models>
+            <sociallogin>
+                <class>FME_SocialLogin_Model</class>
+                <resourceModel>sociallogin_mysql4</resourceModel>
+            </sociallogin>
+            <sociallogin_mysql4>
+                <class>FME_SocialLogin_Model_Mysql4</class>
+                <entities>
+                    <sociallogin>
+                        <table>sociallogin</table>
+                    </sociallogin>
+                </entities>
+            </sociallogin_mysql4>
+        </models>
+        <resources>
+            <sociallogin_setup>
+                <setup>
+                    <module>FME_SocialLogin</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </sociallogin_setup>
+            <sociallogin_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </sociallogin_write>
+            <sociallogin_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </sociallogin_read>
+        </resources>
+        <blocks>
+            <sociallogin>
+                <class>FME_SocialLogin_Block</class>
+            </sociallogin>
+        </blocks>
+        <helpers>
+            <sociallogin>
+                <class>FME_SocialLogin_Helper</class>
+            </sociallogin>
+        </helpers>
+    </global>
+     <default>
+<!-- <captcha>
+<frontend>
+<areas>
+<form_validate>
+<label>Social login</label>
+</form_validate>
+</areas>
+</frontend>
+</captcha>
+<customer>
+<captcha>
+<always_for>
+<form_validate>1</form_validate>
+</always_for>
+</captcha>
+</customer> -->
+</default>
+</config>

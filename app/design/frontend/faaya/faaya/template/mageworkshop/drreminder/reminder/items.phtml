@@ -1,0 +1,58 @@
+<?php
+/**
+ * MageWorkshop
+ * Copyright (C) 2016 MageWorkshop <info@mage-review.com>
+ *
+ * @category   MageWorkshop
+ * @package    MageWorkshop_DRReminder
+ * @copyright  Copyright (c) 2016 MageWorkshop Co. (https://mage-review.com/)
+ * @license    http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3 (GPL-3.0)
+ * @author     MageWorkshop <info@mage-review.com>
+ */
+
+/* @var $this MageWorkshop_DRReminder_Block_ItemsForReminder */
+
+$reminder = $this->getData('reminder');
+$order = Mage::getModel('sales/order')->load($reminder->getOrderId());
+$hash = md5($reminder->getOrderId() . $order->getCreatedAt());
+$productsCollection = $this->getLayout()->getBlockSingleton('drreminder/review_reminder_list')->getReminderItems($hash, $order->getStore());
+?>
+<?php $length = $productsCollection->getSize(); ?>
+<table  width="auto" border="0" cellspacing="0" cellpadding="0" style="margin: 0;padding: 0;outline: 0;background-color: #FFFFFF;">
+    <tr>
+        <?php $i = 0; foreach ($productsCollection as $product): $i++ ?>
+        <td width="250" scope="col"">
+            <table  width="250" style="margin: 0;padding: 0;outline: 0;">
+                <tr>
+                    <td width="250" style="margin: 0;padding: 0;">
+                        <a href="<?php echo $product->getProductUrl() . '#review-form'  ?>" title="<?php echo $this->stripTags($this->getImageLabel($product, 'small_image'), null, true) ?>" class="product-image" target="_blank">
+                            <img src="<?php echo $this->helper('catalog/image')->init($product, 'small_image')->resize(250, 250); ?>" style="border:none; margin:0; padding:0;" width="250" height="250" alt=""/>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="margin: 0;padding: 10px;">
+                            <a href="<?php echo $product->getProductUrl() . '#review-form'  ?>" style="color:#203548;">
+                                <strong><?php echo $this->escapeHtml($product->getName()) ?></strong>
+                            </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <?php if ($i%4!=0): ?>
+            <td width="15" scope="col"></td>
+        <?php else: ?>
+    </tr>
+    <tr>
+        <td colspan="5">&nbsp;</td>
+    </tr>
+    <?php if ($i<$length): ?>
+    <tr>
+        <?php endif ?>
+        <?php endif ?>
+        <?php endforeach ?>
+</table>
+<br/>
+<a href="<?php echo Mage::getUrl("drreminder/index/products/", array('order' => $hash, '_store'=> $order->getStore())) ?>" style="color:#203548;">
+    <strong><?php echo $this->__('See full list of my purchased products'); ?></strong>
+</a>

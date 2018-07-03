@@ -1,0 +1,72 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @package Amasty_GiftCard
+ */
+?>
+<?php
+/* @var $this Amasty_GiftCard_Block_Adminhtml_Renderer_Price */
+?>
+<?php $_isSingleStoreMode = $this->isSingleStoreMode(); ?>
+<?php $_htmlId = $this->getElement()->getHtmlId() ?>
+<?php $_htmlClass = $this->getElement()->getClass() ?>
+<?php $_htmlName = $this->getElement()->getName() ?>
+<?php $_isReadonly = $this->getElement()->getReadonly() ?>
+<?php $data = $this->getListPrices(); ?>
+
+<tr>
+	<td class="label"><?php echo $this->getElement()->getLabel() ?></td>
+	<td class="grid value">
+		<table cellspacing="0" class="data border" id="table">
+			<thead>
+				<tr class="headings">
+					<?php if(!$_isSingleStoreMode): ?>
+						<th><?php echo Mage::helper('amgiftcard')->__('Website') ?></th>
+					<?php endif; ?>
+					<th><?php echo Mage::helper('amgiftcard')->__('Amount') ?> <span class="required">*</span></th>
+					<th class="last"><?php echo Mage::helper('amgiftcard')->__('Action') ?></th>
+				</tr>
+				<tr id="<?php echo $_htmlId ?>_add_template" class="template no-display">
+					<?php if(!$_isSingleStoreMode): ?>
+						<td>
+							<select disabled="no-template" class="<?php echo $_htmlClass ?> required-entry" name="<?php echo $_htmlName ?>[#{index}][website_id]" id="<?php echo $_htmlId ?>_#{index}_website">
+								<?php foreach ($this->getListWebsites() as $_websiteId => $_websiteData): ?>
+									<option value="<?php echo $_websiteId ?>">
+										<?php echo $_websiteData['name'] ?>
+										<?php if (!empty($_websiteData['currency'])): ?> [<?php echo $_websiteData['currency'] ?>]<?php endif; ?>
+									</option>
+								<?php endforeach ?>
+							</select>
+						</td>
+					<?php else: ?>
+						<input type="hidden" name="<?php echo $_htmlName ?>[#{index}][website_id]" id="<?php echo $_htmlId ?>_#{index}_website" value="0">
+					<?php endif; ?>
+					<td>
+						<input disabled="no-template" class="<?php echo $_htmlClass ?> required-entry validate-greater-than-zero" type="text" name="<?php echo $_htmlName ?>[#{index}][price]" value="#{price}" />
+					</td>
+					<td class="last">
+						<input type="hidden" name="<?php echo $_htmlName ?>[#{index}][delete]" class="delete" disabled="no-template" value=""  id="<?php echo $_htmlId ?>_#{index}_delete" />
+						<button title="<?php echo Mage::helper('amgiftcard')->__('Delete Amount'); ?>" class="scalable delete icon-btn delete-product-option" onclick="AmastyGiftCardPriceOptions.deletePriceRow('<?php echo $_htmlId ?>_#{index}');return false"><span><span><span><?php echo Mage::helper('amgiftcard')->__('Delete'); ?></span></span></span></button>
+					</td>
+				</tr>
+
+			</thead>
+			<tbody id="<?php echo $_htmlId ?>_container">
+
+			</tbody>
+
+			<tfoot>
+				<tr>
+					<td colspan="<?php echo 2 + (int) !$_isSingleStoreMode; ?>" class="a-right"><?php echo $this->getButtonAdd() ?></td>
+				</tr>
+			</tfoot>
+		</table>
+	</td>
+</tr>
+
+<script>
+<?php foreach($data as $price): ?>
+	AmastyGiftCardPriceOptions.addPriceRow('<?php echo $_htmlId;?>', '<?php echo sprintf("%.2f", $price['value']);?>', '<?php echo $price['website_id'];?>');
+<?php endforeach; ?>
+</script>

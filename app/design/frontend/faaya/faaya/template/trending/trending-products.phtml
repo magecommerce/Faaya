@@ -1,0 +1,75 @@
+<?php 
+$productCollection = $this->getFeatureCollection();
+$_helper = $this->helper('catalog/output');?>
+<?php if($productCollection->count()): ?> 
+<section class="trending trending trending-products">
+    <div class="left-block">
+        <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('trending_products')->toHtml();?> 
+    </div>
+    <div class="right-block">
+        <div class="owl-carousel trending-carousel">
+            <?php foreach ($productCollection as $_product): ?>
+            <?php $product = Mage::getModel('catalog/product')->load($_product->getId());?> 
+            <div class="item">
+                <div class="image">
+                     <a href="<?php echo $product->getProductUrl() ?>" title="<?php echo $this->stripTags($this->getImageLabel($product, 'small_image'), null, true) ?>" class="product-image"> <img id="product-collection-image-<?php echo $product->getId(); ?>"
+                     src="<?php echo $this->helper('catalog/image')->init($product, 'small_image')->resize(225,159); ?>"
+                     alt="<?php echo $this->stripTags($this->getImageLabel($product, 'small_image'), null, true) ?>" /></a>
+                </div> 
+            </div>
+            <?php endforeach; ?>  
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+       var owl = jQuery('.trending-carousel').on('initialized.owl.carousel change.owl.carousel changed.owl.carousel', function(e) {
+            if (!e.namespace || e.type != 'initialized' && e.property.name != 'position') return;
+
+            var current = e.relatedTarget.current()
+            var items = jQuery(this).find('.owl-stage').children()
+            var add = e.type == 'changed' || e.type == 'initialized'
+
+            items.eq(e.relatedTarget.normalize(current)).toggleClass('current', add)
+        }).owlCarousel({
+            items: 4,
+            //loop: (jQuery(".trending-carousel .item").length > 5) ? true : false,
+            margin: 14,
+            //nav: (jQuery(".trending-carousel .item").length > 5) ? true : false,
+			nav: true,
+			loop: true,
+            responsive: {
+                0: {
+                    items: 1,
+                    center: true,
+					nav: true,
+                    //nav: (jQuery(".trending-carousel .item").length > 2) ? true : false,
+                    //loop: (jQuery(".trending-carousel .item").length > 2) ? true : false
+                },
+                600: {
+                    items: 3,
+					center: true,
+					nav: true,
+                    //nav: (jQuery(".trending-carousel .item").length > 3) ? true : false,
+                    //loop: (jQuery(".trending-carousel .item").length > 3) ? true : false,
+                },
+                1000: {
+                    //items: 4,
+					nav: true,
+                    //nav: (jQuery(".trending-carousel .item").length > 4) ? true : false,
+                    //loop: (jQuery(".trending-carousel .item").length > 4) ? true : false
+                }
+            }
+        });
+        owl.owlCarousel();
+        owl.on('changed.owl.carousel', function(event) {
+            navHeight();
+        })
+		
+		
+
+
+    })
+
+</script>

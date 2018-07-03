@@ -1,0 +1,419 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     rwd_default
+ * @copyright   Copyright (c) 2006-2017 X.commerce, Inc. and affiliates (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+/**
+ * Shopping cart template
+ *
+ * @var $this Mage_Checkout_Block_Cart
+ */
+
+$errorMessage = Mage::getSingleton('core/session')->getExistDid();
+
+
+$itemArray = array();
+$quoteId = $this->getItems();
+$quoteId = $quoteId[0]->getQuoteId();
+
+foreach ($this->getItems() as $_item) {
+    $additionalOption = $_item->getProduct()->getCustomOption('setting');
+    if($additionalOption){
+        $additionalOptions =  unserialize($additionalOption->getValue());
+
+            //print_r($additionalOptions['group']['option']);
+            $groupOption = $additionalOptions['group']['option'];
+            $ringSize = $groupOption['size'];
+            $text = $groupOption['text'];
+            $fontFamily = $groupOption['fontfamily'];
+            $sid = $additionalOptions['group']['sid'];
+            $_item->setGroupType($additionalOptions['group']['type']);
+            $_item->setSmryid($additionalOptions['group']['smryid']);
+            $_item->setGroupOrderdate($additionalOptions['group']['orderdate']);
+            $_item->setGroupConstruction($additionalOptions['group']['construction']);
+            $_item->setGroupRing($additionalOptions['group']['ring']);
+            $_item->setGroupPendant($additionalOptions['group']['pendant']);
+            $_item->setGroupEarring($additionalOptions['group']['earring']);
+            $_item->setGroupBracelets($additionalOptions['group']['bracelets']);
+            $_item->setGroupDiamond($additionalOptions['group']['diamond']);
+            $_item->setGroupChain($additionalOptions['group']['chain']);
+            $_item->setGroupSide1($additionalOptions['group']['side1']);
+            $_item->setGroupSide2($additionalOptions['group']['side2']);
+            $_item->setGroupPromise($additionalOptions['group']['promise']);
+            $_item->setGroupMatchpair($additionalOptions['group']['matchpair']);
+            $_item->setGroupRingSize($ringSize);
+            $_item->setProductcsType($additionalOptions['group']['product_type']);
+            $itemArray[$sid][$_item->getProduct()->getId()] = $_item;
+    }else{
+        $randomInt = strtotime("now");
+        $itemArray[$randomInt][$_item->getProduct()->getId()] = $_item;
+    }
+
+}
+ksort($itemArray);
+?>
+<?php $_priceDisplay = ($this->helper('tax')->displayCartBothPrices()) ? 'display-both-prices' : 'display-single-price'; ?>
+<div class="cart <?php echo $_priceDisplay; ?>">
+    <div class="page-title title-buttons">
+          <?php if($this->getContinueShoppingUrl()): ?>
+                <button type="button" title="<?php echo $this->quoteEscape($this->__('Continue Shopping')) ?>" class="button2 btn-continue" onclick="setLocation('<?php echo Mage::helper('core')->quoteEscape($this->getContinueShoppingUrl()) ?>')"><span><span><?php echo $this->__('Continue Shopping') ?></span></span></button>
+            <?php endif; ?>
+            <h1><?php echo $this->__('Your') ?> <strong><?php echo $this->__('Shopping Bag'); ?></strong></h1>
+    </div>
+    <?php echo $this->getMessagesBlock()->toHtml() ?>
+    <?php echo $this->getChildHtml('form_before') ?>
+    <form action="<?php echo $this->getFormActionUrl() ?>" method="post">
+        <?php echo $this->getBlockHtml('formkey'); ?>
+        <table id="shopping-cart-table" class="cart-table data-table">
+            <tbody>
+            <?php foreach($itemArray as $randomkey=>$_items): ?>
+                    <?php
+                        $firstItem = array_keys($_items);
+                        $price = 0.0;
+                        $diamondDetail = $ringDetail = $pendantDetail = $earringDetail = $braceletsDetail= $chainDetail = $sidestone1 = $sidestone2 = $chaindata = $promiseDetail = $ringSize = $matchpair = $proType = "";
+                        $receiveDay ="";
+                        $flag=0;
+                        $i = 1;
+                        $quoteItemId = $ringId = 0;
+                        foreach($firstItem as $itm){
+
+                            $cnt = count($_items);
+
+                            $type = $_items[$itm]->getGroupType();
+                            if($type == "sid"){
+                              $proType = $_items[$itm]->getProductcsType();
+                            }
+
+                            $orderDate = $_items[$itm]->getGroupOrderdate();
+
+                            if($_items[$itm]->getGroupRing()){
+                                $ringDetail = $_items[$itm]->getGroupRing();
+
+                            }
+                            if($_items[$itm]->getGroupPendant()){
+                                $pendantDetail = $_items[$itm]->getGroupPendant();
+
+                            }
+                            if($_items[$itm]->getGroupEarring()){
+                                $earringDetail = $_items[$itm]->getGroupEarring();
+
+                            }
+                            if($_items[$itm]->getGroupBracelets()){
+                                $braceletsDetail = $_items[$itm]->getGroupBracelets();
+
+                            }
+                            if($_items[$itm]->getGroupDiamond()){
+                                $diamondDetail = $_items[$itm]->getGroupDiamond();
+
+                            }
+                            if($_items[$itm]->getGroupChain()){
+                                $chainDetail = $_items[$itm]->getGroupChain();
+
+                            }
+                            if($_items[$itm]->getGroupSide1()){
+                                $sidestone1 = $_items[$itm]->getGroupSide1();
+
+                            }
+                            if($_items[$itm]->getGroupSide2()){
+                                $sidestone2 = $_items[$itm]->getGroupSide2();
+
+                            }
+                            if($_items[$itm]->getGroupPromise()){
+                                $promiseDetail = $_items[$itm]->getGroupPromise();
+
+                            }
+                            if($_items[$itm]->getGroupRingSize()){
+                                $ringSize = $_items[$itm]->getGroupRingSize();
+
+                            }
+                            if($_items[$itm]->getGroupMatchpair()){
+                                $matchpair = $_items[$itm]->getGroupMatchpair();
+
+                            }
+                            $price += $_items[$itm]->getProduct()->getPrice();
+
+
+                             if($type == "chain" && $flag==0){
+                                $receiveDay =  $orderDate;
+                                $flag = 1;
+                            }
+                            elseif($type == "sid" && $flag==0){
+                                $ringId = $itm;
+                                $quoteItemId = $_items[$itm]->getId();
+                                $receiveDay =  $orderDate;
+                                $flag = 1;
+                            }
+                            elseif($type == "did" && $flag==0){
+                                $receiveDay =  $orderDate;
+                                $flag = 1;
+                            }
+                            if($cnt == 1 && $type =="wedding"){
+                                $receiveDay =  $orderDate;
+                            }
+
+                        }
+                        $firstItem = $_items[$firstItem[0]]->getProduct();
+                        $isVisibleProduct = $firstItem->isVisibleInSiteVisibility();
+
+                        $_product = Mage::getSingleton('catalog/product')->load($firstItem->getId());
+                        $smryItemType = $_product->getResource()->getAttribute('smry_item_type')->getFrontend()->getValue($_product);
+                    ?>
+                    <tr>
+                        <td class="product-cart-image">
+                           <img src="<?php echo Mage::helper('catalog/image')->init($firstItem, 'small_image')->constrainOnly(false)->keepAspectRatio(true)->keepFrame(false)->resize(160, 210); ?>" alt="<?php echo $this->htmlEscape($this->getImageLabel($firstItem, 'small_image')) ?>" />
+
+                            <?php if ($isVisibleProduct): ?>
+                                <?php
+                                $editUrl = Mage::app()->getStore()->getUrl('wizard/index/editcart/editid/'.$randomkey);
+                                $deleteUrl = Mage::app()->getStore()->getUrl('wizard/index/deletecart/deleteid/'.$randomkey);
+                                ?>
+                                    <?php if($type != 'wedding'): ?>
+                                        <a href="<?php echo $editUrl ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Update')) ?>" class="remove"><?php echo $this->__('Update | ') ?></a>
+                                    <?php endif; ?>
+
+                                    <a href="javascript:void(0)<?php //echo $deleteUrl ?>" data-editid="<?php echo $randomkey;?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Remove Item')) ?>" class="remove removeitem"><?php echo $this->__('Remove') ?></a>
+
+                            <?php endif ?>
+                    </td>
+
+                       <td>
+                        <table class="cart-inner-table">
+                            <?php if(in_array($randomkey, $errorMessage)):?>
+                              <tr>
+                                <td colspan="2">
+                                  <span class="error-msg"><i class="fa fa-warning"></i> <?php echo $this->__('Please choose other diamond') ?></span>
+                                </td>
+                              </tr>
+                            <?php endif;?>
+                            <tr>
+                                <td class="product-cart-info">
+                                    <?php if(strtolower($smryItemType) == "style"): ?>
+                                        <h2 class="product-name"><?php echo $_product->getVariantRemark();?></h2>
+                                    <?php else: ?>
+                                        <h2 class="product-name"><?php echo $_product->getDescription();?></h2>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="product-cart-price last">
+
+                                    <?php echo $this->helper('checkout')->formatPrice($price);?>
+                                </td>
+                            </tr>
+
+                           <tr>
+                                <td class="product-cart-info" colspan="2">
+                                    <div class="product-cart-sku">
+                                        <div class="information">
+                                         <?php if($ringDetail): ?>
+                                             <p>
+                                                  <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/ringicon.png'); ?>" alt=""></span> */ ?>
+                                                  <strong><?php echo $this->__('Setting : ');?></strong>
+                                                  <?php echo $this->__($ringDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($pendantDetail): ?>
+                                             <p>
+                                              <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/pendanticon.png'); ?>" alt=""></span> */ ?>
+                                              <strong><?php echo $this->__('Pendent : ');?></strong>
+                                              <?php echo $this->__($pendantDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($braceletsDetail): ?>
+                                             <p>
+                                              <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/braceletsicon.png'); ?>" alt=""></span> */ ?>
+                                              <strong><?php echo $this->__('Bracelet : ');?></strong>
+                                              <?php echo $this->__($braceletsDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($earringDetail): ?>
+                                             <p>
+                                              <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/earringicon.png'); ?>" alt=""></span> */ ?>
+                                              <strong><?php echo $this->__('Earring : ');?></strong>
+                                              <?php echo $this->__($earringDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($promiseDetail): ?>
+                                             <p>
+                                                <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/promiseicon.png'); ?>" alt=""></span> */ ?>
+                                              <strong><?php echo $this->__('Setting : ');?></strong>
+                                              <?php echo $this->__($promiseDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($chainDetail): ?>
+                                             <p>
+                                              <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/chainicon.png'); ?>" alt=""></span> */ ?>
+                                              <strong><?php echo $this->__('Chain : ');?></strong>
+                                              <?php echo $this->__($chainDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($diamondDetail): ?>
+                                             <p>
+                                              <?php /* <span class="image"><img src="<?php echo $this->getSkinUrl('images/diamondicon.png'); ?>" alt=""></span> */ ?>
+                                              <strong><?php echo $this->__('Diamond : ');?></strong>
+                                              <?php echo $this->__($diamondDetail); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($matchpair): ?>
+                                             <p>
+                                                  <strong><?php echo $this->__('Match Pair : ');?></strong>
+                                                  <?php echo $this->__($matchpair); ?>
+                                             </p>
+                                         <?php endif; ?>
+                                         <?php if($receiveDay):?>
+                                             <p>
+                                                <strong><?php echo $this->__('Dispatch by : ');?></strong><?php echo $receiveDay;?>
+                                             </p>
+                                             <?php endif; ?>
+                                        </div>
+                                        <?php if(($ringSize && $proType == 'RING') || ($ringSize && $proType == 'Band')):?>
+                                          <?php $ringProduct = Mage::getModel('catalog/product')->load($ringId);?>
+                                          <?php if($ringProduct->getId()): ?>
+                                          <?php $availableSizes = Mage::getModel('wizard/wizardrelation')->getAvailbleSizes($ringProduct,false);?>
+                                            <div class="cart-ring-size">
+                                                <strong><?php echo $this->__('Ring Size : '); ?></strong>
+                                                <select onchange="updateRingsize(this.value,<?php echo $quoteItemId;?>,<?php echo $randomkey;?>)" >
+                                                  <?php foreach ($availableSizes as $size) : ?>
+                                                    <option <?php if($ringSize == $size){ echo " selected='selected' ";} ?> ><?php echo $size;?></option>
+                                                  <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <?php endif;?>
+                                      <?php endif;?>
+                                     </div>
+                                </td>
+                            </tr>
+                        </table>
+                        </td>
+                    </tr>
+            <?php endforeach ?>
+            </tbody>
+        </table>
+        <script type="text/javascript">decorateTable('shopping-cart-table')</script>
+    </form>
+
+    <div class="cart-sidebar">
+        <?php echo $this->getChildHtml('shopping.cart.table.after'); ?>
+        <div class="cart-forms">
+            <?php /* Extensions placeholder */ ?>
+            <?php echo $this->getChildHtml('checkout_cart_widget') ?>
+            <?php echo $this->getChildHtml('coupon') ?>
+            <?php echo $this->getChildHtml('checkout.cart.extra') ?>
+            <?php if (!$this->getIsVirtual()): echo $this->getChildHtml('shipping'); endif; ?>
+        </div>
+        <div class="cart-totals-wrapper">
+            <div class="cart-totals">
+                <?php echo $this->getChildHtml('totals'); ?>
+                <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('cart_page_shipping_offer')->toHtml(); ?>
+                <?php if(!$this->hasError()): ?>
+                <ul class="checkout-types bottom">
+                <?php foreach ($this->getMethods('methods') as $method): ?>
+                    <?php if ($methodHtml = $this->getMethodHtml($method)): ?>
+                    <li class="method-<?php echo preg_replace("/[^_a-zA-Z0-9-]/", '-', $method); ?>"><?php echo $methodHtml; ?></li>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+                </ul>
+                <?php endif; ?>
+            </div>
+            <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('need-help-block-cart-page')->toHtml(); ?>
+        </div>
+    </div>
+    <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('payment-icons-cart')->toHtml(); ?>
+    <?php echo $this->getChildHtml('crosssell') ?>
+</div>
+<?php Mage::getSingleton('core/session')->unsExistDid();?>
+
+<script type="text/javascript">
+    var BASE_URL='<?php echo preg_replace('/(.*?)(index.php\/?)?/','\1',Mage::getBaseURL());?>';
+    var quoteid = "<?php echo $quoteId;?>";
+    var deleteUrl = "<?php echo Mage::app()->getStore()->getUrl('wizard/index/deletecart/');?>"
+
+
+
+    jQuery(document).ready(function(){
+        jQuery('.removeitem').click(function(){
+            var editid = jQuery(this).data('editid');
+            jQuery.ajax({
+                url: BASE_URL+"wizard/index/confirmdelete",
+                type: "POST",
+                data: {quoteid:quoteid,editid:editid},
+                success: function(redata){
+                    redata = JSON.parse(redata);
+                    if(redata.flag == 1){
+                        var r = confirm(redata.errormsg)
+                        if (r==true)
+                        {
+                            window.location =  redata.url;
+                        } else {
+                            return false;
+                        }
+                    }else{
+                        window.location =  redata.url;
+                    }
+                    console.log(redata);
+                },error: function(xhr){
+                    redata = JSON.parse(xhr.responseText);
+                    if(redata.flag == 1){
+                        var r = confirm(redata.errormsg)
+                        if (r==true)
+                        {
+                            window.location =  redata.url;
+                        } else {
+                            return false;
+                        }
+                    }else{
+                        window.location =  redata.url;
+                    }
+                }
+            })
+        })
+    })
+
+  function updateRingsize(value,id,randomkey){
+
+    jQuery.ajax({
+      url: "<?php echo $this->getUrl('wizard/index/updateringsize'); ?>",
+      type: "POST",
+      data: {value:value,itemid:id,randomkey:randomkey} ,
+      success: function(data){
+        console.log(data);
+      }
+    });
+  }
+
+  function checklockapi(onepageurl){
+    jQuery.ajax({
+      url: "<?php echo $this->getUrl('wizard/index/checkcartlock'); ?>",
+      type: "GET",
+      success: function(data){
+        var response = JSON.parse(data);
+        if(response.length > 0){
+          window.location =  "<?php echo $this->getUrl('checkout/cart'); ?>";
+        }else{
+          window.location =  onepageurl;
+        }
+      }
+    });
+    return false;
+  }
+</script>

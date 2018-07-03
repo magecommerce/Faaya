@@ -1,0 +1,10 @@
+<div class="drw-form-filters-wrapper">
+    <form method="get" action="<?php echo Mage::getUrl('mageworkshop_reviewwall/ajax/reviews', array('_secure' => Mage::app()->getStore()->isCurrentlySecure())); ?>" id="drw-review-search-mini-form" data-type="search">
+        <div class="form-search drw-search-input-wrapper">
+            <input type="hidden" class="drw-hidden-search" value="" name="keyword_search" />
+            <?php $keywords = isset($request) ? $request->getParam('keywords') : ''; ?>
+            <input type="text" class="input-text ac-off" value="<?php echo $this->escapeHtml($keywords) ?>" name="keywords" placeholder="<?php echo $this->__('search in reviews') ?>" id="review-search"/>
+            <button type="submit" class="drw-search-review-button"><span><span><?php echo $this->__('Go') ?></span></span></button>
+        </div>
+    </form>
+</div>

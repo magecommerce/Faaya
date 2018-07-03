@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <modules>
+        <StackExchange_Checkout>
+            <active>true</active>
+            <codePool>local</codePool>
+            <depends>
+                <Mage_Checkout />
+            </depends>
+        </StackExchange_Checkout>
+    </modules>
+</config>

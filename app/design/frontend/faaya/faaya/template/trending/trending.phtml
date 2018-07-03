@@ -1,0 +1,97 @@
+<?php
+    $trendingItems = $this->getCustomPost();
+    $custompostHelper = Mage::helper('custompost');
+?>
+<?php if(count($trendingItems) > 0):?>
+<section class="trending">
+    <div class="left-block">
+        <h2><?php echo $this->__('Trending');?></h2>
+    </div>
+    <div class="right-block">
+        <div class="owl-carousel trending-carousel">
+            <?php foreach($trendingItems as $trending):?>
+                <?php
+                    $title = $trending->post_title;
+                    $description = $trending->post_content;
+                    $id = $trending->ID;
+                    $name = $trending->post_name;
+                    $tImage = get_field('trending_image',$id);
+                    $tIcon = get_field('trending_icon',$id);
+                    $posturl = get_field('posturl',$id);
+                    if($posturl != ''){
+                        $posturl = (strpos($posturl,"http") || strpos($posturl,"www"))?$posturl:Mage::getUrl().$posturl;
+                    }else{
+                        $posturl = $this->getUrl('trending/'.$name);
+                    }
+                    $trendingImage = Mage::helper('latestblogpost')->getResizedHomeNewsImage($tImage['url'], 315, 271,"trending-post");
+                    $trendingIcon = $tIcon['url'];
+                ?>
+                <div class="item">
+                    <div class="image">
+                        <img src="<?php echo $trendingImage; ?>" />
+                        <div class="icon"><img src="<?php echo $trendingIcon; ?>" /></div>
+                    </div>
+                    <div class="details">
+                        <h4><a href="<?php echo $posturl;?>"><?php echo $title;?></a></h4>
+                        <p><?php echo $custompostHelper->textlimit($description,150); ?></p>
+                    </div>
+                    <a href="<?php echo $posturl;?>" class="over-block-link"></a>
+                </div>
+            <?php endforeach;?>
+        </div>
+    </div>
+</section>
+<?php endif;?>
+
+<style>
+.trending-carousel.owl-carousel .owl-nav.disabled,
+.trending-carousel.owl-carousel .owl-dots.disabled{ display: block; }
+</style>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        jQuery('.trending-carousel').on('initialized.owl.carousel change.owl.carousel changed.owl.carousel', function(e) {
+            if (!e.namespace || e.type != 'initialized' && e.property.name != 'position') return;
+
+            var current = e.relatedTarget.current()
+            var items = jQuery(this).find('.owl-stage').children()
+            var add = e.type == 'changed' || e.type == 'initialized'
+
+            items.eq(e.relatedTarget.normalize(current)).toggleClass('current', add)
+        }).owlCarousel({
+            items: 4,
+            //loop: (jQuery(".trending-carousel .item").length > 5) ? true : false,
+            margin: 14,
+            //nav: (jQuery(".trending-carousel .item").length > 5) ? true : false,
+			nav:true,
+			loop: true,
+            responsive:{
+            0:{
+                items:2,
+                //nav:(jQuery(".trending-carousel .item").length > 2) ? true : false,
+                //loop:(jQuery(".trending-carousel .item").length > 2) ? true : false,
+                center:true,
+				nav: true,
+            },
+            600:{
+                items:3,
+                //nav:(jQuery(".trending-carousel .item").length > 3) ? true : false,
+                //loop:(jQuery(".trending-carousel .item").length > 3) ? true : false,
+                center: true,
+				nav: true,
+            },
+            1000:{
+                //items:4,
+				nav: true,
+                //nav:(jQuery(".trending-carousel .item").length > 4) ? true : false,
+                //loop:(jQuery(".trending-carousel .item").length > 4) ? true : false
+            }
+        }
+        });
+		
+		
+
+
+    })
+
+</script>

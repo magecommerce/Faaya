@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<config>
+    <api>
+        <resources>
+            <cancelapi translate="title" module="cancelapi">
+                <model>cancelapi/cancelapi_api</model>
+                <title>Order cancel</title>
+                <methods>
+                   <cancelapi translate="title" module="cancelapi">
+                        <title>Order cancel</title>
+                   </cancelapi>
+                </methods>
+                <faults module="cancelapi">
+                    <data_invalid>
+                        <code>100</code>
+                        <message>Invalid data</message>
+                    </data_invalid>
+                    <filters_invalid>
+                        <code>101</code>
+                        <message>Invalid filters specified. Details in error message.</message>
+                    </filters_invalid>
+                    <not_exists>
+                        <code>102</code>
+                        <message>cancelapi not exists.</message>
+                    </not_exists>
+                    <not_deleted>
+                        <code>103</code>
+                        <message>cancelapi not deleted. Details in error message.</message>
+                    </not_deleted>
+                </faults>
+            </cancelapi>
+          </resources>
+          <acl>
+              <resources>
+                <cancelapi translate="title" module="cancelapi">
+                      <title>Order cancel</title>
+                      <sort_order>5</sort_order>
+                      <cancelapi translate="title" module="cancelapi">
+                        <title>Order cancel</title>
+                      </cancelapi>
+                </cancelapi>
+              </resources>
+        </acl>
+      </api>
+</config>
+

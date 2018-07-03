@@ -1,0 +1,184 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     default_default
+ * @copyright   Copyright (c) 2006-2017 X.commerce, Inc. and affiliates (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php $_order = $this->getOrder();
+$_items = $this->getItemsCollection();
+
+$itemArray = array();
+foreach ($_items as $orderItem) {
+    $options = Mage::getResourceModel('sales/quote_item_option_collection');
+    $options->addItemFilter($orderItem->getQuoteItemId());
+    foreach ($options as $option) {
+        if($option->getCode() == 'customtext'){
+            $additionalOptions =  unserialize($option->getValue());
+            $mainProduct = $additionalOptions['delivery_option']['value'];
+            if($mainProduct){
+                /*per letter*/
+                $_product = Mage::getModel('catalog/product')->load($orderItem->getProduct()->getId());
+                $options = Mage::getModel('catalog/product_option')->getProductOptionCollection($_product);
+
+                $perPrice = 0;
+                $optionValue = '';
+                $optionId = 0;
+                foreach($options as $option) {
+                    if(strtolower($option->getTitle()) == 'word'){
+                        $perPrice = $option->getPrice();
+                        $optionId = $option->getOptionId();
+                    }
+                }
+                $optionValue = '';
+                if($optionId > 0 && $perPrice > 0){
+                    foreach($orderItem->getBuyRequest()->getOptions() as $code => $option){
+                        if($code == $optionId){
+                            $optionValue = $option;
+                        }
+                    }
+                }
+                /*per letter*/
+                $MainProductObj = Mage::getModel('customdelivery/customdelivery')->load($mainProduct);
+                $deliveryTo = array();
+
+                if($MainProductObj->getUndertakerId() > 0 && $MainProductObj->getFormtype() == 'funeral'){
+                    $undertaker = Mage::getModel('undertaker/undertaker')->load($MainProductObj->getUndertakerId());
+                    $deliveryTo[] = $this->__('Undertaker: ').$undertaker->getName().', '.$undertaker->getPostcode();
+                }
+
+                $deliveryTo[] = ($MainProductObj->getFormtype() != '')?$this->__('Type: ').$MainProductObj->getFormtype():'';
+                if($MainProductObj->getFormtype() != 'pickup'){
+                    if($MainProductObj->getAddress() != ''){
+                        $deliveryTo[] = ($MainProductObj->getName() != '')?$MainProductObj->getName():'';
+                        $deliveryTo[] = ($MainProductObj->getAddress() != '')?$MainProductObj->getAddress():'';
+                        $deliveryTo[] = ($MainProductObj->getCity() != '')?$MainProductObj->getCity():'';
+                        $deliveryTo[] = ($MainProductObj->getCounty() != '')?$MainProductObj->getCounty():'';
+                        $deliveryTo[] = ($MainProductObj->getCountry() != '')?Mage::getModel('directory/country')->loadByCode($MainProductObj->getCountry())->getName():'';
+                        $deliveryTo[] = ($MainProductObj->getPostcode() != '')?$MainProductObj->getPostcode():'';
+                    }
+                }else{
+                    $deliveryTo[] = $this->__('Pickup address: ').Mage::getStoreConfig('customdelivery/calendar/pickup_address');
+                }
+
+                foreach ($deliveryTo as $key=>$value) {
+                    if($value == ''){
+                        unset($deliveryTo[$key]);
+                    }
+                }
+
+                $deliveryDetail = array();
+                $deliveryDetail[] = ($MainProductObj->getDeliveryDate() != '')?$this->__('Delivery date: ').date('d-m-Y',strtotime($MainProductObj->getDeliveryDate())):'';
+                $deliveryDetail[] = ($MainProductObj->getPickupTime() != '')?$this->__('Pickup time: ').$MainProductObj->getPickupTime():'';
+
+                if($MainProductObj->getFormtype() == 'funeral'){
+                    $deliveryDetail[] = ($MainProductObj->getFuneralTime() != '')?$this->__('Funeral time: ').$MainProductObj->getFuneralTime():'';
+                    $deliveryDetail[] = ($MainProductObj->getRequireDeliverTime() != '')?$this->__('Required delivery time: ').$MainProductObj->getRequireDeliverTime():'';
+                }
+
+
+                foreach ($deliveryDetail as $key=>$value) {
+                    if($value == ''){
+                        unset($deliveryDetail[$key]);
+                    }
+                }
+                $deliveryDetail = implode("<br>",$deliveryDetail);
+                $deliveryTo = implode("<br>",$deliveryTo);
+
+                $orderItem->setDeliveryDetail($deliveryDetail);
+                $orderItem->setDeliveryTo($deliveryTo);
+                $orderItem->setLetter($optionValue);
+                $orderItem->setLetterPrice($perPrice);
+                $orderItem->setSpecialDeliveryInstruction($MainProductObj->getSpecialDeliveryInstruction());
+                $orderItem->setReasonForPurchase($MainProductObj->getReasonForPurchase());
+
+
+
+                $itemArray[$mainProduct]['product'] = $orderItem;
+            }
+        }
+
+    }
+}
+
+foreach ($_items as $orderItem) {
+    $options = Mage::getResourceModel('sales/quote_item_option_collection');
+    $options->addItemFilter($orderItem->getQuoteItemId());
+    foreach ($options as $option) {
+
+        if($option->getCode() == 'customtext'){
+            $additionalOptions =  unserialize($option->getValue());
+              $subProduct = $additionalOptions['sub_delivery']['value'];
+              if($subProduct){
+                $subProductobj = Mage::getModel('customdelivery/customsubproduct')->load($subProduct);
+                if($subProductobj->getFid()){
+                    $orderItem->setCardMessage($additionalOptions['cardmessage']['value']);
+                    $itemArray[$subProductobj->getFid()]['subproduct'][] = $orderItem;
+                }
+              }
+        }
+
+    }
+}
+?>
+<div class="grid np">
+  <div class="hor-scroll">
+    <table cellspacing="0" class="data order-tables">
+
+        <thead>
+            <tr class="headings">
+                <th><?php echo $this->helper('sales')->__('Product') ?></th>
+                <th><?php echo $this->helper('sales')->__('Delivery') ?></th>
+                <th><span class="nobr"><?php echo $this->helper('sales')->__('Item Status') ?></span></th>
+                <th><span class="nobr"><?php echo $this->helper('sales')->__('Original Price') ?></span></th>
+                <th><?php echo $this->helper('sales')->__('Price') ?></th>
+                <th class="a-center"><?php echo $this->helper('sales')->__('Qty') ?></th>
+                <th><?php echo $this->helper('sales')->__('Subtotal') ?></th>
+                <th><span class="nobr"><?php echo $this->helper('sales')->__('Tax Amount') ?></span></th>
+                <th><span class="nobr"><?php echo $this->helper('sales')->__('Tax Percent') ?></span></th>
+                <th><span class="nobr"><?php echo $this->helper('sales')->__('Discount Amount') ?></span></th>
+                <th class="last"><span class="nobr"><?php echo $this->helper('sales')->__('Row Total') ?></span></th>
+            </tr>
+        </thead>
+        <?php //$_items = $this->getItemsCollection() ?>
+        <?php $i=0;foreach ($itemArray as $item):?>
+            <?php $_item = $item['product'];?>
+            <?php if ($_item->getParentItem()) continue; else $i++;?>
+            <tbody><tr><td colspan="11"><?php echo $this->__("Order %s",$i); ?></td></tr></tbody>
+            <tbody class="<?php echo $i%2?'even':'odd' ?>">
+                <?php echo $this->getItemHtml($_item) ?>
+                <?php echo $this->getItemExtraInfoHtml($_item) ?>
+            </tbody>
+                <?php $subitem = $item['subproduct'];?>
+                <?php foreach ($subitem as $_item): ?>
+                <?php if ($_item->getParentItem()) continue; ?>
+                    <tbody class="<?php echo $i%2?'even':'odd' ?>">
+                        <?php echo $this->getItemHtml($_item) ?>
+                        <?php echo $this->getItemExtraInfoHtml($_item) ?>
+                    </tbody>
+                <?php endforeach; ?>
+
+        <?php endforeach; ?>
+    </table>
+  </div>
+</div>
+<br />

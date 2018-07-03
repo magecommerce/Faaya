@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+       <!-- <reference name="top.links">
+    <action method="addLink" translate="label title" >
+        <label>Login</label>
+        <url>customer/loginurl</url>
+        <title>Login</title>
+        <prepare>true</prepare>
+        <urlParams/>
+        <position>9</position>
+    </action>
+  </reference> -->
+    	<reference name="head">
+          <action method="addJs"><script>sociallogin/popup.js</script></action>
+        <!--  <action method="addJs"><script>sociallogin/sociallogin.js</script></action> -->
+         <action method="addJs"><file>mage/captcha.js</file></action>
+          <action method="addCss"><stylesheet>sociallogin/css/popup.css</stylesheet></action>
+           <action method="addCss"><stylesheet>sociallogin/css/sociallogin.css</stylesheet>
+          </action>
+        </reference>
+       
+
+     <reference name="footer">
+      <action method="setTemplate">
+        <template>page/html/footer.phtml</template>
+      </action>
+		<!--   <block type="sociallogin/sociallogin" name="sociallogin" template="sociallogin/sociallogin.phtml" /> -->
+    </reference>
+   
+    </default>
+   <!--   
+    <sociallogin_index_index>
+        <reference name="content">
+            <block type="sociallogin/sociallogin" name="sociallogin" template="sociallogin/sociallogin.phtml"/>
+            
+           
+        </reference>
+    </sociallogin_index_index>
+<sociallogin_index_fblogin>
+        <reference name="content">
+            <block type="sociallogin/fblogin" name="fblogin" template="sociallogin/fblogin.phtml"/>
+        </reference>
+</sociallogin_index_fblogin> -->
+ <!-- <customer_logged_out>
+    <reference name="top.links">
+      <action method="removeLinkByUrl"><url helper="customer/getLoginUrl"/></action>
+    </reference>    
+</customer_logged_out>
+ -->
+
+</layout> 

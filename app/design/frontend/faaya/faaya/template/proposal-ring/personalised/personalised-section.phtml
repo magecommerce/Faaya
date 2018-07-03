@@ -1,0 +1,142 @@
+<?php
+$personalizeTitle =  get_field('personalize_title','option');
+$personalizeDescription =  get_field('personalize_description','option');
+$personalizeLabel =  get_field('personalize_label','option');
+$personalizeLink =  get_field('personalize_link','option');
+$personalizeRepeater = get_field('personalize_repeater','option');
+$newtab = '';
+$catLink = "javascript:void(0);";
+if($personalizeLink){
+    $newtab = 'target="_blank"';
+    $catLink = check_custom_personizelink($personalizeLink);
+} ?>
+<div class="personalised-by-you">
+    <div class="description">
+        <h2><?php echo $personalizeTitle;?></h2>
+        <p><?php echo $personalizeDescription;?></p>
+        <a href="<?php echo $catLink;?>" class="readmore"><?php echo $personalizeLabel;?></a>
+    </div>
+
+    <div class="blocks">
+        <ul>
+            <?php 
+            $cnt=1;
+            foreach($personalizeRepeater as $personalize):
+                $personalizeHeading = $personalize['personalize_heading'];
+                $personalizeText = $personalize['personalize_text'];
+                $personalizeImage = $personalize['personalize_image'];
+            ?>
+            <li class="item">
+                <div class="image"><img src="<?php echo $personalizeImage['url']; ?>" alt=""></div>
+                <div class="blocks-info">
+                    <h3><?php echo $personalizeHeading;?></h3>
+                    <p><?php echo $personalizeText;?></p>
+                </div>
+                <?php if( $cnt == count($personalizeRepeater) ) {
+                    echo '<a href="javascript:void(0);" class="personalize-popup-link link-box"></a>';
+                }
+                $cnt++;
+                ?>
+            </li>
+            <?php endforeach;?>
+        </ul>
+    </div>
+
+    <!-- Popup -->
+
+    <div class="personalised-popup">
+        <a href="javascript:void(0);" class="close-popup global-close-icon"></a>
+        <h2>Which <strong>Faaya Diamond</strong> do you own?</h2>
+        <form method="post" id="personalised-id" name="personalised-id">
+            <div class="fieldset">
+                <ul class="form-list">
+                    <li class="fields">
+                        <div class="input-box">
+                           <label for="uid">Diamond certificate</label>
+                            <input name="uid" placeholder="LD000" title="" value="" class="input-text required-entry" type="text" />
+                        </div>
+                    </li>
+                    <li class="fields">
+                        <div class="input-box">
+                           <label for="emailid">Email ID</label>
+                            <input name="emailid" placeholder="Enter Email Address" title="" value="" class="input-text required-entry validate-email" type="email" />
+                        </div>
+                    </li>
+                    <li class="fields">
+                        <div class="input-box">
+                           <label for="contactno">Contact No.</label>
+                            <input name="contactno" placeholder="00000000" title="" value="" class="input-text required-entry validate-number" type="text" />
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="buttons-set">
+                <input type="text" name="hideit" id="hideit" value="1" style="display:none !important;" />
+                <button type="button" title="" class="btn btn-link assist-btn"><span><span>Let Faaya Assist</span></span></button>
+            </div>
+        </form>
+    </div>
+
+</div>
+<?php
+    function check_custom_personizelink($arglink)
+    {
+        $httpPost = strpos($arglink,'http');
+        if(strlen($arglink)==0)
+        {
+            $link = 'javascript:;';
+        }
+        elseif(strlen($httpPost)==0)
+        {
+           $link = 'http://'.$arglink;
+        }
+        else
+        {
+           $link = $arglink;
+        }
+        return $link;
+    }
+?>
+
+<script type="text/javascript">
+    var personalisedform = new VarienForm('personalised-id', true);
+    jQuery(document).ready(function () {
+
+      jQuery('.personalize-popup-link').on('click',function (e) {
+         e.stopPropagation();
+        jQuery('.personalised-popup').parent().addClass('personalised-popup-open');
+      });
+      jQuery('.close-popup').on('click',function () {
+        jQuery('.personalised-popup').parent().removeClass('personalised-popup-open');
+      });
+      jQuery('.personalised-popup').on('click',function (e) {
+        e.stopPropagation();
+      });
+
+      jQuery(document).click(function(event){
+        jQuery('.personalised-popup').parent().removeClass('personalised-popup-open');
+     });
+      jQuery('.assist-btn').click(function(){
+            var uid = jQuery('input[name="uid"]').val();
+            var emailid = jQuery('input[name="emailid"]').val();
+            var contactno = jQuery('input[name="contactno"]').val();
+            if (personalisedform.validator.validate()) {
+                jQuery.ajax({
+                  url: "<?php echo Mage::getUrl('assist'); ?>",
+                  type: "POST",
+                  data:{uid:uid,emailid:emailid,contactno:contactno},
+                  success: function(data){
+                    var response = JSON.parse(data);
+                    jQuery('.personalised-popup').find('.buttons-set').html(response);
+                    setTimeout(function(){
+                        location.reload(true);
+                    },100)
+                  }
+                });
+            }
+      })
+
+    });
+
+
+</script>

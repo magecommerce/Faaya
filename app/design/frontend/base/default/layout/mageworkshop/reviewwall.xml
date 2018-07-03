@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+
+    <default>
+        <!--@TODO need change-->
+        <reference name="content">
+            <remove name="detailedreview_include_fb_js" />
+            <block type="core/template" name="reviewwall.facebook.sdk"
+                   template="detailedreview/review/social/facebook/include_js.phtml"/>
+        </reference>
+    </default>
+</layout>

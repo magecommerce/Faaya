@@ -1,0 +1,94 @@
+<?php $_productCollection = $this->viewMatchingBand();?>
+<?php  $_helper = $this->helper('catalog/output');?>
+<?php $selectedMatchingProduct = $this->getCurrentMatchingRing();?>
+<div class="matchingband-top-description">
+    <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('matching-wedding-band')->toHtml();?>
+</div>
+<div class="matching-tabs">
+ <ul class="m-tabs">
+        <li data-tab="engagement-ring">
+            <div class="icon">
+                    <img id="product-collection-image-<?php echo $selectedMatchingProduct->getId(); ?>"
+                     src="<?php echo $this->helper('catalog/image')->init($selectedMatchingProduct, 'small_image')->resize(100); ?>"
+                     alt="<?php echo $this->stripTags($this->getImageLabel($selectedMatchingProduct, 'small_image'), null, true) ?>" /></div>
+            <div class="name">
+                <span class="number"><strong><?php echo $this->__('1');?></strong></span>
+                <span class="tab-name"><?php echo $this->__('CHOOSE YOUR <strong>ENGAGEMENT RING</strong>');?><span class="productname">&#40; <?php echo $selectedMatchingProduct->getName();?> &#41;</span></span>
+            </div>
+        </li>
+        <li class="current" data-tab="matching-wedding-band">
+            <div class="icon"><img src="<?php echo $this->getSkinUrl('images/matching-band-icon-2.png'); ?>" alt=""></div>
+            <div class="name">
+                <span class="number"><strong><?php echo $this->__('2');?></strong></span>
+                <span class="tab-name"><?php echo $this->__('CHOOSE YOUR <strong>MATCHING WEDDING Band</strong>');?></span>
+            </div>
+        </li>
+    </ul>
+<div id="matching-wedding-band" class="tab-content"></div>
+<div class="tab-content current">
+ <div class="tab-description"> 
+  <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('matching-wedding-band-tabs-content')->toHtml();?>
+ </div>
+ <div id="matching-band-carousel">
+    
+    <?php $k = 0; $i=0; foreach ($_productCollection as $product): ?> 
+           <carousel-3d :controls-visible="true" display="8" :perspective="0" :inverse-scaling="1000" :space="600" :height="600">
+         <?php $_product = Mage::getModel('catalog/product')->load($product->getId()); ?>
+         
+            <slide :index="<?php echo $k; ?>">
+                <div class="item">
+                <?php $_imgSize = 670; ?>
+                <img id="product-collection-image-<?php echo $_product->getId(); ?>"
+                     src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->resize($_imgSize); ?>"
+                     alt="<?php echo $this->stripTags($this->getImageLabel($_product, 'small_image'), null, true) ?>" />
+            
+            <div class="product-info">
+                <h2 class="product-name">
+                    <a href="<?php echo $_product->getProductUrl();?>" title="<?php echo $this->stripTags($_product->getName(), null, true) ?>"><?php echo $_helper->productAttribute($_product, $_product->getName(), 'name') ?></a>
+                </h2>
+                <?php
+                if ($this->getChild('name.after')) {
+                    $_nameAfterChildren = $this->getChild('name.after')->getSortedChildren();
+                    foreach ($_nameAfterChildren as $_nameAfterChildName) {
+                        $_nameAfterChild = $this->getChild('name.after')->getChild($_nameAfterChildName);
+                        $_nameAfterChild->setProduct($_product);
+                        echo $_nameAfterChild->toHtml();
+                    }
+                }
+                ?>
+                <p><?php echo $_product->getShortDescription();?></p>
+                <?php echo $this->getPriceHtml($_product, true) ?>
+                <?php if($_product->getRatingSummary()): ?>
+                <?php echo $this->getReviewsSummaryHtml($_product, 'short') ?>
+                <?php endif; ?>
+                <div class="actions">
+                    
+                    
+                    <a title="<?php echo $this->quoteEscape($this->__('Continue')) ?>" class="button" href="<?php echo $_product->getProductUrl() ?>"><?php echo $this->__('Continue') ?></a>
+                    
+                </div>
+            </div>
+        </div> 
+            </slide>
+    <?php endforeach ?>
+     </carousel-3d>
+</div>
+</div></div>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.7/vue.js'></script>
+<script src='https://rawgit.com/Wlada/vue-carousel-3d/master/dist/vue-carousel-3d.min.js'></script>
+<script type="text/javascript">
+    jQuery(document).ready(function (){
+        
+        new Vue({
+            el: '#matching-band-carousel',
+            data: {
+              slides: 7
+            },
+            components: {
+              'carousel-3d': Carousel3d.Carousel3d,
+              'slide': Carousel3d.Slide
+            }
+          })
+            
+    })
+</script>

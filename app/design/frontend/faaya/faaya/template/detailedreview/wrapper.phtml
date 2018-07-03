@@ -1,0 +1,44 @@
+<?php
+/**
+ * MageWorkshop
+ * Copyright (C) 2016 MageWorkshop <info@mage-review.com>
+ *
+ * @category   MageWorkshop
+ * @package    MageWorkshop_DetailedReview
+ * @copyright  Copyright (c) 2016 MageWorkshop Co. (https://mage-review.com/)
+ * @license    http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3 (GPL-3.0)
+ * @author     MageWorkshop <info@mage-review.com>
+ */
+?>
+<?php $variantRemark = (Mage::registry('product'))?Mage::registry('product')->getData('variant_remark'):'';?>
+<?php $isInTab = Mage::getStoreConfig('detailedreview/settings/reviews_in_tab') ? ' in-tab' : ''; ?>
+<?php $isCustomerLogged = $this->helper('customer')->isLoggedIn(); ?>
+
+<div class="reviews-wrapper<?php echo $isInTab; ?>">
+
+    <div class="review-description">
+        <h2>Ratings & <strong>Reviews</strong></h2>
+        <p><?php echo $variantRemark;?></p>
+    </div>
+
+    <?php if (!$isCustomerLogged): ?>
+        <div id="login-dialog-block" class="login-dialog-block" style="display: none;">
+            <div class="login-dialog-container">
+                <?php echo $this->getChildHtml('customer_form_login');?>
+                <?php echo $this->getChildHtml('customer_form_register');?>
+            </div>
+            <div class="clearer"></div>
+        </div>
+    <?php endif;?>
+
+    <?php echo $this->getChildHtml('review_form'); ?>
+
+    <div class="reviews-container" id="feedback">
+        <?php echo $this->getChildHtml('review-wrapper'); ?>
+    </div>
+    <div id="responseLoading"><img width="75" height="75" src="<?php echo $this->getSkinUrl('images/spinner-m.gif'); ?>" alt="<?php echo $this->__('Please, wait...') ?>"/></div>
+</div>
+<!-- the block does not blink when loading need this script -->
+<script type="text/javascript">
+    document.getElementById('feedback').style.display = 'none';
+</script>

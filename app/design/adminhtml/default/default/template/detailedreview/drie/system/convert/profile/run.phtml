@@ -1,0 +1,90 @@
+<?php
+/** @var MageWorkshop_ImportExportReview_Block_Adminhtml_Profile_Edit_Tab_Run $this */
+?>
+<script type="text/javascript">
+function runProfile(popup)
+{
+    var url = '<?php echo $this->getUrl('*/*/run', array('id'=>$this->getProfileId())) ?>',
+        yotpo = $('yotpo'),
+        iframe = $('run_iframe');
+    if ($('profile_direction') != undefined
+        && $('profile_data_transfer') != undefined
+        && getDirection() == 'import' && getTransferType() == 'interactive') {
+        var file = getSelectedFiles();
+        if (file == '') {
+            alert('Please select imported files');
+            $('file_list').show();
+            return false;
+        }
+        url += 'files/' + file + '/';
+    }
+
+    if (yotpo != undefined && yotpo.checked) {
+        url += 'yotpo/1/';
+    }
+
+    if (!popup) {
+        iframe.style.display = 'block';
+        iframe.src = url;
+    } else {
+        window.open(url);
+    }
+}
+
+function getDirection()
+{
+    return $('profile_direction').options[$('profile_direction').options.selectedIndex].value;
+}
+
+function getSelectedFiles()
+{
+    return $('files').options[$('files').options.selectedIndex].value;
+}
+
+function getTransferType()
+{
+    return $('profile_data_transfer').options[$('profile_data_transfer').options.selectedIndex].value;
+}
+</script>
+<ul class="messages">
+<li class="notice-msg">
+    <ul>
+        <li><?php echo $this->__('Please make sure that your changes were saved before running the profile.') ?></li>
+    </ul>
+</li>
+</ul>
+<div id="file_list" style="display: none;">
+<select id="files" name="files">
+    <option value="">Select a file</option>
+<?php if ($files = $this->getImportedFiles()) :
+    foreach ($files as $file) : ?>
+        <option value=<?php echo $file ?>><?php echo $file ?></option>
+<?php   endforeach;
+    endif; ?>
+</select>
+<br />&nbsp;
+</div>
+
+<?php if ($this->canShowForm()): ?>
+    <div style="margin-bottom: 40px;">
+        <h4><label for="import_review_file"><?php echo Mage::helper('mageworkshop_importexportreview')->__('Upload Reviews Import File'); ?></label></h4>
+        <input id="import_review_file" type="file" name="import_review_file"  value=""/>
+        <input id="file_upload" type="hidden" name="file_upload" value="0" />
+        <button onclick="uploadFile();" type="submit"><?php echo $this->__('Check Data'); ?></button>
+        <div style="margin: 20px 0;">
+            <input type="checkbox" id="yotpo" name="yotpo" <?php echo $this->isYotpoImport() ? 'checked' : ''; ?> />
+            <label style="margin-left: 5px; vertical-align: middle;" for="yotpo"><?php echo Mage::helper('mageworkshop_importexportreview')->__('YOTPO CSV Format'); ?></label>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var uploadFile = function () {
+            $('file_upload').setValue(1);
+        };
+    </script>
+<?php endif; ?>
+
+<?php if ($this->showRunButton()): ?>
+    <?php echo $this->getRunButtonHtml() ?><br/>
+    <iframe id="run_iframe" src="<?php echo $this->getJsUrl() ?>blank.html" frameborder=0 style="display:none; width:100%; height:400px;"></iframe>
+<?php endif; ?>

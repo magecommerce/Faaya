@@ -1,0 +1,28 @@
+<?php
+$getCatPosts = $this->getRelatedPost();
+if($getCatPosts->have_posts()){ ?>
+	<div class="related-post">
+		<ul>
+	    <?php while($getCatPosts->have_posts()){
+	    	$getCatPosts->the_post();
+	    	$title = get_the_title();
+	    	//$content = apply_filters('the_content',get_the_content());
+	    	$content = get_the_excerpt();
+	    	$content =  Mage::helper('core/string')->truncate($content, 40);
+	    	$wpblog_fetrdimg = wp_get_attachment_url( get_post_thumbnail_id($post->ID) );
+	    	?>
+	    	<li class="item">
+				<div class="image">
+					<img src="<?php echo $wpblog_fetrdimg; ?>" alt="<?php echo $title;?>">
+				</div>
+				<div class="category-name">
+					<?php echo $title; ?>
+				</div>
+				<h3>
+					<?php echo $content;?>
+				</h3>
+			</li>
+	    <?php }?>
+		</ul>
+	</div>
+<?php }?>

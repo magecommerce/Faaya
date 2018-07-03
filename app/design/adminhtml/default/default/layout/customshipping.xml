@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <customshipping_adminhtml_customshipping_index>
+        <reference name="content">
+            <block type="customshipping/adminhtml_customshipping" name="customshipping" />
+        </reference>
+    </customshipping_adminhtml_customshipping_index>
+	<customshipping_adminhtml_customshipping_edit>
+		<update handle="editor"/>
+    </customshipping_adminhtml_customshipping_edit>
+</layout>

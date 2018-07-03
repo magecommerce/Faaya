@@ -1,0 +1,32 @@
+<?php
+/** @var MageWorkshop_CommentOnReview_Helper_Data $commentOnReviewHelper */
+$commentOnReviewHelper = Mage::helper('mageworkshop_commentonreview');
+
+$displayReplyCaptcha = false;
+if(Mage::getConfig()->getNode('modules/MageWorkshop_CommentOnReview')) {
+    /** @var MageWorkshop_CommentOnReview_Helper_Data $commentOnReviewHelper */
+    $commentOnReviewHelper = Mage::helper('mageworkshop_commentonreview');
+    $displayReplyCaptcha = $commentOnReviewHelper->isCommentOnReviewReCaptchaEnabled();
+}
+?>
+
+<div class="reply-wrapper reply-hide">
+    <form id="reply-form">
+        <div class="reply-comment-wrapper">
+            <div class="reply-comment" role="textbox" aria-multiline="true" contenteditable="true" spellcheck="false"></div>
+            <div class="reply-message-wrapper reply-hide">
+                <ul class="reply-message reply-hide"></ul>
+            </div>
+        </div>
+        <?php if ($displayReplyCaptcha): ?>
+            <div class="reply-captcha-wrapper">
+                <div id="reply-grecaptcha"></div>
+                <div class='captcha-error'></div>
+            </div>
+        <?php endif; ?>
+        <div class="reply-button-wrapper">
+            <button class="reply-submit-button submit-button" type="button" value="<?php echo $this->__('Reply')?>"><?php echo $this->__('Reply')?></button>
+            <button class="reply-cancel-button cancel-button" type="button" value="<?php echo $this->__('Cancel')?>"><?php echo $this->__('Cancel')?></button>
+        </div>
+    </form>
+</div>

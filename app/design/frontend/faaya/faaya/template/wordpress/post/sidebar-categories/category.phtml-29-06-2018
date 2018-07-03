@@ -1,0 +1,37 @@
+<div class="related-post">
+	<ul>
+		<li class="item">
+			<div class="image">
+				<a href="https://www.faayagrowndiamonds.com/blog/how-to-do-a-wedding-thats-great-for-you-and-good-for-the-planet/"><img src="<?php echo $this->getSkinUrl('images/blog/2.jpg'); ?>" alt="image1"></a>
+			</div>
+			<div class="category-name">
+				<?php echo $this->__('Design The Perfect Wedding Ring'); ?>					
+			</div>
+			<h3>
+				<a href="https://www.faayagrowndiamonds.com/blog/how-to-do-a-wedding-thats-great-for-you-and-good-for-the-planet/"><?php echo $this->__('How to do a wedding that’s great for you and good for the planet!');?></a>
+			</h3> 
+		</li>
+		<li class="item">
+			<div class="image">
+				<a href="https://www.faayagrowndiamonds.com/blog/trending-wedding-theme-ideas-for-2018-and-rings-to-match/"><img src="<?php echo $this->getSkinUrl('images/blog/5.jpg'); ?>" alt="image1"></a>
+			</div>
+			<div class="category-name">
+				<?php echo $this->__('WEDDING IDEAS'); ?>					
+			</div>
+			<h3>
+				<a href="https://www.faayagrowndiamonds.com/blog/trending-wedding-theme-ideas-for-2018-and-rings-to-match/"><?php echo $this->__('Trending wedding theme ideas for 2018 (and Rings to Match)');?></a>
+			</h3> 
+		</li>
+		<li class="item">
+			<div class="image">
+				<a href="https://www.faayagrowndiamonds.com/blog/design-the-perfect-wedding-ring/"><img src="<?php echo $this->getSkinUrl('images/blog/3.jpg'); ?>" alt="image1"></a>
+			</div>
+			<div class="category-name">
+				<?php echo $this->__('PLANNING'); ?>					
+			</div>
+			<h3>
+				<a href="https://www.faayagrowndiamonds.com/blog/design-the-perfect-wedding-ring/"><?php echo $this->__('Design The Perfect Wedding Ring');?></a>
+			</h3> 
+		</li>
+	</ul>
+</div>

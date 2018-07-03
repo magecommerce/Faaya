@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <tabs>
+        <wizard translate="label" module="wizard">
+            <label>Faaya</label>
+            <sort_order>100</sort_order>
+        </wizard>
+    </tabs>
+    <sections>
+        <wizard translate="label" module="wizard">
+            <label>Shipping Detail</label>
+            <tab>wizard</tab>
+            <sort_order>1000</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <wizard_group translate="label" module="wizard">
+                    <label>Shiping Details</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>1000</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <wizard_orderby translate="label">
+                            <label>Order By: </label>
+                            <comment>4PM EST TOMORROW</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </wizard_orderby>
+                        <wizard_receiveday translate="label">
+                            <label>Receive on: </label>
+                            <comment>Receive on Number of days Ex : 2</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </wizard_receiveday>
+                        <wizard_shippingvia translate="label">
+                            <label>Free Shipping Via: </label>
+                            <comment>FedEx Priority Overnight</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </wizard_shippingvia>
+                        <wizard_businessday translate="label">
+                            <label>Business Day: </label>
+                            <comment>Ship in number of Business Day</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>s0</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </wizard_businessday>
+                        <fedex_cross translate="label">
+                            <label>Fedex cross total: </label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </fedex_cross>
+                    </fields>
+                </wizard_group>
+            </groups>
+        </wizard>
+    </sections>
+</config>

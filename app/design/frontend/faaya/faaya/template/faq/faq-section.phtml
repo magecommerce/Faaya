@@ -1,0 +1,120 @@
+<?php 
+/*echo '<pre>';
+foreach($faq_category as $faqs){
+    echo $category_label = $faqs['category_label'];
+    $faq_question_answer = $faqs['faq_question_answer'];
+    foreach($faq_question_answer as $faqss){
+                                    print_r($faqss);
+    }
+}*/
+?>
+
+
+<?php if(have_rows('faq_category','option')):  ?> 
+<?php $faq_category = get_field('faq_category','option'); ?>
+<section class="faq-section">
+    <h2><?php echo $this->__('Frequently <strong>Asked Questions</strong>');?></h2>
+    <div class="search-block">
+        <form class="search-form">
+            <input type="text" class="search-field" id="quicksearch" placeholder="<?php echo $this->__('How can I help you');?>" />
+        </form>
+    </div>
+    <div class="filter-block">
+        <?php if(have_rows('faq_category','option')):  ?>  
+        <div id="filters" class="button-group">
+            <?php foreach($faq_category as $faqs){ ?>
+                    <?php  $categoryName = $faqs['category_label'];?>
+                    <button class="button" data-filter=".<?php echo strtolower(str_replace(" ", "-", $categoryName));?>"><?php echo $categoryName;?></button>
+            <?php } ?>   
+        </div>
+        <?php endif; ?>   
+        <?php //if(have_rows('faq_question_answer','option')):  ?>
+            <div class="faq-grid">
+                <?php foreach($faq_category as $faqs){ ?>
+                           <?php  $categoryName = $faqs['category_label'];?> 
+                           <?php $faq_question_answer = $faqs['faq_question_answer'];?>
+                           <?php $i=1;foreach($faq_question_answer as $faq){  ?>
+                               <?php $question = $faq['question'];?>
+                               <?php $answer = $faq['answer'];?>
+                                    <div class="element-item <?php echo strtolower(str_replace(" ", "-", $categoryName));?>">
+                                        <div class="accordion-list">
+                                            <div class="faq-q"><?php echo $question;?></div>
+                                            <div class="faq-a">
+                                                <?php echo $answer;?>
+                                            </div>
+                                        </div>
+                                    </div> 
+                       <?php $i++; }
+                } ?>
+            </div>
+        <?php //endif; ?>
+    </div>
+</section> 
+<script type="text/javascript">
+    var qsRegex;
+    var buttonFilter; 
+
+    var $grid = jQuery('.faq-grid').isotope({
+        itemSelector: '.element-item',
+        layoutMode: 'fitRows',
+        filter: function() {
+            var $this = jQuery(this);
+            var searchResult = qsRegex ? $this.text().match(qsRegex) : true;
+            var buttonResult = buttonFilter ? $this.is(buttonFilter) : true;
+            return searchResult && buttonResult;
+        }
+    });
+
+    jQuery('#filters').on('click', 'button', function() {
+        buttonFilter = jQuery(this).attr('data-filter');
+        $grid.isotope();
+    });
+
+    var $quicksearch = jQuery('#quicksearch').keyup(debounce(function() {
+        qsRegex = new RegExp($quicksearch.val(), 'gi');
+        $grid.isotope();
+    }));
+
+
+
+    jQuery('.button-group').each(function(i, buttonGroup) {
+        var $buttonGroup = jQuery(buttonGroup);
+        $buttonGroup.on('click', 'button', function() {
+            $buttonGroup.find('.is-checked').removeClass('is-checked');
+            jQuery(this).addClass('is-checked');
+        });
+    });
+
+
+    function debounce(fn, threshold) {
+        var timeout;
+        return function debounced() {
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+
+            function delayed() {
+                fn();
+                timeout = null;
+            }
+            setTimeout(delayed, threshold || 100);
+        };
+    }
+ 
+    jQuery(".accordion-list .faq-q").click(function () {
+        if (!jQuery(this).hasClass("active")) {
+            jQuery(".accordion-list .faq-a").stop(true).slideUp();
+            jQuery(".accordion-list .faq-q").removeClass("active");
+            jQuery(this).addClass("active");
+            jQuery(this).next(".faq-a").stop(true).slideDown();
+        } else {
+            jQuery(".accordion-list .faq-a").stop(true).slideUp();
+            jQuery(".accordion-list .faq-q").removeClass("active");
+        }
+
+    });
+    jQuery(document).ready(function(){
+        jQuery('#filters .button:first-child').click();
+    });
+</script>
+<?php endif; ?> 

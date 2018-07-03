@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<config>
+ <global>
+  <page>
+   <layouts>
+    <custom_Contactus>
+     <label>ContactUs Page</label>
+     <template>page/contactus-page.phtml</template>
+    </custom_Contactus>
+   </layouts>  
+   <layouts>
+    <custom_Aboutus>
+     <label>About Us Page</label>
+     <template>page/about-us.phtml</template>
+    </custom_Aboutus>
+   </layouts> 
+  </page>
+ </global>
+</config>

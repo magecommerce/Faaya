@@ -1,0 +1,386 @@
+<?php
+/**
+ * MageWorkshop
+ * Copyright (C) 2016 MageWorkshop <info@mage-review.com>
+ *
+ * @category   MageWorkshop
+ * @package    MageWorkshop_DetailedReview
+ * @copyright  Copyright (c) 2016 MageWorkshop Co. (https://mage-review.com/)
+ * @license    http://opensource.org/licenses/gpl-3.0.html GNU General Public License, version 3 (GPL-3.0)
+ * @author     MageWorkshop <info@mage-review.com>
+ */
+
+/** @var $config MageWorkshop_DetailedReview_Helper_Config */
+$config = $this->helper('detailedreview/config');
+$_items = $this->getReviewsCollection()->getItems();
+$isCustomerLogged = $this->helper('customer')->isLoggedIn();
+$customerId = $isCustomerLogged ? $this->helper('customer')->getCustomer()->getId() : null;
+$isGuestAllowToWrite = $this->helper('review')->getIsGuestAllowToWrite();
+$isGuestAllowToVote = $config->isGuestCanVote();
+$show_vb_image = Mage::getStoreConfig('detailedreview/settings_customer/show_verified_buyer_image');
+$_product = Mage::registry('product');
+$totalReview = Mage::getBlockSingleton('detailedreview/rating_entity_detailed')->getReviewCount($_product->getId());
+if (!$isCustomerLogged){
+    $helperUrl = $this->helper('core/url');
+    $url = $this->getUrl('detailedreview/helpful/vote', array('_secure' => Mage::app()->getStore()->isCurrentlySecure()));
+}
+/** @var MageWorkshop_DetailedReview_Helper_Data $helperDetailedreview */
+$helperDetailedreview = $this->helper('detailedreview');
+
+$enableClientTimezone = Mage::getStoreConfig('detailedreview/datetime_options/enable_to_set_timezone');
+
+$dateFormat = $enableClientTimezone
+    ? Mage::getStoreConfig('detailedreview/datetime_options/date_format')
+    : 'd/M/Y';
+$timeFormat = $enableClientTimezone
+    ? Mage::getStoreConfig('detailedreview/datetime_options/time_format')
+    : 'h:m ' . Zend_Date::MERIDIEM;
+
+//$_product = Mage::registry('product');
+$commentFBDetail = array();
+$configJson = Mage::getModel('detailedreview/review_jsConfig')->getJsonConfig();
+$shortTextSize = Mage::helper('core')->jsonDecode( str_replace('"\\\\"', '"\\"',$configJson));
+$shortTextSize = $shortTextSize['shortTextSize'];
+?>
+<?php if (count($_items)): ?>
+    <?php
+    /** @var MageWorkshop_DetailedReview_Block_Rating_Entity_Detailed $detailedBlock */
+    $detailedBlock  = $this->getLayout()->createBlock('detailedreview/rating_entity_detailed');
+    $ratingsEnabled = Mage::helper('detailedreview')->checkEnabledRatings();
+    $availableSorts = $detailedBlock->getAvailableSorts($ratingsEnabled);
+    $_ids = $this->getReviewsCollection()->getAllIds();
+    ?>
+    <div class="box-collateral box-reviews <?php echo $availableSorts ? 'hide-border-top' : 'show-full-border'; ?>" id="customer-reviews">
+        <input type="hidden" class="total-review" value="<?php echo $totalReview;?>"/>
+        <input type="hidden" class="show-review" id="show-review" value="1"/>
+        <?php //echo $this->getChildHtml('toolbar') ?>
+        <?php $reviewSizing = Mage::getSingleton('detailedreview/review_sizing'); ?>
+        <?php $reviewBodyType = Mage::getSingleton('detailedreview/review_bodyType'); ?>
+        <?php /** @var $_review MageWorkshop_DetailedReview_Model_Review */?>
+        <?php foreach ($_items as $keyReview => $_review):?>
+            <div class="item-review-wrapper">
+                <div class="header-reviews">
+                    <?php $_votes = $_review->getRatingVotes(); ?>
+                    <?php if (count($_votes)): ?>
+                        <ul class="ratings-table">
+                            <?php foreach ($_votes as $_vote): ?>
+                                <li>
+                                    <?php /* ?><span><?php echo $this->__($_vote->getRatingCode() . ':'); ?></span><?php */ ?>
+                                    <div class="ratings">
+                                        <div class="rating-box">
+                                            <div class="rating" style="width:<?php echo $_vote->getPercent(); ?>%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="clearboth"></div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                    <?php if ( ( $helperDetailedreview->checkFieldAvailable('sizing', 'form') ) && ($sizing = $_review->getSizing()) ):?>
+                        <div class="sizing">
+                            <label class="label-review-attr sizing"><?php echo $this->__('Sizing') ?>:</label>
+                            <div class="review-sizing">
+                                <div class="sizing-bar separate">
+                                    <div style="width:<?php echo $reviewSizing->getOptionWidth($sizing) ?>%;"></div>
+                                </div>
+                                <div class="sizing-value"><?php echo $reviewSizing->getOptionValue($sizing) ?></div>
+                            </div>
+                            <div class="clearboth"></div>
+                        </div>
+                    <?php endif;?>
+                    <?php if(Mage::getStoreConfig('detailedreview/social_share_optios/recommended_product') && $_review->getRecommendTo()): ?>
+                        <div class="recommend">
+                            <span><?php echo $this->__('Recommend: '); ?></span>
+                            <div class="recommend-title">
+                                <div class="recommend-value">
+                                    <?php echo $this->escapeHtml($_review->getRecommendTo()); ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <div class="review-dd">
+                    <input class="review-id" name="review-id" type="hidden" value="<?php echo $_review->getId(); ?>">
+                    <div class="top-review">
+                        <div class="title">
+                            <?php echo nl2br($this->escapeHtml($_review->getTitle())); ?>
+                            <?php $date = new Zend_Date($_review->getCreatedAt()); ?>
+                            <small class="date review-date" data-utc="<?php echo $_review->getCreatedAt(); ?>" data-format="<?php echo $dateFormat; ?>"><?php echo date("F Y", strtotime($_review->getCreatedAt())); ?></small>
+                            <small><?php echo date("F Y", strtotime($date));?></small>
+                            <small class="hide-date-review" data-utc="<?php echo $_review->getCreatedAt(); ?>" data-format="<?php echo $dateFormat; ?>"><?php echo $date->get(str_replace('D', 'd', $dateFormat)); ?></small>
+                            <?php /* ?><small class="date review-date" data-utc="<?php echo $_review->getCreatedAt(); ?>" data-format="<?php echo $timeFormat; ?>"><?php echo $date->get($timeFormat); ?></small><?php */ ?>
+                        </div>
+                        <div class="title abuse">
+                            <?php if ($isCustomerLogged): ?>
+                                <?php $complaintButton = $this->getChild('mageworkshop.detailedreview.review.complaint.button'); ?>
+                                <?php if ($complaintButton): ?>
+                                    <?php $complaintButton->setData('record_id', $_review->getId()); ?>
+                                    <?php echo $this->getChildHtml('mageworkshop.detailedreview.review.complaint.button', false); ?>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php if ( $detail = $_review->getDetail() ):?>
+                            <?php $shortText = (strlen($detail) > $shortTextSize)?' short-text':'';?>
+                            <div class="value-review-attr description<?php echo $shortText?>"><?php echo nl2br($this->escapeHtml($detail)) ?></div>
+                        <?php endif;?>
+
+
+                        <div class="review-dt" id="<?php echo 'rw_'.$_review->getId(); ?>">
+                            <span class="nickname"><?php echo $this->escapeHtml($_review->getNickname()); ?></span>
+                        </div>
+
+                    </div>
+
+                    <div class="review-wrapper">
+                        <ul>
+                            <?php if ( $helperDetailedreview->checkFieldAvailable('good_and_bad_detail', 'form') ): ?>
+                                <?php if ( $goodDetail = $_review->getGoodDetail() ): ?>
+                                    <li><label class="label-review-attr"><?php echo $this->__('What do you like about this item?') ?>:</label><div class="value-review-attr"><?php echo nl2br($this->escapeHtml($goodDetail)) ?></div></li>
+                                <?php endif;?>
+                                <?php if ( $noGoodDetail = $_review->getNoGoodDetail() ):?>
+                                    <li><label class="label-review-attr"><?php echo $this->__('What do you dislike about this item?') ?>:</label><div class="value-review-attr"><?php echo nl2br($this->escapeHtml($noGoodDetail)) ?></div></li>
+                                <?php endif;?>
+                            <?php endif;?>
+
+                            <?php if ( $helperDetailedreview->checkFieldAvailable('pros_and_cons', 'form') ): ?>
+                                <?php if ( $goodDetail = $helperDetailedreview->getProsConsText($_review->getPros(), MageWorkshop_DetailedReview_Model_Source_EntityType::PROS) ):?>
+                                    <li><label class="label-review-attr"><?php echo $this->__('Pros') ?>:</label><div class="value-review-attr"><?php echo nl2br($this->escapeHtml($goodDetail)) ?></div></li>
+                                <?php endif;?>
+                                <?php if ( $noGoodDetail = $helperDetailedreview->getProsConsText($_review->getCons(), MageWorkshop_DetailedReview_Model_Source_EntityType::CONS) ):?>
+                                    <li><label class="label-review-attr"><?php echo $this->__('Cons') ?>:</label><div class="value-review-attr"><?php echo nl2br($this->escapeHtml($noGoodDetail)) ?></div></li>
+                                <?php endif;?>
+                            <?php endif;?>
+
+                            <?php if(Mage::getStoreConfigFlag(MageWorkshop_DetailedReview_Block_Product_View_List::XML_PATH_ALLOW_VIDEO_PREVIEW) && $videoHtml = $helperDetailedreview->getVideoIFrame($_review->getVideo())): ?>
+                                <li class="iframe-video">
+                                    <?php echo $videoHtml; ?>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if ( $helperDetailedreview->checkFieldAvailable('video', 'form') && ($videoUrl = $_review->getVideo()) ):?>
+                                <li>
+                                    <a class="video-review" target="_blank" href="<?php
+                                        echo $this->escapeHtml((!preg_match("~^(?:f|ht)tps?://~i", $videoUrl)) ? 'http://'.$videoUrl : $videoUrl);
+                                        ?>">
+                                        <?php echo $this->__('Watch my video')?>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                    <div class="clearer"></div>
+
+                    <?php /* ?><div class="helpful-block">
+                        <form class="helpful-form" action="<?php echo $this->getUrl('detailedreview/helpful/vote', array('_secure' => Mage::app()->getStore()->isCurrentlySecure())); ?>" method="post" >
+                            <div class="js-helpful-voting">
+                                <input type="hidden" name="review_id" value="<?php echo $_review->getId()?>"/>
+                                <?php $isCustomerVoted = $_review->getIsCustomerVoted(); ?>
+                                <?php $isGuestVoted = $_review->checkGuestIsVoted(); ?>
+                                <?php $isCustomerOwner = !is_null($customerId) && $customerId == $_review->getCustomerId(); ?>
+                                <div class="rating-wrapper">
+                                    <a class="review-vote-rating helpful-btn"  title="<?php echo $this->__('Helpful')?>" href="#login-dialog-block">
+                                        <span></span>
+                                    </a>
+                                    <span class="helpful-qty voting-qty"><?php echo $_review->getCountHelpful() ?></span>
+                                </div>
+                                <div class="rating-wrapper">
+                                    <a class="review-vote-rating unhelpful-btn" title="<?php echo $this->__('Unhelpful')?>" href="#login-dialog-block">
+                                        <span></span>
+                                    </a>
+                                    <span class="unhelpful-qty voting-qty"><?php echo $_review->getCountUnhelpful() ?></span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="social-share">
+                        <?php $shareUrl = $_product->getProductUrl() . '#rw_'.$_review->getId(); ?>
+                        <?php $facebookPingResult = Mage::helper('drcore')->pingDetailedReviewFacebook();?>
+                        <?php if($facebookPingResult !== false && !isset($facebookPingResult['error'])): ?>
+
+                            <?php
+                            $images = $_review->getImage() ? explode(",", $_review->getImage()) : array();
+                            ?>
+                            <?php $image = isset($images[0]) ? Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . $images[0] : Mage::getBaseUrl
+                                (Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $_product->getSmallImage(); ?>
+                            <?php $commentFBDetail[$_review->getId()] = array(
+                                                                        'name'=> $_product->getName(),
+                                                                        'url'=> $shareUrl,
+                                                                        'detail' => $_review->getDetail(),
+                                                                        'image' => $image
+                                                                    ); ?>
+
+                            <a class="share-fb" onclick="fbShare(<?php echo $_review->getId();?>)"></a>
+                        <?php endif; ?>
+
+                        <?php if(Mage::getStoreConfig('detailedreview/social_share_optios/twitt_review')): ?>
+                            <div class="share-twitter">
+                                <a href="<?php echo $this->escapeHtml('https://twitter.com/share?dtn=true&count=none&lang=en&via=DetailedReview&text=')?><?php echo urlencode($helperDetailedreview->smartyModifierTruncate($_product->getName(), 30)); ?><?php echo $this->escapeHtml('&url=')?><?php echo urlencode($shareUrl); ?>"
+                                    target="_blank" class="twitter-share-button"
+                                    data-url="<?php echo $shareUrl; ?>"
+                                    data-text="<?php echo urlencode($helperDetailedreview->smartyModifierTruncate($this->escapeHtml($_product->getName(), 30))); ?>"
+                                    data-via="DetailedReview"
+                                    data-social-type="twitter"
+                                    data-action="<?php echo Mage::getUrl('detailedreview/product/getShortLink', array('_secure' => Mage::app()->getStore()->isCurrentlySecure())); ?>">
+                                </a>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if(Mage::getStoreConfig('detailedreview/social_share_optios/share_review_to_pinterest') && $_review->getImage()): ?>
+                            <div class="share-pinterest">
+                                <?php $image  = explode(',', $_review->getImage())?>
+                                <a href="<?php echo 'http://pinterest.com/pin/create/link/?url=' . urlencode($shareUrl) . '&description=' . $_product->getName() . '&media=' . urlencode(Mage::getBaseUrl('media') . $image[0]); ?>" class="link-pinterest" title="<?php echo $this->__('Share on Pinterest'); ?>" target="_blank" data-social-type="pinterest"></a>
+                            </div>
+                        <?php endif; ?>
+                        <?php if (Mage::getStoreConfig('detailedreview/social_share_optios/share_review_by_email')): ?>
+                            <div class="drw-share-email" data-email-subject="<?php echo $this->escapeHtml($_review->getTitle()); ?>" data-share-url="<?php echo $shareUrl;?>"></div>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ( $helperDetailedreview->checkFieldAvailable('response', 'info') && ($response = $_review->getResponse()) ):?>
+                        <div class="admin-response">
+                            <span class="r-arrow"></span>
+                            <label class="label-review-attr"><?php echo $this->__('Administration Response') ?>:</label>
+                            <div class="value-review-attr"><?php echo nl2br($this->escapeHtml($response)) ?></div>
+                        </div>
+                    <?php endif;?>
+                    <?php
+                        $additionalData = $this->getChild('review.additional.data');
+                        $additionalData->setReviewCollection($this->getReviewsCollection())
+                            ->setCurrentItem($_review)
+                            ->setReviewIds($_ids);
+                        echo $this->getChildHtml('review.additional.data', false);
+                    ?>
+                </div><?php */ ?>
+                
+
+            </div> 
+                <div class="images-box">
+                        <?php if ( $helperDetailedreview->checkFieldAvailable('image', 'form') ):
+                            $images = explode(",",$_review->getImage());
+                            foreach($images as $img):
+                                if ( isset($newImageUrl) ) unset ($newImageUrl);
+                                if ( $image = str_replace('\\','/',$img) ) {
+                                    $image = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . $image;
+                                    $newImageUrl = $this->helper('detailedreview')->getResizedImage($image,68,68);
+                                }
+                                if ( isset($newImageUrl) && $newImageUrl ): ?>
+                                    <div class="image-review">
+                                        <a class="image-popup" data-fancybox="review-gallery" href="<?php echo  $image;?>" >
+                                            <img src="<?php echo $newImageUrl;?>" alt=""/>
+                                        </a>
+                                        <div><?php $this->__('click for full-size image'); ?></div>
+                                    </div>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>           
+            </div>
+        <?php endforeach; ?>
+        <?php
+            $commentFBDetail['success'] = $this->__('Post was published.');
+            $commentFBDetail['error'] = $this->__('Post was not published.');
+        ?>
+        <script type="text/javascript">
+            var fbShareComment = <?php echo json_encode($commentFBDetail); ?>
+        </script>
+        <?php //echo $this->getChildHtml('toolbar') ?>
+   <!-- </div>-->
+    <?php echo $this->getChildHtml('mageworkshop.detailedreview.review.complaint'); ?>
+<?php else: ?>
+    <?php if ($this->getReviewsCountWithoutFilters()): ?>
+        <?php echo $this->getMessagesBlock()->addNotice($this->__('Sorry, no reviews matched your criteria.'))->_toHtml(); ?>
+    <?php endif; ?>
+<?php endif; ?>
+<?php if ($isGuestAllowToWrite || $isCustomerLogged): ?>
+    <?php echo $this->getChildHtml('review_form') ?>
+<?php endif;?>
+<?php
+if(Mage::getConfig()->getNode('modules/MageWorkshop_CommentOnReview')) {
+    echo $this->getChildHtml('mageworkshop.commentonreview.reply.comment');
+}
+?>
+</div>
+<div class="load-more-review">
+    <a href="javascript:void(0)" class="load-more" title="<?php echo $this->__('Load More Reviews');?>"><?php echo $this->__('Load More Reviews');?></a>
+</div>
+
+<script type="text/javascript">
+    //<![CDATA[
+    document.observe("dom:loaded", function() {
+        'use strict';
+        ;(function($){
+            var query = window.location.search;
+            if(query != 'undefined') {
+                if (query.search('feedback=1') != -1) {
+                    var lis = $(".toggle-tabs").children("li");
+                    $(lis).each(function(){
+                        if ($(this).children('span').text() == "Reviews") {
+                            $(this).trigger("click");
+                        }
+                    });
+                }
+            }
+        })(DRjQuery);
+        var event = document.createEvent("CustomEvent");
+        event.initEvent("updateDateDR", false, true);
+        window.dispatchEvent(event);
+    });
+    //]]>
+    jQuery(document).ready(function () {  
+    showLoadmore();  
+    jQuery('.load-more').click(function(){ 
+        var sortby = jQuery(".selected").attr('data-sort');
+        var curpage = parseInt(jQuery(".show-review").val());
+        var setpage = curpage + 1;
+        jQuery(".show-review").val(setpage);
+        var productId = '<?php echo $_product->getId();?>';
+        //var url = '<?php //echo "http://127.0.0.1/faaya/detailedreview/product/getReviewsByAjaxOne/?sort=date_desc&range=&keywords=&images=&video=&highest_contributors=&verified_buyers=&admin_response=&r_p=2&r_limit=&r_id=&product_id=1178";//$this->getUrl('detailedreview/product/getReviewsByAjaxOne');?>';
+        var url = '<?php echo $this->getUrl('detailedreview/product/getReviewsByAjaxOne');?>';
+        jQuery.ajax({
+            url : url,
+            dataType : 'html',
+            type: 'POST',
+            data: {sort:sortby,range:'',keywords:'',images:'',video:'',highest_contributors:'',verified_buyers:'',admin_response:'',r_p:setpage,r_limit:'',r_id:'',product_id:productId},
+            success : function(response) {
+              var data =  jQuery.parseJSON(response);
+              jQuery(".box-collateral").append(data.html);
+              showLoadmore();
+            }
+        });     
+    });
+    jQuery(".select-review-sorts li").click(function(){
+        jQuery(".load-more").remove();
+        jQuery(".show-review").val(1);
+    });
+    jQuery(".review-dialog").click(function(){
+         jQuery(".load-more").hide();
+    });
+    jQuery("#buttonBack").click(function(){
+         showLoadmore();
+    });
+    jQuery(".select-review-sorts li.selected").change(function(){
+       jQuery(".box-collateral").addClass("loading");
+    });
+    
+    jQuery(document).scroll(function() {
+        if(jQuery('.box-collateral').css('display') != 'none'){
+            showLoadmore();
+        }
+    });
+});
+function showLoadmore(){
+var totalReview = parseInt(jQuery(".total-review").val());
+    var itemLength =  parseInt(jQuery(".item-review-wrapper").length);
+    if(itemLength < totalReview){
+       jQuery(".load-more").show() 
+    }else{
+        jQuery(".load-more").hide() 
+    }
+}
+</script>
+
+
+<style type="text/css">
+    .reviews-wrapper #feedback #customer-reviews.loading { position:relative; }
+    .reviews-wrapper #feedback #customer-reviews.loading:after { position:absolute; left:0; top:0; width:100%; height:100%; background:rgba(255,255,255,0.8); content:""; }
+</style>

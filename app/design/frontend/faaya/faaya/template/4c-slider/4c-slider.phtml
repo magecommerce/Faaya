@@ -1,0 +1,269 @@
+<?php
+$claritySlider = get_field('clarity_slider' ,'option');
+$clarityText = get_field('clarity_text' ,'option');
+
+$cutDescription = get_field('cut_description' ,'option');
+$cutSlider = get_field('cut_slider' ,'option');
+
+$colorSlider = get_field('color_slider' ,'option');
+$colorText = get_field('color_text' ,'option');
+
+$caratContent = get_field('carat_content' ,'option');
+
+$centerLeftContent = get_field('center_tab_left_content' ,'option');
+$centerRightContent = get_field('center_tab_right_content' ,'option');
+$centerTabLeftImage = get_field('center_tab_left_image' ,'option');
+$centerTabRightImage = get_field('center_tab_right_image' ,'option');
+?>
+<div class="morethenjust-section">
+    <h2><?php echo $this->__('More than just the <strong>4 C’s</strong>');?></h2>
+    <p><?php echo $this->__('A Wiser, Kinder and Better Choice.');?></p>
+    <div class="tabs4c-slider">
+        <ul class="tabs-4c">
+            <li class="tab-link clarity" data-tab="cut"><span><?php echo $this->__('Cut');?></span></li>
+            <li class="tab-link carat" data-tab="color"><span><?php echo $this->__('Color');?></span></li>
+            <li class="tab-link current active-link type-iia" data-tab="eco-positive"><span><?php echo $this->__('Type IIa');?></span></li>
+            <li class="tab-link current active-link" data-tab="eco-positive"><span><?php echo $this->__('Eco Positive');?></span></li>
+            <li class="tab-link cut" data-tab="clarity"><span><?php echo $this->__('Clarity');?></span></li>
+            <li class="tab-link color" data-tab="carat"><span><?php echo $this->__('Carat');?></span></li>
+        </ul>
+        <?php if($claritySlider): ?>
+        <div id="clarity" class="tab-content">
+            <p class="main-description"><?php echo $clarityText ?></p>
+            <div id="clarity">
+                <div class="hidden-xs">    
+                <carousel-3d :controls-visible="true" display="8" :inverse-scaling="0" :width="210" :height="400" :perspective="0" :startIndex="1">
+                    <?php $j=0;foreach($claritySlider as $clarity):
+                            $clarityTitle = $clarity['clarity_title'];
+                            $clarityImage = $clarity['clarity_image'];?>
+                        <slide :index="<?php echo $j;?>">
+                    <figure>
+                        <img src="<?php echo $clarityImage['url'];?>">
+                    </figure>
+                        <figcaption><?php echo $clarityTitle;?></figcaption>
+                        </slide>
+                    <?php $j++;endforeach;?>
+                </carousel-3d>
+                </div>
+                <div class="visible-xs">
+                    <carousel-3d :controls-visible="true" display="8" :inverse-scaling="0" :width="140" :height="200" :perspective="0" :startIndex="1">
+                    <?php $j=0;foreach($claritySlider as $clarity):
+                            $clarityTitle = $clarity['clarity_title'];
+                            $clarityImage = $clarity['clarity_image'];?>
+                        <slide :index="<?php echo $j;?>">
+                    <figure>
+                        <img src="<?php echo $clarityImage['url'];?>">
+                    </figure>
+                        <figcaption><?php echo $clarityTitle;?></figcaption>
+                        </slide>
+                    <?php $j++;endforeach;?>
+                </carousel-3d>
+               </div>                
+
+
+            </div>
+            <a href="<?php echo Mage::getUrl('loose-diamonds'); ?>" class="readmore"><?php echo $this->__('Explore our Diamonds');?></a> </div>
+        <?php endif;?>
+
+        <div id="carat" class="tab-content carat-tab-content">
+            <p class="main-description"><?php echo $caratContent ?></p>
+            <?php /* <div class="carat-range-slider">
+                <div class="carat-range"></div>
+            </div> */ ?>
+            <div class="slider">
+              <div class="carat-slider"></div>
+            </div>
+
+            <a href="<?php echo Mage::getUrl('loose-diamonds'); ?>" class="readmore"><?php echo $this->__('Explore our Diamonds');?></a>
+        </div>
+
+        <div id="eco-positive" class="tab-content current">
+            <div class="eco-positive-slider">
+                <div class="item">
+                    <div class="left">
+                         <?php echo $centerLeftContent;?>
+                    </div>
+                    <div class="right">
+                        <?php echo $centerRightContent;?>
+                    </div>
+                </div>
+
+            </div>
+            <ul class="content-images">
+                <li><img src="<?php echo $centerTabLeftImage['url']; ?>" alt=""></li>
+                <li><img src="<?php echo $centerTabRightImage['url'] ?>" alt=""></li>
+            </ul> <a href="<?php echo Mage::getUrl('loose-diamonds'); ?>" class="readmore"><?php echo $this->__('Explore our Diamonds');?></a> </div>
+
+        <?php if($cutSlider):?>
+            <div id="cut" class="tab-content">
+                <p class="main-description"><?php echo $cutDescription;?></p>
+                <ul class="cut-options">
+                     <?php foreach($cutSlider as $cut):
+                            $cutTitle = $cut['cut_title'];
+                            $cutImage = $cut['cut_image'];?>
+                    <li class="item">
+                        <div class="cut-image"><img src="<?php echo $cutImage['url']; ?>" alt=""></div>
+                        <h4><?php echo $cutTitle;?></h4> </li>
+                  <?php endforeach;?>
+                </ul> <a href="<?php echo Mage::getUrl('loose-diamonds'); ?>" class="readmore"><?php echo $this->__('Explore our Diamonds');?></a> </div>
+      <?php endif;?>
+        <?php if($colorSlider):?>
+        <div id="color" class="tab-content">
+            <p class="main-description">
+              <?php echo $colorText ;?>
+            </p>  
+            <div id="color">
+
+              <div class="hidden-xs">
+                <carousel-3d :controls-visible="true" display="7" :inverse-scaling="0" :width="210" :height="450" :perspective="0">
+                <?php $i=0;foreach($colorSlider as $color):
+                            $colorTitle = $color['color_title'];
+                            $colorImage = $color['color_image'];?>
+                    <slide :index="<?php echo $i;?>">
+                    <figure>
+                        <img src="<?php echo $colorImage['url']; ?>">
+                    </figure>
+                    <figcaption><?php echo $colorTitle;?></figcaption>
+                    </slide>
+                    <?php $i++;endforeach;?>
+                </carousel-3d>
+               </div>
+              
+              <div class="visible-xs">
+                <carousel-3d :controls-visible="true" display="7" :inverse-scaling="0" :width="140" :height="200" :perspective="0">
+                <?php $i=0;foreach($colorSlider as $color):
+                            $colorTitle = $color['color_title'];
+                            $colorImage = $color['color_image'];?>
+                    <slide :index="<?php echo $i;?>">
+                    <figure>
+                        <img src="<?php echo $colorImage['url']; ?>">
+                    </figure>
+                    <figcaption><?php echo $colorTitle;?></figcaption>
+                    </slide>
+                    <?php $i++;endforeach;?>
+                </carousel-3d>
+              </div>
+
+            </div>
+            <a href="<?php echo Mage::getUrl('loose-diamonds'); ?>" class="readmore"><?php echo $this->__('Explore our Diamonds');?></a> </div>
+     <?php endif;?>
+    </div>
+</div>
+
+<style type="text/css">
+.carousel-3d-container { overflow:visible!important; }
+.carousel-3d-slide { background:none; border:0; }
+.carousel-3d-container figure {margin:0;}
+.carousel-3d-container figcaption { float:left; min-width:100%; width:100%; font-size:26px; font-weight:700; color:#000052; margin-top:90px; text-align:center; }
+.carousel-3d-container .carousel-3d-slide.current figcaption { color:#ff6427; }
+</style>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.7/vue.js'></script>
+<script src='https://rawgit.com/Wlada/vue-carousel-3d/master/dist/vue-carousel-3d.min.js'></script>
+<script type="text/javascript">// <![CDATA[
+var storeurl = '<?php echo Mage::getBaseURL();?>';
+jQuery(document).ready(function (){
+
+ jQuery(".carat-slider")
+    .slider({  
+        min: 0, 
+        max: 6,
+       create:changecarat,
+       slide: changecarat,
+      change: changecarat,
+    })
+    .slider("pips", {
+        first: "pip",
+        last: "pip",
+        rest: "label"
+    });
+ 
+
+})
+function changecarat(){
+ jQuery('.carat-slider').find('span').eq(0).html('<img src="'+storeurl+'media/wizard/diamond-carat/'+jQuery('.carat-slider').slider("values", 0)+'.png">');
+}
+// ]]></script>
+<script type="text/javascript">
+    var colorLoad = false;
+    var clarityLoad = false;
+    jQuery(document).ready(function () {
+       /* jQuery('.eco-positive-slider').owlCarousel({
+            loop: false
+            , margin: 0
+            , nav: true
+            , items: 1
+        })*/
+        jQuery('.clarity-slider').owlCarousel({
+            loop: false
+            , margin: 0
+            , nav: true
+            , items: 7
+        , })
+
+
+
+        jQuery('ul.tabs-4c li').click(function () {
+            var tab_id = jQuery(this).attr('data-tab');
+            jQuery('ul.tabs-4c li').removeClass('current');
+            jQuery('.tab-content').removeClass('current');
+            jQuery(this).addClass('current');
+            jQuery("#" + tab_id).addClass('current');
+
+            if(colorLoad == false && tab_id == 'color' ){
+                colorSlider();
+                colorLoad = true;
+           }
+            if(clarityLoad == false && tab_id == 'clarity' ){
+                claritySlider();
+                clarityLoad = true;
+           }
+
+        })
+    })
+</script>
+<script type="text/javascript">
+    function claritySlider(){
+         new Vue({
+          el: '#clarity',
+          data: {
+            slides: 8
+
+          },
+          components: {
+            'carousel-3d': Carousel3d.Carousel3d,
+            'slide': Carousel3d.Slide
+          }
+        })
+    }
+
+    function colorSlider() {
+        new Vue({
+          el: '#color',
+          data: {
+            slides: 7
+
+          },
+          components: {
+            'carousel-3d': Carousel3d.Carousel3d,
+            'slide': Carousel3d.Slide
+          }
+        })
+     }
+
+
+      jQuery(".carat-range").slider({
+            min: 0,
+            max: 6,
+            range: true,
+            values: [0, 6],
+            step:0.1,
+            orientation: "horizontal",
+        }).slider("pips", {
+            rest: "label"
+        })
+
+
+
+
+</script>

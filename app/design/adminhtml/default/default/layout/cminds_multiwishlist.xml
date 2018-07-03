@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<layout version="1.0.0">
+    <adminhtml_customer_edit>
+        <reference name="customer_edit_tabs">
+            <action method="addTab" ifconfig="wishlist/cminds_multiwishilst/enabled">
+                <name>customer_edit_tab_wishlists</name>
+                <block>cminds_multiwishlist/adminhtml_customer_edit_tab_wishlists</block>
+            </action>
+        </reference>
+    </adminhtml_customer_edit>
+    <adminhtml_multiwishlist_grid>
+        <reference name="customer_edit_tab_wishlists">
+            <action method="addProductConfigurationHelper"><type>bundle</type><name>bundle/catalog_product_configuration</name></action>
+        </reference>
+    </adminhtml_multiwishlist_grid>
+    <adminhtml_sales_order_create_index>
+        <reference name="sidebar">
+            <block type="cminds_multiwishlist/sales_order_create_sidebar_wishlist" template="cminds_multiwishlist/sales/order/create/sidebar/items.phtml" name="wishlist" />
+        </reference>
+    </adminhtml_sales_order_create_index>
+    <adminhtml_sales_order_create_load_block_sidebar>
+        <reference name="sidebar">
+            <block type="cminds_multiwishlist/sales_order_create_sidebar_wishlist" template="cminds_multiwishlist/sales/order/create/sidebar/items.phtml" name="wishlist" />
+        </reference>
+    </adminhtml_sales_order_create_load_block_sidebar>
+    <adminhtml_sales_order_create_load_block_sidebar_wishlist>
+        <reference name="content">
+            <block type="cminds_multiwishlist/sales_order_create_sidebar_wishlist" template="cminds_multiwishlist/sales/order/create/sidebar/items.phtml" name="sidebar_wishlist" />
+        </reference>
+    </adminhtml_sales_order_create_load_block_sidebar_wishlist>
+    <adminhtml_sales_order_create_load_block_data>
+        <reference name="sidebar">
+            <block type="cminds_multiwishlist/sales_order_create_sidebar_wishlist" template="cminds_multiwishlist/sales/order/create/sidebar/items.phtml" name="wishlist" />
+        </reference>
+    </adminhtml_sales_order_create_load_block_data>
+</layout>

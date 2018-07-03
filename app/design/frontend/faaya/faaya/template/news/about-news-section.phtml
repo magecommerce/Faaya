@@ -1,0 +1,60 @@
+<?php $blogitems = $this->getLatestHomePostCollection();?> 
+<?php if($blogitems): ?>
+<div class="about-news">
+    <h2>In the <strong>News</strong></h2>
+    <div class="about-news-slider">
+        <div class="news-slider"> 
+            <?php foreach ($blogitems as $item):
+                    $postImageUrl="";
+                    //$big_img = get_field('home_image',$item->getId());
+                    $big_img = get_the_post_thumbnail_url($item->getId(),'full');
+                    if($big_img):
+                        //$postImageUrl = $big_img["url"];
+                        $postImageUrl = Mage::helper('latestblogpost')->getResizedHomeNewsImage($big_img,186,192,"about-latestnews");
+                    else:
+                        $postImageUrl =  $this->getSkinUrl('images/home-block-big.jpg');
+                    endif;
+                  ?>
+                    <div>
+                        <div class="image"><img src="<?php echo $postImageUrl; ?>" alt=""></div>                                               
+                        <div class="info">
+                            <h4><a href="<?php echo $item->getUrl(); ?>"><?php echo $item->getPostTitle();?></a></h4>
+                            <?php $content =  $item->getPostContent();?>
+                            <?php $content = strip_tags(preg_replace("/<img[^>]+\>/i", "", $content));?>
+                            <p><?php echo Mage::helper('core/string')->truncate($content, '100');?></p>
+                        </div>
+                    </div>
+            <?php endforeach;?>             
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    
+    jQuery('.news-slider').slick({
+      centerMode: true,
+      slidesToShow: 3,
+      centerPadding: '0',
+      responsive: [
+        {
+          breakpoint: 768,
+          settings: {
+            centerMode: true,
+            centerPadding: '40px',
+            slidesToShow: 1
+          }
+        },
+        {
+          breakpoint: 480,
+          settings: {
+            centerMode: true,
+            centerPadding: '20px',
+            slidesToShow: 1
+          }
+        }
+      ]
+    });
+    
+</script>
+<?php endif; ?>

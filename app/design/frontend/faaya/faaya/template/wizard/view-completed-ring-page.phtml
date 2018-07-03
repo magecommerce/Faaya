@@ -1,0 +1,665 @@
+<?php
+$helper = Mage::Helper('wizard');
+$editid = $this->getRequest()->getParam('editid');
+$titleHelper =  $helper->getAlltitle();
+$attribute = $helper->getAllAttribute();
+$selected = $helper->getSelectedValue();
+$diaPid = ($selected)?$selected['productId']:0;
+
+$ringSelected = $helper->getRingSelected();
+$ringPid = ($ringSelected)?$ringSelected['productId']:0;
+
+$helper->getRedirect($diaPid,'wizard');
+$helper->getRedirect($ringPid,'wizard/ring');
+
+
+$ringProduct = Mage::getModel('catalog/product')->load($ringPid);
+$ringProduct->load('media_gallery');
+$gallery = $ringProduct->getMediaGallery();
+$price = ($ringProduct->getSpecialPrice() && $ringProduct->getSpecialPrice() < $ringProduct->getPrice())?$ringProduct->getSpecialPrice():$ringProduct->getPrice();
+
+
+$diamondProduct = Mage::getModel('catalog/product')->load($diaPid);
+$price += ($diamondProduct->getSpecialPrice() && $diamondProduct->getSpecialPrice() < $diamondProduct->getPrice())?$diamondProduct->getSpecialPrice():$diamondProduct->getPrice();
+
+$ringData =  Mage::getSingleton('core/session')->getRingData();
+//echo "<pre/>";print_r($ringData);exit;
+
+$productSizeId = $helper->getAttributeId('product_size');
+$shapeId = $helper->getAttributeId('stone_shape');
+$metalTypeId = $helper->getAttributeId('metal_type');
+
+$stepList = $helper->stepList(2,2,false);
+if(count($stepList) > 3){
+    $stepList = $helper->stepList(3,3,false);
+}
+
+if($ringProduct->getId()){
+    $checkMetalOption = Mage::getModel('wizard/wizardrelation')->checkMetalOption($ringProduct);
+}
+
+$params = array('sid'=>$ringPid,'did'=>$diaPid);
+$checkoutText = $this->__('Checkout');
+
+$selectedWedding = false;
+if($editid){
+    $params['editid'] = $editid;
+    $checkoutText = $this->__('Checkout');
+    $selectedWedding = $helper->getSelectedWedding($editid);
+}
+
+$sidestone =  Mage::getSingleton('core/session')->getSidestone();
+
+/*  code for order date */
+$receiveDay =  $helper->getOrderDate($ringPid);
+$rcdate = date('y-m-d',strtotime($receiveDay));
+$rcdate = date_format(date_create($rcdate),"dS F, Y");
+/* end code for order date */
+
+
+$resource = Mage::getSingleton('core/resource');
+$readConnection = $resource->getConnection('core_read');
+$pinfo = $helper->getPinfo($ringPid);
+$weddingband = $helper->getWeddingBand($ringPid);
+$weddingFlag = false;
+if($weddingband){
+
+    $weddingProduct = Mage::getModel('catalog/product')->load($weddingband['pid']);
+    if($weddingProduct && $weddingProduct->getImage() != '' && file_exists(Mage::getBaseDir('media').DS.'catalog'.DS.'product'.str_replace("/", DS, $weddingProduct->getImage()))){
+        $weddingFlag = true;
+    }
+
+}
+
+$sidestoneArr = array();
+if($sidestone != ''){
+    $sidestone = unserialize($sidestone);
+    $sidestoneArr = $readConnection->fetchRow("select *,SUM(price) as price,SUM(weight) from wizardmaster where pid IN (".$sidestone['pid1'].",".$sidestone['pid2'].")");
+    $params['side1'] = $sidestone['pid1'];
+    $params['side2'] = $sidestone['pid2'];
+    if(!empty($sidestoneArr)){
+        $price += $sidestoneArr['price'];
+    }
+}
+$backlink = ($editid)?Mage::app()->getStore()->getUrl('wizard/ringdetail/index/editid/'.$editid):Mage::app()->getStore()->getUrl('wizard/ringdetail');
+?>
+<section class="main-content view-page">
+    <div class="tabs">
+        <ul>
+            <?php foreach ($stepList as $value) { ?>
+                <li class="<?php echo $value['class'];?>">
+                    <a href="<?php echo Mage::app()->getStore()->getUrl($value['url'])?>">
+                        <span class="tab-info">
+                            <span class="title"><?php echo $value['title'];?></span>
+                                <?php if($value['text'] != ''){
+                                echo $value['text'];
+                                }?>
+                        </span>
+                    </a>
+                  </li>
+            <?php } ?>
+        </ul>
+    </div>
+    <div class="col-right-side">
+        <div class="view-completed-slider">
+            <div class="view-completed-slider-product">
+            <div class="view-completed-slider-links links">
+                <a class="link wish-it" href="#"><span><?php echo $this->__('Wish It');?></span></a>
+            </div>
+            <div class="sharethis-product">
+                <div class="sharethis-inline-share-buttons"></div>
+                <script type='text/javascript' src='//platform-api.sharethis.com/js/sharethis.js#property=5a423282c4203c00110b8eca&product=unknown' async='async'></script>
+            </div>
+            <div class="viewcomplete-image">
+                <?php if(count($gallery['images']) > 0 || $ringProduct->getVideo()){ ?>
+                     <?php foreach ($gallery['images'] as $item) {
+
+                         $imageUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $item['file'];
+                        ?>
+                        <div class="item">
+                            <a class="icon-zoom" href="<?php echo $imageUrl ?>" data-fancybox="wizard-slider">
+                                <img src="<?php echo Mage::helper('catalog/image')->init($ringProduct, 'thumbnail', $item['file'])->backgroundColor(255,255,255)->resize(600); ?>" alt="" />
+                            </a>
+                        </div>
+                    <?php } ?>
+
+                    <?php if($helper->checkRemoteFile($ringProduct->getVideo())){ ?>
+                    <div class="item">
+                         <a class="icon-zoom video-zoom-icon" href="<?php echo $ringProduct->getVideo();?>" data-fancybox="wizard-slider"></a>
+                        <div class="slick-video slick-video-2 video-wrapper video-box">
+                            <video id="videoId" autoplay="autoplay" loop="loop" onstart="this.play();" onended="this.play();" autobuffer>
+                                <source src="<?php echo $ringProduct->getVideo();?>" type=video/mp4>
+                            </video>
+                             <div class="control">
+                                  <a href="javascript:void(0);" class="btnPlay pause"><i class="icon-play-pause" aria-hidden="true"></i></a>
+                                  <a href="javascript:void(0);" class="muted" ><i class="icon-volume" aria-hidden="true"></i></a>
+                              </div>
+                        </div>
+                    </div>
+                    <?php } ?>
+                <?php }else{ ?>
+                    <div class="item">
+                        <a class="icon-zoom" data-fancybox="wizard-slider" href="<?php echo Mage::getSingleton('catalog/product_media_config')->getBaseMediaUrl(). '/placeholder/' .Mage::getStoreConfig("catalog/placeholder/small_image_placeholder"); ?>">
+                        <img src="<?php echo Mage::getSingleton('catalog/product_media_config')->getBaseMediaUrl(). '/placeholder/' .Mage::getStoreConfig("catalog/placeholder/small_image_placeholder"); ?>" alt="" />
+                         </a>
+                    </div>
+                <?php } ?>
+            </div>
+            <div class="viewcomplete-thumb">
+                <?php foreach ($gallery['images'] as $item) { ?>
+                    <div class="item">
+                        <img src="<?php echo Mage::helper('catalog/image')->init($ringProduct, 'thumbnail', $item['file'])->backgroundColor(255,255,255)->resize(90); ?>" alt="" />
+                    </div>
+                <?php } ?>
+                <?php if($helper->checkRemoteFile($ringProduct->getVideo())){ ?>
+                    <div class="item"><img src="<?php echo $this->getSkinUrl('css/images/video-icons.png'); ?>" alt="" /></div>
+                <?php } ?>
+            </div>
+            <div class="price-box"><span class="price"><?php echo Mage::helper('core')->currency($price, true, false);?></span></span>
+                </div>
+        </div>
+        </div>
+    </div>
+    <div class="col-left-side">
+        <div class="mobile-btn">
+            <a class="link proceed button" href="<?php echo Mage::getUrl('wizard/index/addtocart',$params)?>"><span><?php echo $this->__('Proceed');?></span></a>
+        </div>
+        <div class="details-blocks">
+            <div class="blocks-navs">
+                <div class="backlink">
+                    <a href="<?php echo $backlink;?>"><?php echo $this->__('BACK');?></a>
+                </div>
+                <a class="link next-links proceed btn" href="<?php echo Mage::getUrl('wizard/index/addtocart', $params) ?>"><span><?php echo $checkoutText;?></span></a>
+            </div>
+            <div class="title desktop product-title-price">
+                <h1><?php echo $ringProduct->getVariantRemark();?></h1>
+                <div class="price-box">
+                    <span class="price"><?php echo Mage::helper('core')->currency($price, true, false);?></span>
+                </div>
+                <div class="sub-title"><?php echo $ringProduct->getDescription();?></div>
+            </div>
+            <div class="delivery-date">
+                <span class="date"><?php echo $this->__('Order now for dispatch by');?> <strong><?php echo $rcdate;?></strong></span>
+                 <ul class="links">
+                    <li><?php echo $this->__('Free Shipping');?></li>
+                    <li><?php echo $this->__('Free returns');?></li>
+                    <li><?php echo $this->__('Free resizing');?></li>
+                </ul>
+            </div>
+            <div class="details-content-section">
+                <div class="row">
+                    <div class="col-sm-12 col-md-6 left">
+                        <h3><?php echo $this->__('Summary');?> - <span><?php echo $this->__('Diamond');?></span></h3>
+                        <div class="details-tbl">
+                            <ul>
+                                <?php foreach ($this->getAttributeArry('left') as $item) { ?>
+                                    <li>
+                                        <span class="title"><?php echo $helper->getAttrTitle($item,$titleHelper);?>
+                                            <?php if($helper->getTooltip($item,$titleHelper)){ ?>
+                                            <div class="tooltip-options">
+                                                <div class="tooltip-image">
+                                                    <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png') ?>" alt="">
+                                                </div>
+                                                <div class="tooltip-content">
+                                                    <a class="close-btn" href="javascript:void(0);"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+                                                    <?php echo $helper->getTooltip($item,$titleHelper);?>
+                                                </div>
+                                            </div>
+                                            <?php } ?>
+                                        </span>
+                                        <span class="value">
+                                            <?php
+                                            if($item['oid']){
+                                                echo $helper->getAttributeValue($item['code'],$diamondProduct->getData($item['code']));
+                                            }elseif($diamondProduct->getData($item['code']) != ''){
+                                                if($item['number_format']){
+                                                    echo number_format($diamondProduct->getData($item['code']),2);
+                                                }else{
+                                                    if($item['code'] == 'certificate_no'){
+
+                                                        if(Mage::helper('wizard')->checkRemoteFile($diamondProduct->getCertificatePdf())){ ?>
+
+                                                        <a class="diamond-pdf" href="<?php echo $diamondProduct->getCertificatePdf();?>" target="_blank" ><span><?php echo $diamondProduct->getData($item['code']);?></span></a>
+
+                                                        <?php  }
+                                                    }else{
+                                                        echo $diamondProduct->getData($item['code']);
+                                                    }
+                                                }
+                                            }else{
+                                                echo "N/A";
+                                            }
+                                            ?>
+                                        </span>
+                                    </li>
+                                <?php } ?>
+                            </ul>
+                            <ul>
+                                <?php foreach ($this->getAttributeArry('right') as $item) { ?>
+                                    <li>
+                                        <span class="title"><?php echo $helper->getAttrTitle($item,$titleHelper);?>
+                                            <?php if($helper->getTooltip($item,$titleHelper)){ ?>
+                                            <div class="tooltip-options">
+                                                <div class="tooltip-image">
+                                                    <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png') ?>" alt="">
+                                                </div>
+                                                <div class="tooltip-content">
+                                                    <a class="close-btn" href="javascript:void(0);"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+                                                    <?php echo $helper->getTooltip($item,$titleHelper);?>
+                                                </div>
+                                            </div>
+                                            <?php } ?>
+                                        </span>
+                                        <span class="value">
+                                            <?php
+                                            if($item['oid']){
+                                                echo $helper->getAttributeValue($item['code'],$diamondProduct->getData($item['code']));
+                                            }elseif($diamondProduct->getData($item['code']) != ''){
+                                                echo $diamondProduct->getData($item['code']);
+                                            }else{
+                                                echo "N/A";
+                                            }
+                                            ?>
+                                        </span>
+                                    </li>
+                                <?php } ?>
+                            </ul>
+                        </div>
+                        <h3><?php echo $this->__('Summary');?> - <span><?php echo $this->__('Setting');?></span></h3>
+                        <div class="details-tbl">
+                            <ul>
+                                <?php foreach ($this->getRingArry('left') as $item) { ?>
+                                <li>
+                                    <span class="title"><?php echo $helper->getAttrTitle($item,$titleHelper);?>
+                                        <?php if($helper->getTooltip($item,$titleHelper)){ ?>
+                                        <div class="tooltip-options">
+                                            <div class="tooltip-image">
+                                                <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png') ?>" alt="">
+                                            </div>
+                                            <div class="tooltip-content">
+                                                <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+
+                                                <?php echo $helper->getTooltip($item,$titleHelper);?>
+                                            </div>
+                                        </div>
+                                        <?php } ?>
+                                   </span>
+                                   <span class="value">
+                                    <?php
+                                    $fn = $item['function'];
+                                    if($fn != '' && Mage::getModel('wizard/wizardrelation')->$fn($ringProduct,true)){
+                                        echo  Mage::getModel('wizard/wizardrelation')->$fn($ringProduct,true);
+                                    }elseif($item['oid']){
+                                        echo $helper->getAttributeValue($item['code'],$ringProduct->getData($item['code']));
+                                    }elseif($ringProduct->getData($item['code']) != ''){
+                                        echo $ringProduct->getData($item['code']);
+                                    }else{
+                                        echo "N/A";
+                                    }
+                                    ?>
+                                    </span>
+                                </li>
+                                <?php } ?>
+                            </ul>
+                        </div>
+                        <?php if(!empty($sidestoneArr)): ?>
+                        <h3><?php echo $this->__('SUMMARY - '); ?><span><?php echo $this->__('Matched paired diamond'); ?></span></h3>
+                        <p class="p_detail"><?php echo $this->__('Closely spaced gemstone are set with tiny prongs so that the surface appears to be “paved” with gemstones.'); ?></p>
+                        <div class="details-tbl">
+                           <ul>
+                              <li>
+                                 <span class="title"><?php echo $this->__('Minimum number of round diamonds'); ?>
+
+                                 </span>
+                                 <span class="value"><?php echo $this->__('2'); ?></span>
+                              </li>
+                              <li>
+                                 <span class="title"><?php echo $this->__('Minimum carat total weight (CT. W.)'); ?>
+                                    <div class="tooltip-options">
+                                       <div class="tooltip-image">
+                                          <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
+                                       </div>
+                                       <div class="tooltip-content">
+                                          <a class="close-btn" href="javascript:void(0)">
+                                            <img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt="">
+                                          </a>
+                                          <h3><?php echo $this->__('Metal Type'); ?></h3>
+                                          <img src="<?php echo Mage::getBaseUrl('media');?>/wizard/tooltip-img1.png" alt="Metal Type">
+                                          <p><?php echo $this->__('Metal type tooltip'); ?></p>
+                                       </div></div>
+                                 </span>
+                                 <span class="value"><?php echo $sidestoneArr['SUM(weight)']; ?></span>
+                              </li>
+                              <li>
+                                 <span class="title"><?php echo $this->__('Average Colour') ?>
+                                 <div class="tooltip-options">
+                                       <div class="tooltip-image">
+                                          <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
+                                       </div>
+                                       <div class="tooltip-content">
+                                          <a class="close-btn" href="javascript:void(0)">
+                                            <img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt="">
+                                          </a>
+                                          <h3><?php echo $this->__('Metal Type'); ?></h3>
+                                          <img src="<?php echo Mage::getBaseUrl('media');?>/wizard/tooltip-img1.png" alt="Metal Type">
+                                          <p><?php echo $this->__('Metal type tooltip'); ?></p>
+                                       </div></div>
+                                 </span>
+                                 <span class="value"><?php echo $sidestoneArr['stone_color']; ?></span>
+                              </li>
+                              <li>
+                                 <span class="title"><?php echo $this->__('Average Clarity'); ?>
+                                    <div class="tooltip-options">
+                                       <div class="tooltip-image">
+                                          <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
+                                       </div>
+                                       <div class="tooltip-content">
+                                          <a class="close-btn" href="javascript:void(0)">
+                                            <img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt="">
+                                          </a>
+                                          <h3><?php echo $this->__('Metal Type'); ?></h3>
+                                          <img src="<?php echo Mage::getBaseUrl('media');?>/wizard/tooltip-img1.png" alt="Metal Type">
+                                          <p><?php echo $this->__('Metal type tooltip'); ?></p>
+                                       </div></div>
+                                 </span>
+                                 <span class="value"><?php echo $sidestoneArr['stone_quality']; ?></span>
+                              </li>
+                              <li>
+                                 <span class="title"><?php echo $this->__('Average Cut'); ?>
+                                    <div class="tooltip-options">
+                                       <div class="tooltip-image">
+                                          <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
+                                       </div>
+                                       <div class="tooltip-content">
+                                          <a class="close-btn" href="javascript:void(0)">
+                                            <img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt="">
+                                          </a>
+                                          <h3><?php echo $this->__('Metal Type'); ?></h3>
+                                          <img src="<?php echo Mage::getBaseUrl('media');?>/wizard/tooltip-img1.png" alt="Metal Type">
+                                          <p><?php echo $this->__('Metal type tooltip'); ?></p>
+                                       </div></div>
+                                 </span>
+                                 <span class="value"><?php echo $sidestoneArr['stone_cut']; ?></span>
+                              </li>
+                           </ul>
+                        </div>
+                        <?php endif; ?>
+                        <?php if(!empty($pinfo)){ ?>
+                                    <?php
+                                    $pinfo = unserialize($pinfo);
+                                    $pieces = 0;
+                                    $piecesweight = 0;
+                                    if(count($pinfo) > 0){
+                                      foreach ($pinfo as $pinfoitem) {
+                                        $pieces += $pinfoitem['PIECES'];
+                                        $piecesweight += $pinfoitem['WEIGHT'];
+                                      }
+                                      $pinfo['PIECES'] = $pieces;
+                                      $pinfo['WEIGHT'] = $piecesweight;
+                                      $pinfo['STONE_COLOR'] = $pinfo[0]['STONE_COLOR'];
+                                      $pinfo['QUALITY'] = $pinfo[0]['QUALITY'];
+                                    }else{
+                                        $pinfo = $pinfo;
+                                    }
+                                    ?>
+                                <h3><?php echo $this->__('SUMMARY - '); ?><span><?php echo $this->__('Pave set diamond'); ?></span></h3>
+                                <p class="p_detail"><?php echo $this->__('Closely spaced gemstone are set with tiny prongs so that the surface appears to be “paved” with gemstones.'); ?></p>
+                                <div class="details-tbl">
+                                   <ul>
+                                      <li>
+                                         <span class="title"><?php echo $this->__('Minimum number of round diamonds'); ?>
+
+                                         </span>
+                                         <span class="value"><?php echo $pinfo['PIECES']; ?></span>
+                                      </li>
+                                      <li>
+                                         <span class="title"><?php echo $this->__('Minimum carat total weight (CT. W.)'); ?>
+                                            <div class="tooltip-options">
+                                               <div class="tooltip-image">
+                                                  <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
+                                               </div>
+                                               <div class="tooltip-content">
+                                                  <a class="close-btn" href="javascript:void(0)">
+                                                    <img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt="">
+                                                  </a>
+                                                  <?php echo $helper->getTooltip($attribute['WEIGHT'],$titleHelper);?>
+                                               </div></div>
+                                         </span>
+                                         <span class="value"><?php echo $pinfo['WEIGHT']; ?></span>
+                                      </li>
+                                      <li>
+                                         <span class="title"><?php echo $this->__('Average Colour') ?>
+                                         <div class="tooltip-options">
+                                               <div class="tooltip-image">
+                                                  <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
+                                               </div>
+                                               <div class="tooltip-content">
+                                                  <a class="close-btn" href="javascript:void(0)">
+                                                    <img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt="">
+                                                  </a>
+                                                  <?php echo $helper->getTooltip($attribute['STONE_COLOR'],$titleHelper);?>
+                                               </div></div>
+                                         </span>
+                                         <span class="value"><?php echo $pinfo['STONE_COLOR']; ?></span>
+                                      </li>
+                                      <li>
+                                         <span class="title"><?php echo $this->__('Average Clarity'); ?>
+                                            <div class="tooltip-options">
+                                               <div class="tooltip-image">
+                                                  <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
+                                               </div>
+                                               <div class="tooltip-content">
+                                                  <a class="close-btn" href="javascript:void(0)">
+                                                    <img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt="">
+                                                  </a>
+                                                  <?php echo $helper->getTooltip($attribute['STONE_QUALITY'],$titleHelper);?>
+                                               </div></div>
+                                         </span>
+                                         <span class="value"><?php echo $pinfo['QUALITY']; ?></span>
+                                      </li>
+                                   </ul>
+                                </div>
+                        <?php } ?>
+                    </div>
+                    <div class="col-sm-12 col-md-6 right">
+                        <div class="ring-size-block clickable">
+                            <h3><?php echo $this->__('Select Ring Size');?></h3>
+                            <div class="ring-size-block-select">
+                                <ul class="cls<?php echo $productSizeId;?> size-dropdown">
+                                    <?php $availableSizes = Mage::getModel('wizard/wizardrelation')->getAvailbleSizes($ringProduct,false);
+                                    ?>
+                                    <?php
+                                     foreach ($availableSizes as $key=>$value) { ?>
+                                        <?php $cls = ($ringData[$ringProduct->getId()]['size'] == $value)?'selected':'';?>
+                                        <li class="<?php echo $cls;?>"><a href="javascript:void(0)" id="<?php echo 'size_'.$value;?>" data-index="<?php echo $key;?>" data-id="<?php echo $productSizeId;?>"><?php echo number_format($value,1);?></a></li>
+                                    <?php } ?>
+                                </ul>
+                            </div>
+                            <a target="_blank" class="size-guide" href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)."wizard/sizeguide/sizeguide.pdf";?>"><?php echo $this->__('Size Guide');?></a>
+                        </div>
+                        <?php if($weddingband['pinfo']){ ?>
+                            <?php $weddinginfo = unserialize($weddingband['pinfo']);$weddinginfo= $weddinginfo[0];?>
+                        <div class="wedding-band-block">
+                            <input type="hidden" name="weddingid" id="weddingid" value="<?php echo $weddingband['pid'];?>">
+                            <button class="button"><?php echo $this->__('add wedding band'); ?></button>
+                            <div class="wedding-block-content">
+                                <h3><?php echo $weddingband['variant_remark']; ?> <span class="price"><?php echo Mage::helper('core')->currency($weddingband['price'], true, false);?></span></h3>
+                                <p><?php echo $weddingband['variant_name']; ?></p>
+                                <div class="details-tbl">
+                                    <ul>
+                                        <li>
+                                            <span class="title"><?php echo $this->__('Minimum number of round diamonds'); ?>
+                                                <div class="tooltip-options">
+                                                <div class="tooltip-image">
+                                                    <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
+                                                </div>
+                                                <div class="tooltip-content">
+                                                    <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+                                                    <h3><?php echo $this->__('Metal Type'); ?></h3>
+                                                    <img src="<?php echo Mage::getBaseUrl('media');?>/wizard/tooltip-img1.png" alt="Metal Type"><p><?php echo $this->__('Metal type tooltip'); ?></p></div></div>
+                                            </span>
+                                            <span class="value"><?php echo $weddinginfo['PIECES']; ?></span>
+                                        </li>
+                                        <li>
+                                            <span class="title"><?php echo $this->__('Minimum carat total weight (CT. TW.)'); ?>
+                                                <div class="tooltip-options">
+                                                <div class="tooltip-image">
+                                                    <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
+                                                </div>
+                                                <div class="tooltip-content">
+                                                    <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+                                                    <h3><?php echo $this->__('Metal Type'); ?></h3>
+                                                    <img src="<?php echo Mage::getBaseUrl('media');?>/wizard/tooltip-img1.png" alt="Metal Type"><p><?php echo $this->__('Metal type tooltip'); ?></p></div></div>
+                                            </span>
+                                            <span class="value"><?php echo $weddinginfo['WEIGHT']; ?></span>
+                                        </li>
+                                        <li>
+                                            <span class="title"><?php echo $this->__('Average Colour'); ?>
+                                                <div class="tooltip-options">
+                                                <div class="tooltip-image">
+                                                    <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
+                                                </div>
+                                                <div class="tooltip-content">
+                                                    <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+                                                    <h3><?php echo $this->__('Metal Type'); ?></h3>
+                                                    <img src="<?php echo Mage::getBaseUrl('media');?>/wizard/tooltip-img1.png" alt="Metal Type"><p><?php echo $this->__('Metal type tooltip'); ?></p></div></div>
+                                            </span>
+                                            <span class="value"><?php echo $weddinginfo['STONE_COLOR']; ?></span>
+                                        </li>
+                                        <li>
+                                            <span class="title"><?php echo $this->__('Average Clarity'); ?>
+                                                <div class="tooltip-options">
+                                                <div class="tooltip-image">
+                                                    <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
+                                                </div>
+                                                <div class="tooltip-content">
+                                                    <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+                                                    <h3><?php echo $this->__('Metal Type'); ?></h3>
+                                                    <img src="<?php echo Mage::getBaseUrl('media');?>/wizard/tooltip-img1.png" alt="Metal Type"><p><?php echo $this->__('Metal type tooltip'); ?></p></div></div>
+                                            </span>
+                                            <span class="value"><?php echo $weddinginfo['QUALITY']; ?></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <?php } ?>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="mobile-btn">
+            <a class="link proceed button" href="<?php echo Mage::getUrl('wizard/index/addtocart', array('sid'=>$ringPid,'did'=>$diaPid)) ?>"><span><?php echo $this->__('Proceed');?></span></a>
+        </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+    var BASE_URL='<?php echo preg_replace('/(.*?)(index.php\/?)?/','\1',Mage::getBaseURL());?>';
+    var productId='<?php echo $ringProduct->getId();?>';
+    var weddingflag='<?php echo $weddingFlag;?>';
+
+    var selectedWedding='<?php echo $selectedWedding;?>';
+
+    if(weddingflag){
+        var weddingMainImage ='<?php echo Mage::helper('catalog/image')->init($weddingProduct, 'image');?>';
+        var weddingLargeImage ='<?php echo Mage::helper('catalog/image')->init($weddingProduct,'image')->backgroundColor(255,255,255)->resize(600);?>';
+        var weddingSmallImage ='<?php echo Mage::helper('catalog/image')->init($weddingProduct,'image')->backgroundColor(255,255,255)->resize(90);?>';
+    }
+
+    jQuery(document).ready(function(){
+
+
+
+        if(selectedWedding == '1'){
+            setTimeout(function(){
+                jQuery('.wedding-band-block .button').trigger('click');
+            },100)
+        }
+        jQuery('.clickable ul li a').click(function(){
+            var metalOption = jQuery(this).hasClass('metalOpt');
+            var dataindex = jQuery(this).data('index');
+            var dataid = jQuery(this).data('id');
+            setData(jQuery(this).attr('id'),metalOption,dataindex,dataid);
+        })
+
+
+        //var btnName = jQuery('.wedding-band-block > .button').text('add wedding band');
+        jQuery('.wedding-band-block .button').click(function (){
+            var $this = jQuery(this);
+            jQuery(this).toggleClass('remove');
+            jQuery('.wedding-block-content').slideToggle();
+            var wed = jQuery('#weddingid').val();
+            wed = 'wedding/'+wed;
+            if($this.hasClass('remove')){
+                jQuery('.viewcomplete-image').slick('slickAdd','<div class="item wedding-image"><a class="icon-zoom" href="'+weddingMainImage+'" data-fancybox="wizard-slider"><img src="'+weddingLargeImage+'" alt=""></a></div>');
+                jQuery('.viewcomplete-thumb').slick('slickAdd','<div class="item wedding-image"><img src="'+weddingSmallImage+'" alt=""></div>');
+                jQuery('.viewcomplete-thumb').find('.wedding-image').trigger('click');
+                $this.text('remove wedding band');
+                var existurl = jQuery('.next-links').attr('href');
+                existurl = existurl+wed;
+                jQuery('.next-links').attr('href',existurl);
+            } else {
+                var existurl = jQuery('.next-links').attr('href');
+                $this.text('add wedding band');
+                jQuery('.wedding-image').remove();
+                jQuery('.viewcomplete-thumb').find('.slick-track').find('.item').eq(0).trigger('click');
+                existurl = existurl.replace(wed, "");
+                jQuery('.next-links').attr('href',existurl);
+            }
+
+        })
+
+    })
+
+    var detailsSidebarSticky = jQuery('.wizard-completed-index .page-header').offset().top;
+    jQuery(window).scroll(function (){
+        jQuery('.col-right-side').removeClass('sidebar-fixed');
+        if (jQuery(window).scrollTop() >= detailsSidebarSticky) {
+           jQuery('.col-right-side').addClass('sidebar-fixed');
+        }
+        else {
+           jQuery('.col-right-side').removeClass('sidebar-fixed');
+        }
+    });
+
+    function setData(id,metalOption,dataindex,dataid){
+        jQuery.ajax({
+            url: BASE_URL+"wizard/index/setringdata",
+            type: "POST",
+            data: {id:id,pid:productId,metaloption:metalOption},
+            success: function(redata){
+                if(metalOption){
+                    location.reload();
+                }else{
+                    jQuery('.cls'+dataid).find('li').removeClass('selected');
+                    jQuery('.cls'+dataid).find('li').eq(dataindex).addClass('selected');
+                }
+            },error: function(xhr){
+                if(metalOption){
+                    location.reload();
+                }else{
+                    jQuery('.cls'+dataid).find('li').removeClass('selected');
+                    jQuery('.cls'+dataid).find('li').eq(dataindex).addClass('selected');
+                }
+            }
+        })
+    }
+    jQuery(window).load(function(){
+          if(jQuery('video').length > 0){
+            jQuery('.slick-video video')[0].play();
+          }
+          jQuery('.viewcomplete-image').on('afterChange', function(event, slick, currentSlide, nextSlide){
+              jQuery('.slick-video video').trigger('pause');
+              jQuery('.btnPlay').addClass('pause');
+              if(jQuery('.viewcomplete-image').find('.slick-current').find('video').length > 0){
+                setTimeout(function () {
+                     jQuery('.slick-video video')[0].play();
+                },200);
+              }
+          });
+    });
+
+</script>

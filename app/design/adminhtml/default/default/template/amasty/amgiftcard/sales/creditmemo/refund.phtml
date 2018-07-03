@@ -1,0 +1,20 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @package Amasty_GiftCard
+ */
+?>
+<?php /* @var $this Amasty_GiftCard_Block_Adminhtml_Sales_Order_Creditmemo_Controls */?>
+
+<?php if ($this->hasRefundToGiftCard()): ?>
+	<p>
+		<label for="creditmemo_amgiftcard_return"><?php echo Mage::helper('amgiftcard')->__('Refund to Gift Card') ?></label>
+		<input
+			type="text"
+			name="creditmemo[refund_amgiftcard_return]"
+			value="<?php echo $this->getReturnValue(); ?>"
+			id="creditmemo_amgiftcard_return"
+			class="input-text not-negative-amount" style="width: 60px; text-align: right;">
+	</p>
+<?php endif; ?>

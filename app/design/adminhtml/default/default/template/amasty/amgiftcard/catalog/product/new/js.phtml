@@ -1,0 +1,31 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @package Amasty_GiftCard
+ */
+?>
+<script type="text/javascript">
+	$('am_giftcard_price_type').observe('change', function(event){
+		var value = event.element().value;
+		amChangeGiftCardPriceType(value);
+
+	});
+
+
+	function amChangeGiftCardPriceType(value){
+		$('am_giftcard_price_percent').disable();
+		if(value == "1") {
+			$('am_giftcard_price_percent').enable();
+			$('am_giftcard_price_percent').addClassName('required-entry')
+			//Element.addClass($('am_giftcard_price_percent'), 'required-entry');
+
+
+		}
+	}
+
+
+	amChangeGiftCardPriceType($('am_giftcard_price_type').value);
+
+
+</script>

@@ -1,0 +1,492 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @package Amasty_GiftCard
+ */
+-->
+<config>
+    <modules>
+        <Amasty_GiftCard>
+            <version>1.2.6</version>
+        </Amasty_GiftCard>
+    </modules>
+
+    <crontab>
+        <jobs>
+            <amgiftcard_notify_expired_cards>
+                <schedule><cron_expr>0 12 * * *</cron_expr></schedule>
+                <run><model>amgiftcard/cronObserver::notifyExpiredCards</model></run>
+            </amgiftcard_notify_expired_cards>
+            <amgiftcard_expire_card>
+                <schedule><cron_expr>*/1 * * * *</cron_expr></schedule>
+                <run><model>amgiftcard/cronObserver::expireAccounts</model></run>
+            </amgiftcard_expire_card>
+            <amgiftcard_send_cards>
+                <schedule><cron_expr>*/30 * * * *</cron_expr></schedule>
+                <run><model>amgiftcard/cronObserver::sendCards</model></run>
+            </amgiftcard_send_cards>
+        </jobs>
+    </crontab>
+
+    <global>
+        <models>
+            <amgiftcard>
+                <class>Amasty_GiftCard_Model</class>
+                <resourceModel>amgiftcard_resource</resourceModel>
+            </amgiftcard>
+            <amgiftcard_resource>
+                <class>Amasty_GiftCard_Model_Resource</class>
+                <deprecatedNode>amgiftcard_mysql4</deprecatedNode>
+                <entities>
+                    <price>
+                        <table>amasty_giftcard_price</table>
+                    </price>
+                    <code_set>
+                        <table>amasty_giftcard_code_set</table>
+                    </code_set>
+                    <code>
+                        <table>amasty_giftcard_code</table>
+                    </code>
+                    <image>
+                        <table>amasty_giftcard_image</table>
+                    </image>
+                    <image_to_product>
+                        <table>amasty_giftcard_image_to_product</table>
+                    </image_to_product>
+                    <account>
+                        <table>amasty_giftcard_account</table>
+                    </account>
+                    <account_order>
+                        <table>amasty_giftcard_account_order</table>
+                    </account_order>
+
+                    <customer_card>
+                        <table>amasty_giftcard_customer_card</table>
+                    </customer_card>
+
+
+                </entities>
+            </amgiftcard_resource>
+        </models>
+        <resources>
+            <amgiftcard_setup>
+                <setup>
+                    <module>Amasty_GiftCard</module>
+                    <class>Mage_Catalog_Model_Resource_Eav_Mysql4_Setup</class>
+                </setup>
+            </amgiftcard_setup>
+
+            <amgiftcard_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </amgiftcard_write>
+
+            <amgiftcard_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </amgiftcard_read>
+        </resources>
+
+        <template>
+            <email>
+                <amgiftcard_email_email_template translate="label" module="amgiftcard">
+                    <label>[Gift Card] Send gift card</label>
+                    <file>amasty_giftcard_send_code.html</file>
+                    <type>html</type>
+                </amgiftcard_email_email_template>
+                <amgiftcard_email_email_template_notify translate="label" module="amgiftcard">
+                    <label>[Gift Card] Expiry Notification Email Template</label>
+                    <file>amasty_giftcard_expr_notif.html</file>
+                    <type>html</type>
+                </amgiftcard_email_email_template_notify>
+                <amgiftcard_email_email_template_confirmation_to_sender>
+                    <label>[Gift Card] Sender Confirmation Email Template</label>
+                    <file>amasty_giftcard_confirmation_to_sender.html</file>
+                    <type>html</type>
+                </amgiftcard_email_email_template_confirmation_to_sender>
+            </email>
+        </template>
+
+        <blocks>
+            <amgiftcard>
+                <class>Amasty_GiftCard_Block</class>
+            </amgiftcard>
+        </blocks>
+
+        <helpers>
+            <amgiftcard>
+                <class>Amasty_GiftCard_Helper</class>
+            </amgiftcard>
+        </helpers>
+
+        <sales>
+            <quote>
+                <totals>
+                    <amgiftcard>
+                        <class>amgiftcard/total_quote_giftCard</class>
+                        <after>discount,tax,grand_total,reward,giftwrapping,amgiftwrap</after>
+                        <before>customerbalance</before>
+                        <renderer>amgiftcard/checkout_cart_total</renderer>
+                    </amgiftcard>
+                </totals>
+            </quote>
+            <order_invoice>
+                <totals>
+                    <amgiftcard>
+                        <class>amgiftcard/total_invoice_giftCard</class>
+                        <after>discount,tax,grand_total,reward,giftwrapping,amgiftwrap</after>
+                        <before>customerbalance</before>
+                    </amgiftcard>
+                </totals>
+            </order_invoice>
+            <order_creditmemo>
+                <totals>
+                    <amgiftcard>
+                        <class>amgiftcard/total_creditmemo_giftCard</class>
+                        <after>weee,discount,tax,grand_total,giftwrapping,customerbalance,amgiftwrap</after>
+                        <before>reward</before>
+                    </amgiftcard>
+                </totals>
+            </order_creditmemo>
+        </sales>
+
+        <catalog>
+            <product>
+                <type>
+                    <amgiftcard translate="label" module="amgiftcard">
+                        <label>Gift Card</label>
+                        <model>amgiftcard/catalog_product_type_giftCard</model>
+                        <is_qty>1</is_qty>
+                        <index_data_retreiver>amgiftcard/catalogIndex_data_giftCard</index_data_retreiver>
+                        <price_model>amgiftcard/catalog_product_price_giftCard</price_model>
+
+                        <index_priority>50</index_priority>
+                        <composite>0</composite>
+                        <!--<price_indexer>amgiftcard/indexer_price</price_indexer>-->
+                    </amgiftcard>
+                </type>
+            </product>
+        </catalog>
+
+        <events>
+            <sales_convert_quote_item_to_order_item>
+                <observers>
+                    <amgiftcard_append_additional_data>
+                        <class>amgiftcard/observer</class>
+                        <method>appendGiftcardAdditionalData</method>
+                    </amgiftcard_append_additional_data>
+                </observers>
+            </sales_convert_quote_item_to_order_item>
+            <sales_order_save_commit_after>
+                <observers>
+                    <amgiftcard_generate_giftcard_account>
+                        <class>amgiftcard/observer</class>
+                        <method>generateGiftCardAccounts</method>
+                    </amgiftcard_generate_giftcard_account>
+                </observers>
+            </sales_order_save_commit_after>
+
+            <sales_quote_collect_totals_before>
+                <observers>
+                    <amgiftcard_before_collect_totals>
+                        <class>amgiftcard/observer</class>
+                        <method>quoteCollectTotalsBefore</method>
+                    </amgiftcard_before_collect_totals>
+                </observers>
+            </sales_quote_collect_totals_before>
+
+            <sales_quote_merge_after>
+                <observers>
+                    <amgiftcard_merge_quote>
+                        <class>amgiftcard/observer</class>
+                        <method>quoteMergeAfter</method>
+                    </amgiftcard_merge_quote>
+                </observers>
+            </sales_quote_merge_after>
+
+            <sales_order_invoice_register>
+                <observers>
+                    <amgiftcard_sales_order_invoice_register>
+                        <class>amgiftcard/observer</class>
+                        <method>increaseOrderGiftCardInvoicedAmount</method>
+                    </amgiftcard_sales_order_invoice_register>
+                </observers>
+            </sales_order_invoice_register>
+
+
+            <sales_model_service_quote_submit_before>
+                <observers>
+                    <amgiftcard>
+                        <class>amgiftcard/observer</class>
+                        <method>dischargeCard</method>
+                    </amgiftcard>
+                </observers>
+            </sales_model_service_quote_submit_before>
+
+            <sales_model_service_quote_submit_success>
+                <observers>
+                    <amgiftcard>
+                        <class>amgiftcard/observer</class>
+                        <method>addCardLog</method>
+                    </amgiftcard>
+                </observers>
+            </sales_model_service_quote_submit_success>
+
+            <checkout_type_multishipping_create_orders_single>
+                <observers>
+                    <amgiftcard>
+                        <class>amgiftcard/observer</class>
+                        <method>dischargeCard</method>
+                    </amgiftcard>
+                </observers>
+            </checkout_type_multishipping_create_orders_single>
+
+
+            <sales_model_service_quote_submit_failure>
+                <observers>
+                    <amgiftcard>
+                        <class>amgiftcard/observer</class>
+                        <method>revertGiftCardAccountBalance</method>
+                    </amgiftcard>
+                </observers>
+            </sales_model_service_quote_submit_failure>
+
+            <checkout_multishipping_refund_all>
+                <observers>
+                    <amgiftcard>
+                        <class>amgiftcard/observer</class>
+                        <method>revertGiftCardsForAllOrders</method>
+                    </amgiftcard>
+                </observers>
+            </checkout_multishipping_refund_all>
+
+            <sales_order_load_after>
+                <observers>
+                    <amgiftcard>
+                        <class>amgiftcard/observer</class>
+                        <method>salesOrderLoadAfter</method>
+                    </amgiftcard>
+                </observers>
+            </sales_order_load_after>
+
+
+            <adminhtml_sales_order_creditmemo_register_before>
+                <observers>
+                    <amgiftcard>
+                        <class>amgiftcard/observer</class>
+                        <method>creditmemoDataImport</method>
+                    </amgiftcard>
+                </observers>
+            </adminhtml_sales_order_creditmemo_register_before>
+
+            <sales_order_creditmemo_refund>
+                <observers>
+                    <amgiftcard>
+                        <class>amgiftcard/observer</class>
+                        <method>refund</method>
+                    </amgiftcard>
+                </observers>
+            </sales_order_creditmemo_refund>
+
+            <payment_method_is_active>
+                <observers>
+                    <amgiftcard>
+                        <class>amgiftcard/observer</class>
+                        <method>togglePaymentMethods</method>
+                    </amgiftcard>
+                </observers>
+            </payment_method_is_active>
+
+            <sales_quote_config_get_product_attributes>
+                <observers>
+                    <amgiftcard>
+                        <class>amgiftcard/observer</class>
+                        <method>addProductAttributes</method>
+                    </amgiftcard>
+                </observers>
+            </sales_quote_config_get_product_attributes>
+
+            <paypal_prepare_line_items>
+                <observers>
+                    <amgiftcard>
+                        <class>amgiftcard/observer</class>
+                        <method>addPaypalGiftCardItem</method>
+                    </amgiftcard>
+                </observers>
+            </paypal_prepare_line_items>
+
+            <adminhtml_sales_order_create_process_data>
+                <observers>
+                    <amgiftcard>
+                        <class>amgiftcard/observer</class>
+                        <method>processOrderCreationData</method>
+                    </amgiftcard>
+                </observers>
+            </adminhtml_sales_order_create_process_data>
+
+            <sales_quote_payment_import_data_before>
+                <observers>
+                    <amgiftcard>
+                        <class>amgiftcard/observer</class>
+                        <method>paymentDataImport</method>
+                    </amgiftcard>
+                </observers>
+            </sales_quote_payment_import_data_before>
+        </events>
+
+        <fieldsets>
+            <sales_convert_quote_address>
+                <am_base_gift_cards_amount>
+                    <to_order>*</to_order>
+                </am_base_gift_cards_amount>
+                <am_gift_cards_amount>
+                    <to_order>*</to_order>
+                </am_gift_cards_amount>
+                <am_used_gift_cards>
+                    <to_order>am_gift_cards</to_order>
+                </am_used_gift_cards>
+            </sales_convert_quote_address>
+        </fieldsets>
+
+
+        <pdf>
+            <totals>
+                <amgiftcard translate="title">
+                    <title>Gift Cards</title>
+                    <source_field>am_gift_cards_amount</source_field>
+                    <amount_prefix>-</amount_prefix>
+                    <font_size>7</font_size>
+                    <display_zero>0</display_zero>
+                    <sort_order>550</sort_order>
+                </amgiftcard>
+            </totals>
+        </pdf>
+    </global>
+
+
+    <frontend>
+        <routers>
+            <amgiftcard>
+                <use>standard</use>
+                <args>
+                    <module>Amasty_GiftCard</module>
+                    <frontName>amgiftcard</frontName>
+                </args>
+            </amgiftcard>
+        </routers>
+
+
+        <events>
+            <catalog_product_collection_load_before>
+                <observers>
+                    <amgiftcard>
+                        <model>amgiftcard/observer</model>
+                        <method>catalogProductCollectionLoadBefore</method>
+                    </amgiftcard>
+                </observers>
+            </catalog_product_collection_load_before>
+
+
+        </events>
+
+        <translate>
+            <modules>
+                <Amasty_GiftCard>
+                    <files>
+                        <default>Amasty_GiftCard.csv</default>
+                    </files>
+                </Amasty_GiftCard>
+            </modules>
+        </translate>
+
+        <layout>
+            <updates>
+                <amgiftcard module="Amasty_GiftCard">
+                    <file>amasty/amgiftcard/amgiftcard.xml</file>
+                </amgiftcard>
+            </updates>
+        </layout>
+    </frontend>
+
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Amasty_GiftCard before="Mage_Adminhtml">Amasty_GiftCard_Adminhtml</Amasty_GiftCard>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+
+    <adminhtml>
+        <layout>
+            <updates>
+                <amgiftcard module="Amasty_GiftCard">
+                    <file>amasty/amgiftcard/amgiftcard.xml</file>
+                </amgiftcard>
+            </updates>
+        </layout>
+
+        <events>
+            <adminhtml_catalog_product_edit_prepare_form>
+                <observers>
+                    <amasty_giftcard_product_edit_prepare_form>
+                        <class>amgiftcard/giftCard</class>
+                        <method>replaceRendererPrices</method>
+                    </amasty_giftcard_product_edit_prepare_form>
+                </observers>
+            </adminhtml_catalog_product_edit_prepare_form>
+        </events>
+
+        <!--<sales>
+            <order>
+                <create>
+                    <available_product_types>
+                        <amgiftcard/>
+                    </available_product_types>
+                </create>
+            </order>
+        </sales> -->
+
+        <translate>
+            <modules>
+                <Amasty_GiftCard>
+                    <files>
+                        <default>Amasty_GiftCard.csv</default>
+                    </files>
+                </Amasty_GiftCard>
+            </modules>
+        </translate>
+    </adminhtml>
+
+    <default>
+        <amgiftcard>
+            <general>
+                <active>1</active>
+                <allowed_product_types>simple,grouped,configurable,virtual,bundle,downloadable</allowed_product_types>
+            </general>
+            <card>
+                <lifetime>0</lifetime>
+                <allow_message>1</allow_message>
+                <allow_use_themselves>1</allow_use_themselves>
+                <choose_delivery_date>1</choose_delivery_date>
+                <notify_expires_date>0</notify_expires_date>
+                <notify_expires_date_days>0</notify_expires_date_days>
+            </card>
+            <email>
+                <email_identity>general</email_identity>
+                <email_template>amgiftcard_email_email_template</email_template>
+                <email_template_notify>amgiftcard_email_email_template_notify</email_template_notify>
+                <email_recepient_cc></email_recepient_cc>
+                <send_confirmation_to_sender>1</send_confirmation_to_sender>
+                <email_template_confirmation_to_sender>amgiftcard_email_email_template_confirmation_to_sender</email_template_confirmation_to_sender>
+            </email>
+        </amgiftcard>
+    </default>
+</config>
