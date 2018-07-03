@@ -286,13 +286,13 @@ ksort($itemArray);
                                              </p>
                                              <?php endif; ?>
                                         </div>
-                                        <?php if(($ringSize && $proType == $productTypelist['ring']) || ($ringSize && $proType == $productTypelist['band'])):?>
+                                        <?php if(($ringSize && $proType == $productTypelist['ring']) || ($ringSize && $proType == $productTypelist['band']) || ($ringSize && $proType == $productTypelist['promise'])):?>
                                           <?php $ringProduct = Mage::getModel('catalog/product')->load($ringId);?>
                                           <?php if($ringProduct->getId()): ?>
                                           <?php $availableSizes = Mage::getModel('wizard/wizardrelation')->getAvailbleSizes($ringProduct,false);?>
                                             <div class="cart-ring-size">
                                                 <strong><?php echo $this->__('Ring Size : '); ?></strong>
-                                                <select class="sizeSelectpicker" onchange="updateRingsize(this.value,<?php echo $quoteItemId;?>,<?php echo $randomkey;?>)" >
+                                                <select onchange="updateRingsize(this.value,<?php echo $quoteItemId;?>,<?php echo $randomkey;?>)" >
                                                   <?php foreach ($availableSizes as $size) : ?>
                                                     <option <?php if($ringSize == $size){ echo " selected='selected' ";} ?> ><?php echo $size;?></option>
                                                   <?php endforeach; ?>

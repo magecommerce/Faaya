@@ -271,7 +271,7 @@ $productTypelist = Mage::helper('wizard')->getProductTypeList();
                                                </p>
                                                <?php endif; ?>
                                            <?php
-                                           if(($ringSize && $proType == $productTypelist['ring']) || ($ringSize && $proType == $productTypelist['band'])):?>
+                                           if(($ringSize && $proType == $productTypelist['ring']) || ($ringSize && $proType == $productTypelist['band']) || ($ringSize && $proType == $productTypelist['promise'])):?>
                                               <div class="cart-ring-size">
                                                 <strong><?php echo $this->__('Ring Size : '); ?></strong><?php echo $ringSize;?>
                                               </div>
