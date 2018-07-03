@@ -313,13 +313,14 @@ class Cda_Wizard_IndexController extends Mage_Core_Controller_Front_Action{
             if($key == 0){
                 $checked = 'checked="checked"';
             }
+             $img = Mage::getBaseUrl('media').'chaintype/'.str_replace(" ","-",strtolower($option)).'.png';
         $html .= '<li>
-            <input type="radio" class="radio" id="chain_type-'.$option['chain_type'].'" name="chain_type[]" value="'.$option['chain_type'].'" '.$checked.' />
-            <label for="chain_type-'.$option['chain_type'].'">
+            <input type="radio" class="radio" id="chain_type-'.str_replace(" ","-",strtolower($option)).'" name="chain_type[]" value="'.$option.'" '.$checked.' />
+            <label for="chain_type-'.str_replace(" ","-",strtolower($option)).'">
                 <span class="image">
-                    <img src="'.Mage::getBaseUrl('media').'catalog/product/'.$option['image'].'">
+                    <img src="'.$img.'">
                 </span>
-                <span>'.$option['chain_type'].'</span>
+                <span>'.$option.'</span>
             </label>
         </li>';
         }
