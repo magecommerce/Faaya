@@ -31,6 +31,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
     protected $_insertArray = array();
     protected $_updateArray = array();
     protected $_deleteArray = array();
+
     public function _construct(){
         $this->_connectionRead = $this->_getConnection('core_read');
         $this->_connectionWrite = $this->_getConnection('core_write');
@@ -645,7 +646,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                             $name = basename(trim($image['IMAGE_FILE_NAME']));
                             $name = preg_replace('/\s+/', '', $name);
                             $ext = pathinfo($name, PATHINFO_EXTENSION);
-                             if($ext !="mp4"){
+                             if($ext !="mp4" && $ext !="tif"){
                                 if($value['SMRY_ITEM_TYPE']=='DIAMOND'){
                                         $isFileExist = Mage::getBaseDir('media').DS.'diamondimages'.DS . $name;
                                     }else{
@@ -674,7 +675,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                             $name = basename(trim($value["DIA_IMAGE"]));
                             $name = preg_replace('/\s+/', '', $name);
                             $ext = pathinfo($name, PATHINFO_EXTENSION);
-                             if($ext !="mp4"){
+                             if($ext !="mp4" && $ext !="tif"){
                                 $isFileExist = Mage::getBaseDir('media').DS.'diamondimages'.DS . $name;
                                if(file_exists($isFileExist)) {
                                     $filepath = "media" . DS . "diamondimages" . DS . $name;
@@ -685,7 +686,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                 }
             try {
                 $simProduct->save();
-                echo $productSku.' Created successfully /n';
+                echo $productSku.' Created successfully'."\n";
                 $productId = $simProduct->getId();
                 $this->_insertArray['A'][$productSku] = $varientName;
                 $this->inserWidzetRelation($simProduct,$value);
@@ -718,22 +719,23 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
     }
 
 
-    protected function deleteWidzetRelation($productId){
+    protected function deleteWidzetRelation($sku){
          $conn = Mage::getSingleton('core/resource')->getConnection('core_write');
         // Delete from wizardrelation
         try {
-            $sql = 'DELETE FROM wizardrelation WHERE pid='.$productId;
+            $sql = 'DELETE FROM wizardrelation WHERE variant_id='.$sku;
             $conn->query($sql);
         } catch (Exception $e){
             echo $e->getMessage();
         }
+
          // Delete from wizardmaster
-        try {
+        /*try {
             $sql = 'DELETE FROM wizardmaster WHERE pid='.$productId;
             $conn->query($sql);
         } catch (Exception $e){
             echo $e->getMessage();
-        }
+        }*/
 
     }
     //protected function inserWidzetRelation($simProduct,$childAttribute,$sku){
@@ -799,12 +801,12 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
         $productId = $simProduct->getId();
         $smryId =  $simProduct->getSmryId();
         /*update stock item*/
-        $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($simProduct);
+        /*$stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($simProduct);
         $stockItem->setQty(1);
         $stockItem->setData('use_config_manage_stock',0);
         $stockItem->setData('manage_stock',1);
         $stockItem->setData('is_in_stock',1);
-        $stockItem->save();
+        $stockItem->save();*/
 
         $sku = $simProduct->getSku();
         $itemId = $simProduct->getItemId();
@@ -882,8 +884,10 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                     $matchpair = 1;
                 }
             }
+
             if(count($pinfoArray) > 0){
                 $pinfo = serialize($pinfoArray);
+                $pinfo = str_replace('"', "'", $pinfo);
             }
         }
         if(count($ldMaterial) > 0){
@@ -962,6 +966,21 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                 $setString = implode(",", $setString);
                 $sqlquery = "UPDATE {$this->_getTableName('wizardmaster')} set ".$setString." WHERE sku={$sku}";
                 $dbConnection->query($sqlquery);
+            }
+
+            if(isset($sizes)){
+            $sizeData = array();
+            $k = 0;
+                foreach ($sizes as $key => $sizeArray) {
+                    $sizeData[$k]['variant_id'] = $variantId;
+                    $sizeData[$k]['variant_size_id'] = $sizeArray['PRODUCT_SIZE_ID'];
+                    $sizeData[$k]['product_size'] = $sizeArray['PRODUCT_SIZE'];
+                    $k++;
+                }
+                $dbConnection = $this->_getConnection('core_write');
+                $sqlquery = "DELETE FROM {$this->_getTableName('wizardsize')} WHERE variant_id={$variantId};";
+                $dbConnection->query($sqlquery);
+                $dbConnection->insertMultiple($this->_getTableName('wizardsize'), $sizeData);
             }
         }catch (Exception $e){
             echo $e->getMessage();
@@ -1553,15 +1572,29 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                 $simProduct->setLwRatio($lwRatio);
 
                 /* Update Inventory*/
-               $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($simProduct->getId());
-                if ($stockItem->getId() > 0) {
-                    $qty = 1;
-                    $stockItem->setQty($qty);
-                    $stockItem->setUseConfigManageStock(1);
-                    $stockItem->setIsInStock((int)($qty > 0));
-                    $stockItem->save();
+                if($value['SMRY_ITEM_TYPE'] == 'DIAMOND'){
+                   $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($simProduct->getId());
+                    if ($stockItem->getId() > 0) {
+                        $qty = 1;
+                        $stockItem->setQty($qty);
+                        $stockItem->setUseConfigManageStock(0);
+                        $stockItem->setIsInStock((int)($qty > 0));
+                        $stockItem->save();
+                    }
                 }
                 /* End Update Inventory*/
+                /* Set Inventory*/
+                /*if($value['SMRY_ITEM_TYPE'] == 'DIAMOND'){
+                    $stockData = $simProduct->getStockData();
+                    $stockData = array(
+                        'use_config_manage_stock' => 1, //'Use config settings' checkbox
+                        'manage_stock' => 1, //manage stock
+                        'is_in_stock' => 1, //Stock Availability
+                        'qty' => 1 //qty
+                    );
+                    $simProduct->setStockData($stockData);
+                }*/
+
                 foreach($this->_dropdown as $attr){
                     $code = strtolower($attr);
                     $values = $value[$attr];
@@ -1585,7 +1618,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                         }
                     }
 
-                 $simProduct->setCategoryIds($this->_categoryIds[$smryId]);
+                $simProduct->setCategoryIds($this->_categoryIds[$smryId]);
                 // set Image Gallery
                 $this->_removeProductImage($simProduct);
                 $mediaAttribute = array ('image','small_image','thumbnail');
@@ -1597,7 +1630,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                             $name = basename(trim($image['IMAGE_FILE_NAME']));
                             $name = preg_replace('/\s+/', '', $name);
                             $ext = pathinfo($name, PATHINFO_EXTENSION);
-                             if($ext !="mp4"){
+                             if($ext !="mp4"  && $ext !="tif"){
                                  if($value['SMRY_ITEM_TYPE']=='DIAMOND'){
                                         $isFileExist = Mage::getBaseDir('media').DS.'diamondimages'.DS . $name;
                                     }else{
@@ -1624,7 +1657,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                             $name = basename(trim($value["DIA_IMAGE"]));
                             $name = preg_replace('/\s+/', '', $name);
                             $ext = pathinfo($name, PATHINFO_EXTENSION);
-                             if($ext !="mp4"){
+                             if($ext !="mp4"  && $ext !="tif"){
                                 $isFileExist = Mage::getBaseDir('media').DS.'diamondimages'.DS . $name;
                                if(file_exists($isFileExist)) {
                                     $filepath = "media" . DS . "diamondimages" . DS . $name;
@@ -1645,10 +1678,11 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                         $this->updateWidzetMaster($simProduct,$value);
                     }else{
                         //die($diaData['SMRY_ITEM_TYPE'].' for update only diamond');
-                        $this->deleteWidzetRelation($productId);
+                        $this->deleteWidzetRelation($sku);
                         //$this->inserWidzetRelation($simProduct,$value,$sku);
                         $this->inserWidzetRelation($simProduct,$value);
-                        $this->inserWidzetMaster($simProduct,$value);
+                        $this->updateWidzetMaster($simProduct,$value);
+                        //$this->inserWidzetMaster($simProduct,$value);
                     }
 
 
