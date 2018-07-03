@@ -887,7 +887,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
 
             if(count($pinfoArray) > 0){
                 $pinfo = serialize($pinfoArray);
-                $pinfo = str_replace('"', "'", $pinfo);
+                //$pinfo = str_replace('"', "'", $pinfo);
             }
         }
         if(count($ldMaterial) > 0){
@@ -959,7 +959,8 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
             $dbConnection = $this->_getConnection('core_write');
             $setString = array();
             foreach ($data as $key=>$value) {
-                $setString[] = $key.'="'.$value.'"';
+                //$setString[] = $key.'="'.$value.'"';
+                $setString[] = $key."='".$value."'";
             }
 
             if(!empty($setString)){
