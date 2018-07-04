@@ -654,7 +654,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                                     }
 
                                if(file_exists($isFileExist)) {
-                                    $filepath = "media" . DS . "styleimages" . DS . $name;
+                                    $filepath = Mage::getBaseDir('media') . DS . "styleimages" . DS . $name;
                                     if ($image['IMAGE_TYPE'] == "CATALOGUE") {
                                         $simProduct->addImageToMediaGallery($filepath, $mediaAttribute, false, false);
                                     } else {
@@ -678,7 +678,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                              if($ext !="mp4" && $ext !="tif"){
                                 $isFileExist = Mage::getBaseDir('media').DS.'diamondimages'.DS . $name;
                                if(file_exists($isFileExist)) {
-                                    $filepath = "media" . DS . "diamondimages" . DS . $name;
+                                    $filepath = Mage::getBaseDir('media') . DS . "diamondimages" . DS . $name;
                                     $simProduct->addImageToMediaGallery($filepath, $mediaAttribute, false, false);
                                 }
                             }
@@ -1638,7 +1638,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                                         $isFileExist = Mage::getBaseDir('media').DS.'styleimages'.DS . $name;
                                     }
                                if(file_exists($isFileExist)) {
-                                    $filepath = "media" . DS . "styleimages" . DS . $name;
+                                    $filepath = Mage::getBaseDir('media') . DS . "styleimages" . DS . $name;
                                     if ($image['IMAGE_TYPE'] == "CATALOGUE") {
                                         $simProduct->addImageToMediaGallery($filepath, $mediaAttribute, false, false);
                                     } else {
@@ -1661,7 +1661,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                              if($ext !="mp4"  && $ext !="tif"){
                                 $isFileExist = Mage::getBaseDir('media').DS.'diamondimages'.DS . $name;
                                if(file_exists($isFileExist)) {
-                                    $filepath = "media" . DS . "diamondimages" . DS . $name;
+                                    $filepath = Mage::getBaseDir('media') . DS . "diamondimages" . DS . $name;
                                     $simProduct->addImageToMediaGallery($filepath, $mediaAttribute, false, false);
                                 }
                             }
