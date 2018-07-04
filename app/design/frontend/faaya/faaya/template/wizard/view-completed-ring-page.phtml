@@ -215,13 +215,11 @@ $backlink = ($editid)?Mage::app()->getStore()->getUrl('wizard/ringdetail/index/e
                                                 if($item['number_format']){
                                                     echo number_format($diamondProduct->getData($item['code']),2);
                                                 }else{
-                                                    if($item['code'] == 'certificate_no'){
-
-                                                        if(Mage::helper('wizard')->checkRemoteFile($diamondProduct->getCertificatePdf())){ ?>
+                                                    if($item['code'] == 'certificate_no' && Mage::helper('wizard')->checkRemoteFile($diamondProduct->getCertificatePdf())){ ?>
 
                                                         <a class="diamond-pdf" href="<?php echo $diamondProduct->getCertificatePdf();?>" target="_blank" ><span><?php echo $diamondProduct->getData($item['code']);?></span></a>
 
-                                                        <?php  }
+                                                        <?php
                                                     }else{
                                                         echo $diamondProduct->getData($item['code']);
                                                     }

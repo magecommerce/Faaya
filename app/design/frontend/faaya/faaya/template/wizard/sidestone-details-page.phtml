@@ -70,9 +70,6 @@ $backlink = Mage::app()->getStore()->getUrl($stepList[2]['backurl']);
                 </div>
                 <?php //if(count($gallery['images']) > 0 || $product->getVideoUrl()){ ?>
                 <div class="viewcomplete-image">
-                    <div class="item">
-                        <img src="<?php echo $this->getSkinUrl('images/loose-diamond/'.$stoneShape.'.png'); ?>" alt="" />
-                    </div>
                     <?php foreach ($gallery['images'] as $item) { ?>
                         <div class="item">
                             <img src="<?php echo Mage::helper('catalog/image')->init($product, 'thumbnail', $item['file'])->resize(600); ?>" alt="" />
@@ -103,9 +100,6 @@ $backlink = Mage::app()->getStore()->getUrl($stepList[2]['backurl']);
                     </div>
                 <?php } */ ?>
                 <div class="viewcomplete-thumb">
-                   <div class="item">
-                        <img src="<?php echo $this->getSkinUrl('images/loose-diamond/'.$stoneShape.'.png'); ?>" alt="" />
-                    </div>
                    <?php foreach ($gallery['images'] as $item) { ?>
                         <div class="item">
                             <img src="<?php echo Mage::helper('catalog/image')->init($product, 'thumbnail', $item['file'])->backgroundColor(255,255,255)->resize(90); ?>" alt="" />
@@ -203,13 +197,11 @@ $backlink = Mage::app()->getStore()->getUrl($stepList[2]['backurl']);
                                                 if($item['number_format']){
                                                     echo number_format($product->getData($item['code']),2);
                                                 }else{
-                                                    if($item['code'] == 'certificate_no'){
-
-                                                        if(Mage::helper('wizard')->checkRemoteFile($product->getCertificatePdf())){ ?>
+                                                    if($item['code'] == 'certificate_no' && Mage::helper('wizard')->checkRemoteFile($product->getCertificatePdf())){ ?>
 
                                                         <a class="diamond-pdf" href="<?php echo $product->getCertificatePdf();?>" target="_blank" ><span><?php echo $product->getData($item['code']);?></span></a>
 
-                                                        <?php  }
+                                                        <?php
                                                     }else{
                                                         echo $product->getData($item['code']);
                                                     }

@@ -1,4 +1,6 @@
 <?php
+$catId = $this->getRequest()->getParam('category');
+
 $helper = Mage::Helper('wizard');
 $editid = ($this->getRequest()->getParam('editid'))?$this->getRequest()->getParam('editid'):0;
  $did = $this->getRequest()->getParam('did');
@@ -79,7 +81,12 @@ $attribute = Mage::helper('wizard')->getAllAttribute();
 $mainPrice  = $stylePrice+$diamondPrice;
 $mainPrice = (!empty($sidestoneArr))?($sidestoneArr['price']+$mainPrice):$mainPrice;
 $ids = $_product->getCategoryIds();
-$category = Mage::getModel("catalog/category")->load($ids[0]);
+if($catId){
+    $category = Mage::getModel("catalog/category")->load($catId);
+}else{
+    $category = Mage::getModel("catalog/category")->load($ids[0]);
+}
+
 $categoryLink = $category->getUrl();
 $categoryName = $category->getName();
 if($editid){
@@ -252,7 +259,7 @@ $productTypelist = Mage::helper('wizard')->getProductTypeList();
                                                         <?php //if($ringSize == $size):?>
                                                     <tr>
                                                         <th><?php //echo $this->__('Ring Size -');?>
-                                                            <select name="ring-size" id="ring-size" class="validate-select sizeSelectpicker">
+                                                            <select name="ring-size" id="ring-size" class="validate-select">
                                                                 <option value=""><?php echo $this->__('Select size') ?></option>
                                                                 <?php foreach(Mage::getModel('wizard/wizardrelation')->getAvailbleSizes($_product,false) as $size):?>
                                                                 <option value="<?php echo $size;?>" data-val="size_<?php echo $size;?>"><?php echo $size;?></option>

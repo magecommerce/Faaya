@@ -316,13 +316,11 @@ if($editid){
                                                 if($item['number_format']){
                                                     echo number_format($product->getData($item['code']),2);
                                                 }else{
-                                                    if($item['code'] == 'certificate_no'){
-
-                                                        if(Mage::helper('wizard')->checkRemoteFile($product->getCertificatePdf())){ ?>
+                                                    if($item['code'] == 'certificate_no' && Mage::helper('wizard')->checkRemoteFile($product->getCertificatePdf())){?>
 
                                                         <a class="diamond-pdf" href="<?php echo $product->getCertificatePdf();?>" target="_blank" ><span><?php echo $product->getData($item['code']);?></span></a>
 
-                                                        <?php  }
+                                                        <?php
                                                     }else{
                                                         echo $product->getData($item['code']);
                                                     }
