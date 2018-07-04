@@ -5,7 +5,7 @@
 
             <action method="addItem"><type>skin_css</type><name>css/wizard/bootstrap-select.css</name></action>
             <action method="addItem"><type>skin_css</type><name>css/wizard/jquery.dataTables.css</name></action>
-            <action method="addItem"><type>skin_css</type><name>css/wizard/jquery.mCustomScrollbar.css</name></action>
+            <!-- <action method="addItem"><type>skin_css</type><name>css/wizard/jquery.mCustomScrollbar.css</name></action> -->
             <action method="addItem"><type>skin_css</type><name>css/wizard/jquery.fancybox.css</name></action>
             <action method="addItem"><type>skin_css</type><name>css/wizard/slick.css</name></action>
             <action method="addItem"><type>skin_css</type><name>css/wizard/custom.css</name></action>
@@ -15,7 +15,7 @@
             <action method="addItem"><type>skin_js</type><name>js/wizard/bootstrap.js</name></action>
             <action method="addItem"><type>skin_js</type><name>js/wizard/bootstrap-select.js</name></action>
             <action method="addItem"><type>skin_js</type><name>js/wizard/jquery.dataTables.js</name></action>
-            <action method="addItem"><type>skin_js</type><name>js/wizard/jquery.mCustomScrollbar.js</name></action>
+            <!-- <action method="addItem"><type>skin_js</type><name>js/wizard/jquery.mCustomScrollbar.js</name></action> -->
             <action method="addItem"><type>skin_js</type><name>js/wizard/jquery.fancybox.js</name></action>
             <action method="addItem"><type>skin_js</type><name>js/wizard/slick.js</name></action>
             <action method="addItem"><type>skin_js</type><name>js/wizard/custom.js</name></action>
