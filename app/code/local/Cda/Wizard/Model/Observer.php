@@ -297,5 +297,65 @@ class Cda_Wizard_Model_Observer extends Mage_Core_Model_Abstract {
             }
         }
     }
+    public function catalogProductSaveAfter($observer)
+    {
+        $staticArr = array(
+                'item_id'=>0,
+                'variant_id'=>0,
+                'smry_id'=>0,
+                'base_variant_id'=>0,
+                'construction'=>0,
+                'variant_remark'=>0,
+                'variant_name'=>0,
+                'price'=>0,
+                'special_price'=>0,
+                'total_dia_wt'=>0,
+                'metal_color'=>1,
+                'karat'=>1,
+                'weight'=>0,
+                'sub_category'=>1,
+                'stone_shape'=>1,
+                'row_identity'=>0,
+                'product_size'=>1,
+                'stone_quality'=>1,
+                'group_code'=>0,
+                'polish'=>0,
+                'symmetry'=>0,
+                'fluorescence'=>0,
+                'depth_mm'=>0,
+                'table_per'=>0,
+                'band_width'=>1,
+                'metal_type'=>1,
+                'stone_cut'=>1,
+                'stone_color'=>1,
+                'chain_type'=>1,
+                'chain_length'=>1,
+                'back_type'=>0,
+                'depth_per'=>0,
+                'collection'=>1,
+                'image'=>0
+        );
+
+        $helper = Mage::helper('wizard');
+        if ($actionInstance = Mage::app()->getFrontController()->getAction()) {
+            $action = $actionInstance->getFullActionName();
+            if ($action == 'adminhtml_catalog_product_save') { //if on admin save action
+                $product = $observer->getProduct();
+                $masterModel = Mage::getModel('wizard/wizardmaster')->load($product->getId(),'pid');
+                $optionArray = array();
+                $optionArray['product_type'] =$helper->getAttributeValue('jewelry',$product->getData('jewelry'));
+                $optionArray['url'] =$product->getUrlKey();
+
+                foreach ($staticArr as $key=>$value) {
+                    $optionArray[$key] = ($value == 1)?$helper->getAttributeValue($key,$product->getData($key)):$product->getData($key);
+                    if($optionArray[$key] == 'N/A'){
+                        $optionArray[$key] = '';
+                    }
+                    $masterModel->setData($key,$optionArray[$key]);
+                }
+                $masterModel->save();
+            }
+        }
+    }
 }
 ?>

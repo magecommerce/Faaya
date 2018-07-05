@@ -818,29 +818,6 @@ class Cda_Wizard_Helper_Data extends Mage_Core_Helper_Abstract
           if (!file_exists($imagePath)) {
               return Mage::getSingleton('catalog/product_media_config')->getBaseMediaUrl(). '/placeholder/' .Mage::getStoreConfig("catalog/placeholder/small_image_placeholder");
           }
-
-
-            /*if (@getimagesize($imagePath)) {
-
-            }else{
-                return Mage::getSingleton('catalog/product_media_config')->getBaseMediaUrl(). '/placeholder/' .Mage::getStoreConfig("catalog/placeholder/small_image_placeholder");
-            }*/
-          // resize the image if needed
-          /*$rszImagePath = Mage::getBaseDir('media') . DS . 'catalog' . DS . 'product'
-                        . DS . 'cache' . DS . $width . 'x' . $height . DS
-                        . $productImage;
-
-          if (!file_exists($rszImagePath)) {
-              $image = new Varien_Image($imagePath);
-              //$image->resize($width, $height);
-            $image->constrainOnly(TRUE);
-            $image->keepAspectRatio(TRUE);
-            $image->keepFrame(FALSE);
-            $image->resize($width,null);
-            $image->save($rszImagePath);
-          }*/
-          // return the image URL
-          //return Mage::getBaseUrl('media') . '/catalog/product/cache/' . $width . 'x'
           return $imageurl;
     }
 
@@ -877,7 +854,7 @@ class Cda_Wizard_Helper_Data extends Mage_Core_Helper_Abstract
         return $chainlength;
     }
     public function getChainType($pid,$length){
-        $chainTypeArr = array('Cable Chain- Thin','Cable Chain- Medium','Cable Chain- Thick','Thin','Medium','Thick');
+        $chainTypeArr = array('Cable Chain- Thin','Cable Chain- Medium','Cable Chain- Thick','Thin','Medium','Thick','CHAIN');
         $chaintype = $this->_readConnection->fetchCol("select variant_refsmryid from wizardrelation where type='chain' AND pid =".$pid);
         if(!empty($chaintype)){
             $relationtype = '"'.implode('","', $chaintype).'"';

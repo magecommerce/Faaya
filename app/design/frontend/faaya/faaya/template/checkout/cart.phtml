@@ -77,9 +77,9 @@ ksort($itemArray);
 <?php $_priceDisplay = ($this->helper('tax')->displayCartBothPrices()) ? 'display-both-prices' : 'display-single-price'; ?>
 <div class="cart <?php echo $_priceDisplay; ?>">
     <div class="page-title title-buttons">
-          <?php if($this->getContinueShoppingUrl()): ?>
-                <button type="button" title="<?php echo $this->quoteEscape($this->__('Continue Shopping')) ?>" class="button2 btn-continue" onclick="setLocation('<?php echo Mage::helper('core')->quoteEscape($this->getContinueShoppingUrl()) ?>')"><span><span><?php echo $this->__('Continue Shopping') ?></span></span></button>
-            <?php endif; ?>
+          <?php //if($this->getContinueShoppingUrl()): ?>
+                <button type="button" title="<?php echo $this->quoteEscape($this->__('Continue Shopping')) ?>" class="button2 btn-continue" onclick="history.back(); return false;"><span><span><?php echo $this->__('Continue Shopping') ?></span></span></button>
+            <?php //endif; ?>
             <h1><?php echo $this->__('Your') ?> <strong><?php echo $this->__('Shopping Bag'); ?></strong></h1>
     </div>
     <?php echo $this->getMessagesBlock()->toHtml() ?>

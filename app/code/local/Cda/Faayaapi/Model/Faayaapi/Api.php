@@ -658,7 +658,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                                     if ($image['IMAGE_TYPE'] == "CATALOGUE") {
                                         $simProduct->addImageToMediaGallery($filepath, $mediaAttribute, false, false);
                                     } else {
-                                        $simProduct->addImageToMediaGallery($filepath, array(), false, false);
+                                        $simProduct->addImageToMediaGallery($filepath, null, false, false);
                                     }
                                 }
 
@@ -1642,7 +1642,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                                     if ($image['IMAGE_TYPE'] == "CATALOGUE") {
                                         $simProduct->addImageToMediaGallery($filepath, $mediaAttribute, false, false);
                                     } else {
-                                        $simProduct->addImageToMediaGallery($filepath, array(), false, false);
+                                        $simProduct->addImageToMediaGallery($filepath, null, false, false);
                                     }
                                 }
                             }elseif ($ext =="mp4"){
