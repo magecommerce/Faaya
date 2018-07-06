@@ -551,7 +551,7 @@ $productShapes .= '<li class="item">
 
             $multiArr = array($product1,$product2);
             $image = '<span class="zoom-icon">
-            <a data-fancybox data-type="ajax" data-src="'.Mage::getBaseURL().'popuphtml/popup.php?pid='.$product1['pid'].'" href="javascript:;">
+            <a data-fancybox data-type="ajax" data-src="'.Mage::getBaseURL().'popuphtml/multidiamond.php?pid1='.$product1['pid'].'&pid2='.$product2['pid'].'" href="javascript:;">
                     <img src="'.$mediapath.'wizard/zoom-icon.png" alt="'.$product1["pid"].'" class="mCS_img_loaded">
                 </a>
             </span>

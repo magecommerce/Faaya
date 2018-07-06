@@ -5,7 +5,7 @@
 
             <action method="addItem"><type>skin_css</type><name>css/wizard/bootstrap-select.css</name></action>
             <action method="addItem"><type>skin_css</type><name>css/wizard/jquery.dataTables.css</name></action>
-            <!-- <action method="addItem"><type>skin_css</type><name>css/wizard/jquery.mCustomScrollbar.css</name></action> -->
+            <action method="addItem"><type>skin_css</type><name>css/wizard/jquery.mCustomScrollbar.css</name></action>
             <action method="addItem"><type>skin_css</type><name>css/wizard/jquery.fancybox.css</name></action>
             <action method="addItem"><type>skin_css</type><name>css/wizard/slick.css</name></action>
             <action method="addItem"><type>skin_css</type><name>css/wizard/custom.css</name></action>
@@ -15,7 +15,7 @@
             <action method="addItem"><type>skin_js</type><name>js/wizard/bootstrap.js</name></action>
             <action method="addItem"><type>skin_js</type><name>js/wizard/bootstrap-select.js</name></action>
             <action method="addItem"><type>skin_js</type><name>js/wizard/jquery.dataTables.js</name></action>
-            <!-- <action method="addItem"><type>skin_js</type><name>js/wizard/jquery.mCustomScrollbar.js</name></action> -->
+            <action method="addItem"><type>skin_js</type><name>js/wizard/jquery.mCustomScrollbar.js</name></action>
             <action method="addItem"><type>skin_js</type><name>js/wizard/jquery.fancybox.js</name></action>
             <action method="addItem"><type>skin_js</type><name>js/wizard/slick.js</name></action>
             <action method="addItem"><type>skin_js</type><name>js/wizard/custom.js</name></action>
@@ -44,10 +44,10 @@
         </reference>
         <reference name="head">
          </reference>
-		<reference name="content">
+        <reference name="content">
             <block type="wizard/index" name="wizard" template="wizard/sidestone.phtml" />
-		</reference>
-	</wizard_sidestone_index>
+        </reference>
+    </wizard_sidestone_index>
 
     <wizard_diamond_index>
         <reference name="root">
@@ -118,13 +118,13 @@
         </reference>
     </wizard_completed_index>
 
-	<cms_view_completed_ring_page>
+    <cms_view_completed_ring_page>
         <reference name="root">
             <action method="setTemplate">
                     <template>page/wizard.phtml</template>
             </action>
         </reference>
-	</cms_view_completed_ring_page>
+    </cms_view_completed_ring_page>
     <wizard_compare_index translate="label">
         <label>Catalog Product Compare List</label>
         <reference name="root">

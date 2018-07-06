@@ -301,7 +301,7 @@ $backlink = ($editid)?Mage::app()->getStore()->getUrl('wizard/ringdetail/index/e
                             </ul>
                         </div>
                         <?php if(!empty($sidestoneArr)): ?>
-                        <h3><?php echo $this->__('SUMMARY - '); ?><span><?php echo $this->__('Matched paired diamond'); ?></span></h3>
+                        <h3><?php echo $this->__('SUMMARY - '); ?><span><?php echo $this->__('Matched pair diamond'); ?></span></h3>
                         <p class="p_detail"><?php echo $this->__('Closely spaced gemstone are set with tiny prongs so that the surface appears to be “paved” with gemstones.'); ?></p>
                         <div class="details-tbl">
                            <ul>
@@ -314,68 +314,62 @@ $backlink = ($editid)?Mage::app()->getStore()->getUrl('wizard/ringdetail/index/e
                               <li>
                                  <span class="title"><?php echo $this->__('Minimum carat total weight (CT. W.)'); ?>
                                     <div class="tooltip-options">
-                                       <div class="tooltip-image">
-                                          <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
-                                       </div>
-                                       <div class="tooltip-content">
-                                          <a class="close-btn" href="javascript:void(0)">
-                                            <img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt="">
-                                          </a>
-                                          <h3><?php echo $this->__('Metal Type'); ?></h3>
-                                          <img src="<?php echo Mage::getBaseUrl('media');?>/wizard/tooltip-img1.png" alt="Metal Type">
-                                          <p><?php echo $this->__('Metal type tooltip'); ?></p>
-                                       </div></div>
+                                        <div class="tooltip-image">
+                                            <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png') ?>" alt="">
+                                        </div>
+                                        <div class="tooltip-content">
+                                            <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+
+                                            <?php echo $helper->getTooltip($attribute['WEIGHT'],$titleHelper);?>
+                                        </div>
+                                    </div>
                                  </span>
                                  <span class="value"><?php echo $sidestoneArr['SUM(weight)']; ?></span>
                               </li>
                               <li>
                                  <span class="title"><?php echo $this->__('Average Colour') ?>
-                                 <div class="tooltip-options">
-                                       <div class="tooltip-image">
-                                          <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
-                                       </div>
-                                       <div class="tooltip-content">
-                                          <a class="close-btn" href="javascript:void(0)">
-                                            <img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt="">
-                                          </a>
-                                          <h3><?php echo $this->__('Metal Type'); ?></h3>
-                                          <img src="<?php echo Mage::getBaseUrl('media');?>/wizard/tooltip-img1.png" alt="Metal Type">
-                                          <p><?php echo $this->__('Metal type tooltip'); ?></p>
-                                       </div></div>
+                                     <div class="tooltip-options">
+                                            <div class="tooltip-image">
+                                                <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png') ?>" alt="">
+                                            </div>
+                                            <div class="tooltip-content">
+                                                <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+
+                                                <?php echo $helper->getTooltip($attribute['STONE_COLOR'],$titleHelper);?>
+                                            </div>
+                                    </div>
                                  </span>
                                  <span class="value"><?php echo $sidestoneArr['stone_color']; ?></span>
                               </li>
                               <li>
                                  <span class="title"><?php echo $this->__('Average Clarity'); ?>
-                                    <div class="tooltip-options">
-                                       <div class="tooltip-image">
-                                          <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
-                                       </div>
-                                       <div class="tooltip-content">
-                                          <a class="close-btn" href="javascript:void(0)">
-                                            <img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt="">
-                                          </a>
-                                          <h3><?php echo $this->__('Metal Type'); ?></h3>
-                                          <img src="<?php echo Mage::getBaseUrl('media');?>/wizard/tooltip-img1.png" alt="Metal Type">
-                                          <p><?php echo $this->__('Metal type tooltip'); ?></p>
-                                       </div></div>
+                                     <div class="tooltip-options">
+                                            <div class="tooltip-image">
+                                                <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png') ?>" alt="">
+                                            </div>
+                                            <div class="tooltip-content">
+                                                <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+
+                                                <?php echo $helper->getTooltip($attribute['STONE_QUALITY'],$titleHelper);?>
+                                            </div>
+                                    </div>
+
                                  </span>
                                  <span class="value"><?php echo $sidestoneArr['stone_quality']; ?></span>
                               </li>
                               <li>
                                  <span class="title"><?php echo $this->__('Average Cut'); ?>
-                                    <div class="tooltip-options">
-                                       <div class="tooltip-image">
-                                          <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png'); ?>" alt="">
-                                       </div>
-                                       <div class="tooltip-content">
-                                          <a class="close-btn" href="javascript:void(0)">
-                                            <img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt="">
-                                          </a>
-                                          <h3><?php echo $this->__('Metal Type'); ?></h3>
-                                          <img src="<?php echo Mage::getBaseUrl('media');?>/wizard/tooltip-img1.png" alt="Metal Type">
-                                          <p><?php echo $this->__('Metal type tooltip'); ?></p>
-                                       </div></div>
+                                     <div class="tooltip-options">
+                                            <div class="tooltip-image">
+                                                <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png') ?>" alt="">
+                                            </div>
+                                            <div class="tooltip-content">
+                                                <a class="close-btn" href="javascript:void(0)"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
+
+                                                <?php echo $helper->getTooltip($attribute['STONE_CUT'],$titleHelper);?>
+                                            </div>
+                                    </div>
+
                                  </span>
                                  <span class="value"><?php echo $sidestoneArr['stone_cut']; ?></span>
                               </li>
