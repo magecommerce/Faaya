@@ -41,6 +41,15 @@
                     </product_save_after_observer>
                 </observers>
             </catalog_product_save_after>
+            <catalog_product_delete_after_done>
+                <observers>
+                    <product_delete_after_observer>
+                        <type>singleton</type>
+                        <class>Cda_Wizard_Model_Observer</class>
+                        <method>catalogProductDeleteAfter</method>
+                    </product_delete_after_observer>
+                </observers>
+            </catalog_product_delete_after_done>
         </events>
         <models>
             <wizard>

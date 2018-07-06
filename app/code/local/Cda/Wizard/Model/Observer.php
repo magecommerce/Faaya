@@ -357,5 +357,19 @@ class Cda_Wizard_Model_Observer extends Mage_Core_Model_Abstract {
             }
         }
     }
+
+    public function catalogProductDeleteAfter($observer)
+    {
+        $productId = $observer->getProduct()->getId();
+        try {
+            $masterModel = Mage::getModel('wizard/wizardmaster')->load($productId,'pid')->delete();
+            $realationModel= Mage::getModel('wizard/wizardrelation')->getCollection()->addFieldToFilter('pid', $productId);
+            foreach ($realationModel as $item) {
+                $item->delete();
+            }
+        } catch (Exception $e){
+            echo $e->getMessage();
+        }
+    }
 }
 ?>
