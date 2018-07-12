@@ -191,6 +191,7 @@ $backlink = ($editid)?Mage::app()->getStore()->getUrl('wizard/ringdetail/index/e
                     <div class="col-sm-12 col-md-6 left">
                         <h3><?php echo $this->__('Summary');?> - <span><?php echo $this->__('Diamond');?></span></h3>
                         <div class="details-tbl">
+                            <input type="hidden" name="diamond-id" value="<?php echo $diamondProduct->getId();?>">
                             <ul>
                                 <?php foreach ($this->getAttributeArry('left') as $item) { ?>
                                     <li>
@@ -265,6 +266,7 @@ $backlink = ($editid)?Mage::app()->getStore()->getUrl('wizard/ringdetail/index/e
                         </div>
                         <h3><?php echo $this->__('Summary');?> - <span><?php echo $this->__('Setting');?></span></h3>
                         <div class="details-tbl">
+                            <input type="hidden" name="ring-id" value="<?php echo $ringProduct->getId();?>">
                             <ul>
                                 <?php foreach ($this->getRingArry('left') as $item) { ?>
                                 <li>
@@ -469,14 +471,16 @@ $backlink = ($editid)?Mage::app()->getStore()->getUrl('wizard/ringdetail/index/e
                             </div>
                             <a target="_blank" class="size-guide" href="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)."wizard/sizeguide/sizeguide.pdf";?>"><?php echo $this->__('Size Guide');?></a>
                         </div>
-                        <?php if($weddingband['pinfo']){ ?>
-                            <?php $weddinginfo = unserialize($weddingband['pinfo']);$weddinginfo= $weddinginfo[0];?>
+                        <?php if($weddingband){ ?>
+
                         <div class="wedding-band-block">
                             <input type="hidden" name="weddingid" id="weddingid" value="<?php echo $weddingband['pid'];?>">
                             <button class="button"><?php echo $this->__('add wedding band'); ?></button>
                             <div class="wedding-block-content">
                                 <h3><?php echo $weddingband['variant_remark']; ?> <span class="price"><?php echo Mage::helper('core')->currency($weddingband['price'], true, false);?></span></h3>
                                 <p><?php echo $weddingband['variant_name']; ?></p>
+                                <?php if($weddingband['pinfo']){ ?>
+                                <?php $weddinginfo = unserialize($weddingband['pinfo']);$weddinginfo= $weddinginfo[0];?>
                                 <div class="details-tbl">
                                     <ul>
                                         <li>
@@ -533,6 +537,7 @@ $backlink = ($editid)?Mage::app()->getStore()->getUrl('wizard/ringdetail/index/e
                                         </li>
                                     </ul>
                                 </div>
+                                <?php } ?>
                             </div>
                         </div>
                         <?php } ?>

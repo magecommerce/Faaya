@@ -247,7 +247,7 @@ Compare products page
             <block type="catalog/product_compare_list" name="catalog.compare.list" template="catalog/product/compare/list.phtml" />
         </reference>
     </catalog_product_compare_index>
-    
+
     <catalog_product_compare_index_ajax translate="label">
         <label>Catalog Product Compare List</label>
         <reference name="root">

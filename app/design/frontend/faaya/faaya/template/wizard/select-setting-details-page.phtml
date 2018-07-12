@@ -1,9 +1,25 @@
 <?php
+$sku = $this->getRequest()->getParam('sku');
 $helper = Mage::Helper('wizard');
 $selected = $helper->getSelectedValue();
 $diamondId = ($selected)?$selected['productId']:0;
 
 $ringSelected = $helper->getRingSelected();
+if($sku){
+    $skufromId = Mage::getModel('catalog/product')->loadByAttribute('sku',$sku);
+    //echo "<pre/>";print_r($skufromId->getId());exit;
+    if($skufromId){
+        if($ringSelected){
+                $ringSelected['productId'] = $skufromId->getId();
+        }else{
+                $ringSelected = array('productId'=>$skufromId->getId());
+        }
+        Mage::getSingleton('core/session')->setRingSelected(serialize($ringSelected));
+        $ringSelected =  Mage::getSingleton('core/session')->getRingSelected();
+        $ringSelected = unserialize($ringSelected);
+    }
+    //echo "<pre/>";print_r(unserialize(Mage::getSingleton('core/session')->getSelectedValue()));exit;
+}
 $pid = ($ringSelected)?$ringSelected['productId']:0;
 $curCode = $helper->getCurSymbol();
 
@@ -347,7 +363,7 @@ $attribute = Mage::helper('wizard')->getAllAttribute();
 
 <script type="text/javascript">
 
-  
+
 
 
    var BASE_URL='<?php echo preg_replace('/(.*?)(index.php\/?)?/','\1',Mage::getBaseURL());?>';
@@ -435,7 +451,7 @@ $attribute = Mage::helper('wizard')->getAllAttribute();
         })
     }
 
-     
+
        jQuery(window).load(function(){
           if(jQuery('video').length > 0){
             jQuery('.slick-video video').trigger('play');

@@ -1,4 +1,5 @@
 <?php
+$sku = $this->getRequest()->getParam('sku');
 $editid = $this->getRequest()->getParam('editid');
 $prms = $this->getRequest()->getParam('prms');
 $shapeParams = $this->getRequest()->getParam('shape');
@@ -10,6 +11,21 @@ $attribute = Mage::helper('wizard')->getAllAttribute();
 $titleHelper =  array();
 $moreContent = array('NATIVE_PURITY','SERIES');
 $selected =  Mage::getSingleton('core/session')->getSelectedValue();
+
+if($sku){
+    $skufromId = Mage::getModel('catalog/product')->loadByAttribute('sku',$sku);
+    if($skufromId){
+        if($selected != ''){
+                $selected = unserialize($selected);
+                $selected['productId'] = $skufromId->getId();
+        }else{
+            $selected = array('productId'=>$skufromId->getId());
+        }
+        Mage::getSingleton('core/session')->setSelectedValue(serialize($selected));
+        $selected =  Mage::getSingleton('core/session')->getSelectedValue();
+    }
+    //echo "<pre/>";print_r(unserialize(Mage::getSingleton('core/session')->getSelectedValue()));exit;
+}
 if($selected != ''){
     $selected = unserialize($selected);
     $pid = $selected['productId'];

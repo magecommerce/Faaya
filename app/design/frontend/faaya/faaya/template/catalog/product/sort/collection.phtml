@@ -1,10 +1,5 @@
 <?php
-$currentCategory = Mage::registry('current_category');
-$categoryId = $currentCategory->getId();
-
 $ringfilter = Mage::getBlockSingleton('layernavigation/layernavigation')->getCollectionfilter();
-
-
 $metalColor = $ringfilter['metal_color'];
 $karat = $ringfilter['karat'];
 $collection = $ringfilter['collection'];
@@ -14,28 +9,7 @@ $karat = array_filter($karat);
 
 $subCategory = $ringfilter['sub_category'];
 $subCategory = array();
-/*
-$subStatic = array(
-              'Solitaires'=>'Solitaires',
-              'Halo_Ring'=>'Halo Ring',
-              '3_Stone_Ring'=>'3 Stone Ring',
-              'Trellis'=>'Trellis',
-              'Vintage'=>'Vintage'
-              );
-$otherSub = array_diff($subCategory, $subStatic);
-if(!empty($otherSub)){
-  $subStatic = array_merge($subStatic,$otherSub);
-}
-$subCategory = $subStatic;
-*/
 
-
-$_caratCollection = Mage::getModel('catalog/product')->getCollection()
-             ->joinField('category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null, 'left')
-             ->addAttributeToSelect('*')
-             ->addAttributeToFilter('category_id',$categoryId)
-             ->addAttributeToFilter('sub_category',array("neq"=>""))
-             ->addAttributeToFilter('metal_color',array("neq"=>""));
 ?>
 <?php
 $changeAttributeName = array('metal color'=>'metal','karat'=>'metal karat','sub category'=>'ring style');

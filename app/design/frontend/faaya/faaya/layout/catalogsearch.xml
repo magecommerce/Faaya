@@ -62,7 +62,7 @@
                     <block type="core/text_list" name="product_list.name.after" as="name.after" />
                     <block type="core/text_list" name="product_list.after" as="after" />
                     <block type="catalog/product_list_toolbar" name="product_list_toolbar" template="catalog/product/listlist/toolbar.phtml">
-                        <block type="page/html_pager" name="product_list_toolbar_pager"/>  
+                        <block type="page/html_pager" name="product_list_toolbar_pager"/>
                         <action method="addPagerLimit" translate="label"><mode>grid</mode><limit>all</limit><label>All</label></action>
                     </block>
                    <!-- <action method="addColumnCountLayoutDepend"><layout>empty</layout><count>6</count></action>
