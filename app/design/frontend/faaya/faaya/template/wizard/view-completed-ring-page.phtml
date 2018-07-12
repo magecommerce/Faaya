@@ -62,15 +62,35 @@ $readConnection = $resource->getConnection('core_read');
 $pinfo = $helper->getPinfo($ringPid);
 $weddingband = $helper->getWeddingBand($ringPid);
 $weddingFlag = false;
-if($weddingband){
+/*if($weddingband){
 
     $weddingProduct = Mage::getModel('catalog/product')->load($weddingband['pid']);
     if($weddingProduct && $weddingProduct->getImage() != '' && file_exists(Mage::getBaseDir('media').DS.'catalog'.DS.'product'.str_replace("/", DS, $weddingProduct->getImage()))){
         $weddingFlag = true;
     }
 
-}
+}*/
+$weddingMedia = array();
+if($weddingband){
 
+    $weddingProduct = Mage::getModel('catalog/product')->load($weddingband['pid']);
+    $weddingGallery = $weddingProduct->getMediaGallery();
+    if($weddingProduct && count($weddingGallery['images']) > 0){
+        foreach ($weddingGallery['images'] as $value) {
+            if(file_exists(Mage::getBaseDir('media').DS.'catalog'.DS.'product'.str_replace("/", DS, $value['file']))){
+                    if (strpos($value['file'], 'set') !== false) {
+                        $weddingMedia[] = array('default'=>true,'mainimage'=>Mage::helper('wizard')->getResizeImageWidth($value['file']),'largeimage'=>Mage::helper('wizard')->getResizeImage($value['file'],600,600),'smallimage'=>Mage::helper('wizard')->getResizeImage($value['file'],90,90));
+                    }else{
+                        $weddingMedia[] = array("default"=>false,"mainimage"=>Mage::helper("wizard")->getResizeImageWidth($value["file"]),"largeimage"=>Mage::helper("wizard")->getResizeImage($value["file"],600,600),"smallimage"=>Mage::helper("wizard")->getResizeImage($value["file"],90,90));
+                    }
+
+            }
+        }
+        $weddingFlag = true;
+    }
+
+}
+//$weddingMedia = Mage::helper('core')->jsonEncode($weddingMedia);
 $sidestoneArr = array();
 if($sidestone != ''){
     $sidestone = unserialize($sidestone);
@@ -560,11 +580,7 @@ $backlink = ($editid)?Mage::app()->getStore()->getUrl('wizard/ringdetail/index/e
 
     var selectedWedding='<?php echo $selectedWedding;?>';
 
-    if(weddingflag){
-        var weddingMainImage ='<?php echo Mage::helper('catalog/image')->init($weddingProduct, 'image');?>';
-        var weddingLargeImage ='<?php echo Mage::helper('catalog/image')->init($weddingProduct,'image')->backgroundColor(255,255,255)->resize(600);?>';
-        var weddingSmallImage ='<?php echo Mage::helper('catalog/image')->init($weddingProduct,'image')->backgroundColor(255,255,255)->resize(90);?>';
-    }
+    var weddingmedia = <?php echo Mage::helper('core')->jsonEncode($weddingMedia);?>;
 
     jQuery(document).ready(function(){
 
@@ -591,9 +607,18 @@ $backlink = ($editid)?Mage::app()->getStore()->getUrl('wizard/ringdetail/index/e
             var wed = jQuery('#weddingid').val();
             wed = 'wedding/'+wed;
             if($this.hasClass('remove')){
-                jQuery('.viewcomplete-image').slick('slickAdd','<div class="item wedding-image"><a class="icon-zoom" href="'+weddingMainImage+'" data-fancybox="wizard-slider"><img src="'+weddingLargeImage+'" alt=""></a></div>');
-                jQuery('.viewcomplete-thumb').slick('slickAdd','<div class="item wedding-image"><img src="'+weddingSmallImage+'" alt=""></div>');
-                jQuery('.viewcomplete-thumb').find('.wedding-image').trigger('click');
+                for (var i = 0; i < weddingmedia.length; i++) {
+                    if(weddingmedia[i].default){
+                        jQuery('.viewcomplete-image').slick('slickAdd','<div class="item wedding-image"><a class="icon-zoom" href="'+weddingmedia[i].mainimage+'" data-fancybox="wizard-slider"><img src="'+weddingmedia[i].largeimage+'" alt=""></a></div>');
+                        jQuery('.viewcomplete-thumb').slick('slickAdd','<div class="item wedding-image wedding-image-active"><img src="'+weddingmedia[i].smallimage+'" alt=""></div>');
+                    }else{
+                        jQuery('.viewcomplete-image').slick('slickAdd','<div class="item wedding-image"><a class="icon-zoom" href="'+weddingmedia[i].mainimage+'" data-fancybox="wizard-slider"><img src="'+weddingmedia[i].largeimage+'" alt=""></a></div>');
+                        jQuery('.viewcomplete-thumb').slick('slickAdd','<div class="item wedding-image"><img src="'+weddingmedia[i].smallimage+'" alt=""></div>');
+                    }
+                }
+                /*jQuery('.viewcomplete-image').slick('slickAdd','<div class="item wedding-image"><a class="icon-zoom" href="'+weddingMainImage+'" data-fancybox="wizard-slider"><img src="'+weddingLargeImage+'" alt=""></a></div>');
+                jQuery('.viewcomplete-thumb').slick('slickAdd','<div class="item wedding-image"><img src="'+weddingSmallImage+'" alt=""></div>');*/
+                jQuery('.viewcomplete-thumb').find('.wedding-image-active').trigger('click');
                 $this.text('remove wedding band');
                 var existurl = jQuery('.next-links').attr('href');
                 existurl = existurl+wed;
