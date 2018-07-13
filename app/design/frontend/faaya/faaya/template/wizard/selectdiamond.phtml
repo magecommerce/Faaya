@@ -224,11 +224,11 @@ $productUrl = ($editid)?Mage::app()->getStore()->getUrl($productUrl.'/editid/'.$
 
             <?php }else{ ?>
 
-			<div class="backlink backlink-loose">
+            <div class="backlink backlink-loose">
 
-				<a href="<?php echo Mage::getUrl('loose-diamonds') ?>">BACK</a>
+                <a href="<?php echo Mage::getUrl('loose-diamonds') ?>">BACK</a>
 
-			</div>
+            </div>
 
             <?php } ?>
 
@@ -312,7 +312,7 @@ $productUrl = ($editid)?Mage::app()->getStore()->getUrl($productUrl.'/editid/'.$
 
                                         <span class="mobile"><?php echo $option;?></span>
 
-                                        <?php echo $helper->getAttImage0($attribute['STONE_SHAPE'],$option,$titleHelper);?>
+                                        <?php echo $helper->getAttImage($attribute['STONE_SHAPE'],$option,$titleHelper);?>
 
                                         <span><?php echo $option;?></span>
 
