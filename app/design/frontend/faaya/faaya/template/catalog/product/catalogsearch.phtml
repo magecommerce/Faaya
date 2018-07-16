@@ -17,7 +17,7 @@
     <div class="filter-wrapper"><div class="filtered-options" style="display: none;"><a href="javascript:void(0);" class="clear-all"><?php echo $this->__('Clear All');?></a></div></div>
     <div class="block block-layered-nav block-layered-nav--no-filters sticky-category-filter">
 
-   <?php  echo $collectionSort = $this->getLayout()->createBlock('catalog/product')->setTemplate('catalog/product/sort/collection.phtml')->toHtml();?>
+   <?php  echo $collectionSort = $this->getLayout()->createBlock('catalog/product')->setTemplate('catalog/product/sort/collectionsearch.phtml')->toHtml();?>
 </div>
 <?php if($totalRecord <= 0): ?>
 <p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>

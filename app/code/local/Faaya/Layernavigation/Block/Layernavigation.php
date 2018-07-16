@@ -104,8 +104,13 @@ class Faaya_Layernavigation_Block_Layernavigation extends Mage_Catalog_Block_Pro
       return $allRingFilter;
     }
 
-    public function getCollectionfilter(){
-      $filterlist = 'select * from wizardmaster where construction =  "PRESET" AND collection != ""';
+    public function getCollectionfilter($flag=false){
+      if($flag == false){
+        $filterlist = 'select * from wizardmaster where construction =  "PRESET" AND collection != ""';
+      }else{
+        $filterlist = 'select * from wizardmaster where construction =  "PRESET"';
+      }
+
       $filterlist = $this->_readConnection->fetchAll($filterlist);
       $allRingFilter = array();
 
