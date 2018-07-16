@@ -30,7 +30,7 @@ class Cda_Wizard_Block_Search extends Mage_Core_Block_Template{
         $whereArr = implode(" OR ", $whereArr);
 
 
-        $query = 'SELECT * FROM wizardmaster WHERE is_basevariant = 1 and IF(center_diamond=1, special_character LIKE  "%C%", 1 )  AND IF(matchpair =1, special_character LIKE  "%M%", 1 ) AND  construction =  "PRESET" and ('.$whereArr.') group by variant_id order by multiprice';
+        $query = 'SELECT * FROM wizardmaster WHERE is_default = 1 and IF(center_diamond=1, special_character LIKE  "%C%", 1 )  AND IF(matchpair =1, special_character LIKE  "%M%", 1 ) AND  construction =  "PRESET" and ('.$whereArr.') group by variant_id order by multiprice';
 
       $collection = $this->_readConnection->fetchAll($query);
       $minPrice = 0;

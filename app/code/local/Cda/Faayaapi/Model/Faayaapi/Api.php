@@ -870,6 +870,13 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
         $proCollection = $childAttribute['COLLECTION'];
 
 
+        $stockCode = $childAttribute['STOCK_CODE'];
+        $description = $childAttribute['DESCRIPTION'];
+        $gender = $childAttribute['GENDER'];
+        $finishType = $childAttribute['FINISH_TYPE'];
+        $certificateNo = $childAttribute['CERTIFICATE_NO'];
+
+
         if(count($sizes) > 0){
             foreach($sizes as $size){
                $availableSize .=  $size['PRODUCT_SIZE_ID'].":".$size['PRODUCT_SIZE'].',';
@@ -960,6 +967,12 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
             $data['depth_per'] = $depthPer;
             $data['status'] = 1;
             $data['collection'] = $proCollection;
+
+            $data['stock_code'] = $stockCode;
+            $data['description'] = $description;
+            $data['gender'] = $gender;
+            $data['finish_type'] = $finishType;
+            $data['certificate_no'] = $certificateNo;
 
             $dbConnection = $this->_getConnection('core_write');
             $setString = array();
@@ -1054,6 +1067,12 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
         $depthPer = $childAttribute['DEPTH_PER'];
         $proCollection = $childAttribute['COLLECTION'];
 
+        $stockCode = $childAttribute['STOCK_CODE'];
+        $description = $childAttribute['DESCRIPTION'];
+        $gender = $childAttribute['GENDER'];
+        $finishType = $childAttribute['FINISH_TYPE'];
+        $certificateNo = $childAttribute['CERTIFICATE_NO'];
+
 
         if(count($sizes) > 0){
             foreach($sizes as $size){
@@ -1144,6 +1163,13 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
             $data['depth_per'] = $depthPer;
             $data['status'] = 1;
             $data['collection'] = $proCollection;
+
+            $data['stock_code'] = $stockCode;
+            $data['description'] = $description;
+            $data['gender'] = $gender;
+            $data['finish_type'] = $finishType;
+            $data['certificate_no'] = $certificateNo;
+
 
             $wigzetMaster->setData($data)->save();
             if(isset($sizes)){
