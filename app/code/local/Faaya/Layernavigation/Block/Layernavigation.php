@@ -115,7 +115,9 @@ class Faaya_Layernavigation_Block_Layernavigation extends Mage_Catalog_Block_Pro
       $allRingFilter = array();
 
       foreach ($filterlist as $value) {
-        $allRingFilter['collection'][str_replace(' ', '_', $value['collection'])] = $value['collection'];
+        if($value['collection'] != ''){
+          $allRingFilter['collection'][str_replace(' ', '_', $value['collection'])] = $value['collection'];
+        }
         $allRingFilter['product_type'][str_replace(' ', '_', $value['product_type'])] = $value['product_type'];
         $allRingFilter['metal_color'][str_replace(' ', '_', $value['metal_color'])] = $value['metal_color'];
         $allRingFilter['karat'][str_replace(' ', '_', $value['karat'])] = $value['karat'];
