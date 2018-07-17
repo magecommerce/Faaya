@@ -108,7 +108,24 @@ class Faaya_Layernavigation_Block_Layernavigation extends Mage_Catalog_Block_Pro
       if($flag == false){
         $filterlist = 'select * from wizardmaster where construction =  "PRESET" AND collection != ""';
       }else{
-        $filterlist = 'select * from wizardmaster where construction =  "PRESET"';
+
+        $queryString = Mage::app()->getRequest()->getParam('q');
+
+        $whereArr = array();
+        $whereArr[] = 'description LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'variant_remark LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'stone_shape LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'metal_color LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'karat LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'metal_type LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'sub_category LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'gender LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'product_type LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'finish_type LIKE "%'.$queryString.'%"';
+
+        $whereArr = implode(" OR ", $whereArr);
+
+        $filterlist = 'select * from wizardmaster where construction =  "PRESET" and ('.$whereArr.')';
       }
 
       $filterlist = $this->_readConnection->fetchAll($filterlist);

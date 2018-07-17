@@ -17,6 +17,7 @@ $ringAttribute = array('metal_color','karat','sub_category'); ?>
 
     <div class="block-content toggle-content">
         <div id="narrow-by-list">
+        <?php if(count($ringfilter['total_dia_wt'])>0): ?>
         <div class="filter-options diamond_size">
           <div class="filter-label">
             <?php echo $this->__('Diamond Size');?>
@@ -32,6 +33,7 @@ $ringAttribute = array('metal_color','karat','sub_category'); ?>
              </ol>
           </div>
         </div>
+        <?php endif;?>
         <?php // Metal Color ?>
         <?php if(count($metalColor) > 0):?>
             <div class="filter-options metal">
@@ -151,3 +153,4 @@ $ringAttribute = array('metal_color','karat','sub_category'); ?>
         </div>
     </div>
   </div>
+  <div class="searchterm"><strong><?php echo $this->__('SEARCH RESULTS FOR ')."'".Mage::app()->getRequest()->getParam('q')."'";?></strong></div>
