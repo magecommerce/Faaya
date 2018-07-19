@@ -8,7 +8,7 @@ $ringSelected = $helper->getRingSelected();
 if($sku){
     $skufromId = Mage::getModel('catalog/product')->loadByAttribute('sku',$sku);
     //echo "<pre/>";print_r($skufromId->getId());exit;
-    if($skufromId){
+    if($skufromId && $skufromId->isSaleable()){
         if($ringSelected){
                 $ringSelected['productId'] = $skufromId->getId();
         }else{
@@ -17,6 +17,9 @@ if($sku){
         Mage::getSingleton('core/session')->setRingSelected(serialize($ringSelected));
         $ringSelected =  Mage::getSingleton('core/session')->getRingSelected();
         $ringSelected = unserialize($ringSelected);
+    } else {
+        $helper -> clearselection();
+        Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::app()->getStore()->getUrl('wizard'))->sendResponse();
     }
     //echo "<pre/>";print_r(unserialize(Mage::getSingleton('core/session')->getSelectedValue()));exit;
 }
@@ -31,6 +34,11 @@ $helper->getRedirect($pid,'wizard');
 $shape = $helper->getShapeValue($selected,$ringSelected);
 
 $product = $this->getProduct($pid);
+
+if(!$product->isSaleable()){
+    $helper -> clearselection();
+    Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::app()->getStore()->getUrl('wizard'))->sendResponse();
+}
 
 $gallery = $product->getMediaGallery();
 

@@ -13,11 +13,13 @@ class Cda_Wizard_Model_Productupdate extends Mage_Core_Model_Abstract
         $product = Mage::getModel('catalog/product')->loadByAttribute('sku',$sku);
         if($product){
             $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product);
-            $stockItem->setQty(1);
+            $stockItem->setQty(0);
             $stockItem->setData('use_config_manage_stock',0);
             $stockItem->setData('manage_stock',1);
             $stockItem->setData('is_in_stock',0);
             $stockItem->save();
+            Mage::getModel('catalog/product_status')->updateProductStatus($product->getId(), 1, Mage_Catalog_Model_Product_Status::STATUS_DISABLED);
+
             $updateEdit = "update wizardmaster set status=0 where sku='".$sku."' ";
             $this->_writeConnection->query($updateEdit);
         }

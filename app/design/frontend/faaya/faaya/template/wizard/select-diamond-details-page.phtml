@@ -14,7 +14,7 @@ $selected =  Mage::getSingleton('core/session')->getSelectedValue();
 
 if($sku){
     $skufromId = Mage::getModel('catalog/product')->loadByAttribute('sku',$sku);
-    if($skufromId){
+    if($skufromId && $skufromId->isSaleable()){
         if($selected != ''){
                 $selected = unserialize($selected);
                 $selected['productId'] = $skufromId->getId();
@@ -23,6 +23,9 @@ if($sku){
         }
         Mage::getSingleton('core/session')->setSelectedValue(serialize($selected));
         $selected =  Mage::getSingleton('core/session')->getSelectedValue();
+    } else {
+        $helper -> clearselection();
+        Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::app()->getStore()->getUrl('wizard'))->sendResponse();
     }
     //echo "<pre/>";print_r(unserialize(Mage::getSingleton('core/session')->getSelectedValue()));exit;
 }
@@ -40,6 +43,12 @@ if($prms || $looseDiamond){
 }
 
 $product = Mage::getModel('catalog/product')->load($pid);
+
+if(!$product->isSaleable()){
+    $helper -> clearselection();
+    Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::app()->getStore()->getUrl('wizard'))->sendResponse();
+}
+
 $product->load('media_gallery');
 /*  code for order date */
 $receiveDay =  $helper->getOrderDate($pid);
