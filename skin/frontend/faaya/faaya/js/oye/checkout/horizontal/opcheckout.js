@@ -370,7 +370,8 @@ Billing.prototype = {
         $('shipping:same_as_billing').checked = flag;
     },
 
-    save: function(){
+    save: function(param){
+        console.log(param);
         if (checkout.loadWaiting!=false) return;
 
         var validator = new Validation(this.form);
@@ -381,6 +382,19 @@ Billing.prototype = {
 //                $('billing:use_for_shipping').value=1;
 //            }
 
+            if(param == 'stop'){
+                this.onComplete = this.resetLoadWaitingWait.bindAsEventListener(this);
+                var request = new Ajax.Request(
+                    this.saveUrl,
+                    {
+                        method: 'post',
+                        onComplete: this.onComplete,
+                        onSuccess: checkout.gotoSection('billing'),
+                        onFailure: checkout.ajaxFailure.bind(checkout),
+                        parameters: Form.serialize(this.form)
+                    }
+                );
+            } else {
             var request = new Ajax.Request(
                 this.saveUrl,
                 {
@@ -391,12 +405,18 @@ Billing.prototype = {
                     parameters: Form.serialize(this.form)
                 }
             );
+            }
         }
     },
 
     resetLoadWaiting: function(transport){
         checkout.setLoadWaiting(false);
         document.body.fire('billing-request:completed', {transport: transport});
+    },
+    
+    resetLoadWaitingWait: function(transport){
+        checkout.setLoadWaiting(false);
+        //document.body.fire('billing-request:completed', {transport: transport});
     },
 
     /**
@@ -543,10 +563,10 @@ Shipping.prototype = {
     },
 
     save: function(){
-        if (checkout.loadWaiting!=false) return;
+        //if (checkout.loadWaiting!=false) return;
         var validator = new Validation(this.form);
         if (validator.validate()) {
-            checkout.setLoadWaiting('shipping');
+            checkout.setLoadWaiting('billing');
             var request = new Ajax.Request(
                 this.saveUrl,
                 {
