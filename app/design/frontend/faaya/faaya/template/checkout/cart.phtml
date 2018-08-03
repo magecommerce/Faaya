@@ -30,7 +30,7 @@
  *
  * @var $this Mage_Checkout_Block_Cart
  */
-
+$productTypelist = Mage::helper('wizard')->getProductTypeList();
 $errorMessage = Mage::getSingleton('core/session')->getExistDid();
 
 
@@ -77,9 +77,9 @@ ksort($itemArray);
 <?php $_priceDisplay = ($this->helper('tax')->displayCartBothPrices()) ? 'display-both-prices' : 'display-single-price'; ?>
 <div class="cart <?php echo $_priceDisplay; ?>">
     <div class="page-title title-buttons">
-          <?php if($this->getContinueShoppingUrl()): ?>
-                <button type="button" title="<?php echo $this->quoteEscape($this->__('Continue Shopping')) ?>" class="button2 btn-continue" onclick="setLocation('<?php echo Mage::helper('core')->quoteEscape($this->getContinueShoppingUrl()) ?>')"><span><span><?php echo $this->__('Continue Shopping') ?></span></span></button>
-            <?php endif; ?>
+          <?php //if($this->getContinueShoppingUrl()): ?>
+                <button type="button" title="<?php echo $this->quoteEscape($this->__('Continue Shopping')) ?>" class="button2 btn-continue" onclick="history.back(); return false;"><span><span><?php echo $this->__('Continue Shopping') ?></span></span></button>
+            <?php //endif; ?>
             <h1><?php echo $this->__('Your') ?> <strong><?php echo $this->__('Shopping Bag'); ?></strong></h1>
     </div>
     <?php echo $this->getMessagesBlock()->toHtml() ?>
@@ -103,7 +103,7 @@ ksort($itemArray);
 
                             $type = $_items[$itm]->getGroupType();
                             if($type == "sid"){
-                              $proType = $_items[$itm]->getProductcsType();
+                              $proType = strtolower($_items[$itm]->getProductcsType());
                             }
 
                             $orderDate = $_items[$itm]->getGroupOrderdate();
@@ -286,7 +286,7 @@ ksort($itemArray);
                                              </p>
                                              <?php endif; ?>
                                         </div>
-                                        <?php if(($ringSize && $proType == 'RING') || ($ringSize && $proType == 'Band')):?>
+                                        <?php if(($ringSize && $proType == $productTypelist['ring']) || ($ringSize && $proType == $productTypelist['band']) || ($ringSize && $proType == $productTypelist['promise'])):?>
                                           <?php $ringProduct = Mage::getModel('catalog/product')->load($ringId);?>
                                           <?php if($ringProduct->getId()): ?>
                                           <?php $availableSizes = Mage::getModel('wizard/wizardrelation')->getAvailbleSizes($ringProduct,false);?>

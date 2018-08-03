@@ -42,8 +42,9 @@ $description =  get_field('promise_description','option');
                     endif;
              ?>
             <div class="block">
+                <h3 class="visible-xs"><a href="<?php echo $cLink;?>"><?php echo $proposeTitle;?></a></h3>
                 <div class="image"><img src="<?php echo $image; ?>" alt="" /></div>
-                <h3><a href="<?php echo $cLink;?>"><?php echo $proposeTitle;?></a></h3>
+                <h3 class="hidden-xs"><a href="<?php echo $cLink;?>"><?php echo $proposeTitle;?></a></h3>
             </div>
         <?php endwhile; ?>
     </div>

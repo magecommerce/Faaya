@@ -10,7 +10,7 @@
 <?php if ($post): ?>
 	<?php $helper = $this->helper('wordpress') ?>
 	<?php $author = $post->getAuthor() ?>
-	
+
 	<div class="post-view">
 		<?php echo $this->getBeforePostContentHtml() ?>
 		<div class="post-entry entry std<?php if ($post->getFeaturedImage()): ?> post-entry-with-image<?php endif; ?>">
@@ -26,14 +26,13 @@
 				</div>
 				<div class="post-date desktop">
 					<div class="date"><?php echo $post->getPostDate() ?></div>
-					<div class="read-time">10 min read</div>
 				</div>
 				<div class="post-view-container">
 				<div class="post-title">
 					<h1><?php echo $this->escapeHtml($post->getPostTitle()) ?></h1>
 				</div>
 				<div class="category-name">
-					<?php 
+					<?php
 						$cate = wp_get_post_categories($post->getId());
 						if(!empty($cate)){
 							$catArg =  get_term_by('id', $cate[0], 'category');
@@ -43,7 +42,6 @@
 				</div>
 				<div class="post-date mobile">
 					<div class="date"><?php echo $post->getPostDate() ?></div>
-					<div class="read-time">10 min read</div>
 				</div>
 				<div class="author-name">
 					 By <span><?php echo $post->getAuthor()->getDisplayName() ?></span>

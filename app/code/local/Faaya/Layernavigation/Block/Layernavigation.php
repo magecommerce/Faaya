@@ -104,13 +104,37 @@ class Faaya_Layernavigation_Block_Layernavigation extends Mage_Catalog_Block_Pro
       return $allRingFilter;
     }
 
-    public function getCollectionfilter(){
-      $filterlist = 'select * from wizardmaster where construction =  "PRESET" AND collection != ""';
+    public function getCollectionfilter($flag=false){
+      if($flag == false){
+        $filterlist = 'select * from wizardmaster where construction =  "PRESET" AND collection != ""';
+      }else{
+
+        $queryString = Mage::app()->getRequest()->getParam('q');
+
+        $whereArr = array();
+        $whereArr[] = 'description LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'variant_remark LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'stone_shape LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'metal_color LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'karat LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'metal_type LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'sub_category LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'gender LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'product_type LIKE "%'.$queryString.'%"';
+        $whereArr[] = 'finish_type LIKE "%'.$queryString.'%"';
+
+        $whereArr = implode(" OR ", $whereArr);
+
+        $filterlist = 'select * from wizardmaster where construction =  "PRESET" and ('.$whereArr.')';
+      }
+
       $filterlist = $this->_readConnection->fetchAll($filterlist);
       $allRingFilter = array();
 
       foreach ($filterlist as $value) {
-        $allRingFilter['collection'][str_replace(' ', '_', $value['collection'])] = $value['collection'];
+        if($value['collection'] != ''){
+          $allRingFilter['collection'][str_replace(' ', '_', $value['collection'])] = $value['collection'];
+        }
         $allRingFilter['product_type'][str_replace(' ', '_', $value['product_type'])] = $value['product_type'];
         $allRingFilter['metal_color'][str_replace(' ', '_', $value['metal_color'])] = $value['metal_color'];
         $allRingFilter['karat'][str_replace(' ', '_', $value['karat'])] = $value['karat'];

@@ -1,54 +1,5 @@
 
 function VideoControls(){
-    //return a DOM object
-    /*var video = document.getElementById('video'); //or
-    var video = jQuery('video').get(0); //or
-    var video = jQuery('video')[0];*/
-   /* jQuery(".video-box").each(function(){
-       var video = jQuery('video');
-      //Play/Pause control clicked
-      jQuery('.btnPlay').on('click', function() {
-          if(jQuery('.btnPlay').parents('.video-box').children('video')[0].paused) {
-            alert('if');
-              video[0].play();
-              jQuery('.btnPlay').addClass('pause');
-          }
-          else {
-            alert('elase');
-              video[0].pause();
-              jQuery('.btnPlay').removeClass('pause');
-          }
-          return false;
-      });
-      //Mute/Unmute control clicked
-      jQuery('.muted').click(function() {
-          video[0].muted = !video[0].muted;
-          jQuery(this).toggleClass('mute');
-      });
-    });*/
-
-        jQuery(function(){
-           /* var video = jQuery('video');
-            jQuery(".btnPlay").click(function() {
-                if(video[0].paused) {
-                      console.log('paused');
-                      video[0].play();
-                      jQuery('.btnPlay').addClass('pause');
-                  }
-                  else {
-                      console.log('play');
-                      video[0].pause();
-                      jQuery('.btnPlay').removeClass('pause');
-                  }
-                   return false;
-            });
-            jQuery('.muted').click(function() {
-                  video[0].muted = !video[0].muted;
-                  jQuery(this).toggleClass('mute');
-                  console.log(video[0].muted);
-              });*/
-        });
-
          jQuery(function(){
             jQuery( ".btnPlay" ).each(function(index) {
                 var video = jQuery(this).parents('.video-box').children('video');
@@ -73,12 +24,9 @@ function VideoControls(){
                    jQuery(this).toggleClass('mute');
                    console.log(video[0].muted);
                  });
-            });    
-
+            });
 
         });
-
-
 
 }
 
@@ -90,15 +38,10 @@ jQuery(document).ready(function () {
         var offsetTable = jQuery('.list-table').offset().top
     }
     var TableheaderHeight = jQuery('.page-header').outerHeight();
-    /*var evenWidth = jQuery(".wizard .tabs ul").width()/jQuery(".wizard .tabs ul li").size();
-    jQuery(".wizard .tabs ul li").css("width", evenWidth-10);*/
+
     jQuery("#tablesortby").change(function () {
        jQuery(".diamond-list-table").find("th."+jQuery(this).val()).trigger("click");
     });
-    /*jQuery(document).click(function (event){
-        jQuery('.tooltip-content.open').removeClass('open');
-        event.stopPropagation();
-    })*/
 
     //var tabLen = jQuery('.tabs li').length;
     if(jQuery('.tabs li').length > 3){
@@ -146,9 +89,6 @@ jQuery(document).ready(function () {
           }
         });
       }
-
-
-
 
 
     jQuery('.tooltip-image').on('click', function (event) {
@@ -211,10 +151,6 @@ jQuery(document).ready(function () {
     });
 
 
-   /* jQuery(document).on('click', '.selected.existrow',function () {
-        return false;
-    });
-*/
     jQuery('.change-image').change(function() {
         jQuery('.tooltip-multiimage img').hide();
         jQuery('.tooltip-multitext p').hide();
@@ -225,11 +161,7 @@ jQuery(document).ready(function () {
         return false;
     });
 
-    // jQuery("[data-fancybox]").fancybox({
-    //     afterShow: function (instance, slide) {
-    //         popupSlider()
-    //     }
-    // });
+
 
     viewSlider();
 
@@ -241,9 +173,7 @@ jQuery(document).ready(function () {
     var compareCount = [];
 
     jQuery(document).on('click', '.compare-icon', function () {
-        /*if(jQuery('.diamond-list-table tbody tr').hasClass('existrow') == true){
-            removeCompare();
-        }*/
+
         if(jQuery(this).parents('tr').hasClass('existrow')){
             return false;
         }
@@ -287,12 +217,12 @@ jQuery(document).ready(function () {
 
     jQuery('#reset-btn').click(function () {
         jQuery(".custom-options ul li input:checkbox").removeAttr("checked");
-        jQuery('.price-range').slider("values", 0, 0.25);
+        jQuery('.price-range').slider("values", 0, 0.2);
         jQuery('.price-range').slider("values", 1, 6);
         jQuery('.range-slider').siblings('.carat-content').find('input[id="max-carat"]').val(6);
-        jQuery('.range-slider').siblings('.carat-content').find('input[id="min-carat"]').val(0.25);
+        jQuery('.range-slider').siblings('.carat-content').find('input[id="min-carat"]').val(0.2);
         jQuery('#max-carat').val(6);
-        jQuery('#min-carat').val(0.25);
+        jQuery('#min-carat').val(0.2);
 
         jQuery( "#depth-mm-slider" ).slider("values", 0, jQuery( "#depth-mm-slider" ).slider("option", "min"));
         jQuery( "#min-depth_mm").val(jQuery( "#depth-mm-slider" ).slider("option", "min")+'%');
@@ -331,7 +261,7 @@ jQuery(document).ready(function () {
             min: 0,
             max: 6,
             range: true,
-            values: [0.25, 6],
+            values: [0.2, 6],
             step:0.1,
             orientation: "vertical",
 /*            create: attachSlider,*/
@@ -473,26 +403,10 @@ jQuery(document).ready(function () {
         jQuery('.ring-size-block-select').removeClass('open');
     });
 
-
-    // var selectedVal = jQuery( ".ring-size-block-select .size-dropdown li.selected a" ).text();
-    // var currentVal = jQuery( ".ring-size-block-select .selected-value > span" ).text();
-    // jQuery('.ring-size-block-select .size-dropdown li').on('click','a',function(){
-    //     console.log(selectedVal + ' ' + 'selected');
-    //     console.log(currentVal + ' ' + 'current');
-
-    // });
-
-
     jQuery('[data-fancybox="wizard-slider"]').fancybox({
         // Options will go here
          baseClass: "zoom-fancybox",
     });
-
-
-   
-
-
-
 
 });
 
@@ -519,9 +433,9 @@ jQuery(window).load(function () {
     },200)
 
     var liselect = jQuery(".size-dropdown > li.selected").text();
-    jQuery(".selected-value > span").text(liselect); 
+    jQuery(".selected-value > span").text(liselect);
     jQuery(".size-dropdown > li").click(function() {
-       jQuery(".selected-value > span").text(jQuery(this).text()); 
+       jQuery(".selected-value > span").text(jQuery(this).text());
     });
 
 });
@@ -532,7 +446,7 @@ jQuery(window).resize(function () {
         var offsetTable = jQuery('.list-table').offset().top
         console.log('resize');
     }
-    var TableheaderHeight = jQuery('.page-header').outerHeight();   
+    var TableheaderHeight = jQuery('.page-header').outerHeight();
 
     itemEquealHeight();
     tableHeaderSticky();
@@ -550,12 +464,7 @@ jQuery(window).resize(function () {
         },100);
 
     }
-
-
-        itemEquealHeight();
-
-
-
+    itemEquealHeight();
 });
 
 /***
@@ -628,7 +537,7 @@ function popupSlider() {
 }
 
 function viewSlider() {
-   
+
     jQuery('.viewcomplete-image').each(function(key, item) {
 
       var sliderIdName = 'viewcomplete-image' + key;
@@ -739,13 +648,7 @@ function onReady(adataSet)
     initComplete: function () {
             this.api().columns('.heading').every(function (index) {
                 var column = this;
-                /*var select = jQuery('<select class="selectpicker"><option value="">'+columnOrder[index].sTitle+'</option></select>').appendTo(jQuery(column.header()).empty()).on('change', function () {
-                    var val = jQuery.fn.dataTable.util.escapeRegex(jQuery(this).val());
-                    column.search(val ? '^' + val + 'jQuery' : '', true, false).draw();
-                });*/
-                /*column.data().unique().sort().each(function (d, j) {
-                    select.append('<option value="' + d + '">' + d + '</option>')
-                });*/
+
             });
         },
     "rowCallback": function (row, data) {
@@ -818,7 +721,7 @@ function updateRows(){
             if(jQuery.inArray( "selected", className.split(" ")) >= 0){
                 jQuery(this).addClass('existrow');
                 jQuery('.diamond-list-table tbody tr').eq(index).insertBefore(jQuery('.diamond-list-table tbody tr').eq(cnt));
-               
+
                 if(selLength == cnt+1){
                     jQuery('.diamond-list-table tbody tr').eq(cnt).addClass('comparelast');
                 }

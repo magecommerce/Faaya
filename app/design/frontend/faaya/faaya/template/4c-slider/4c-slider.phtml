@@ -31,20 +31,34 @@ $centerTabRightImage = get_field('center_tab_right_image' ,'option');
         <div id="clarity" class="tab-content">
             <p class="main-description"><?php echo $clarityText ?></p>
             <div id="clarity">
-
-               <carousel-3d :controls-visible="true" display="8" :inverse-scaling="0" :width="210" :height="400" :perspective="0" :startIndex="1">
-                <?php $j=0;foreach($claritySlider as $clarity):
-                        $clarityTitle = $clarity['clarity_title'];
-                        $clarityImage = $clarity['clarity_image'];?>
-                    <slide :index="<?php echo $j;?>">
-                  <figure>
-                    <img src="<?php echo $clarityImage['url'];?>">
-                  </figure>
-                     <figcaption><?php echo $clarityTitle;?></figcaption>
-                    </slide>
-                  <?php $j++;endforeach;?>
-               </carousel-3d>
-
+                <div class="hidden-xs">    
+                <carousel-3d :controls-visible="true" display="8" :inverse-scaling="0" :width="210" :height="400" :perspective="0" :startIndex="1">
+                    <?php $j=0;foreach($claritySlider as $clarity):
+                            $clarityTitle = $clarity['clarity_title'];
+                            $clarityImage = $clarity['clarity_image'];?>
+                        <slide :index="<?php echo $j;?>">
+                    <figure>
+                        <img src="<?php echo $clarityImage['url'];?>">
+                    </figure>
+                        <figcaption><?php echo $clarityTitle;?></figcaption>
+                        </slide>
+                    <?php $j++;endforeach;?>
+                </carousel-3d>
+                </div>
+                <div class="visible-xs">
+                    <carousel-3d :controls-visible="true" display="8" :inverse-scaling="0" :width="140" :height="200" :perspective="0" :startIndex="1">
+                    <?php $j=0;foreach($claritySlider as $clarity):
+                            $clarityTitle = $clarity['clarity_title'];
+                            $clarityImage = $clarity['clarity_image'];?>
+                        <slide :index="<?php echo $j;?>">
+                    <figure>
+                        <img src="<?php echo $clarityImage['url'];?>">
+                    </figure>
+                        <figcaption><?php echo $clarityTitle;?></figcaption>
+                        </slide>
+                    <?php $j++;endforeach;?>
+                </carousel-3d>
+               </div>                
 
 
             </div>
@@ -100,18 +114,35 @@ $centerTabRightImage = get_field('center_tab_right_image' ,'option');
             </p>  
             <div id="color">
 
-              <carousel-3d :controls-visible="true" display="7" :inverse-scaling="0" :width="210" :height="450" :perspective="0">
-               <?php $i=0;foreach($colorSlider as $color):
-                        $colorTitle = $color['color_title'];
-                        $colorImage = $color['color_image'];?>
-                <slide :index="<?php echo $i;?>">
-                  <figure>
-                    <img src="<?php echo $colorImage['url']; ?>">
-                  </figure>
-                  <figcaption><?php echo $colorTitle;?></figcaption>
-                </slide>
-                 <?php $i++;endforeach;?>
-              </carousel-3d>
+              <div class="hidden-xs">
+                <carousel-3d :controls-visible="true" display="7" :inverse-scaling="0" :width="210" :height="450" :perspective="0">
+                <?php $i=0;foreach($colorSlider as $color):
+                            $colorTitle = $color['color_title'];
+                            $colorImage = $color['color_image'];?>
+                    <slide :index="<?php echo $i;?>">
+                    <figure>
+                        <img src="<?php echo $colorImage['url']; ?>">
+                    </figure>
+                    <figcaption><?php echo $colorTitle;?></figcaption>
+                    </slide>
+                    <?php $i++;endforeach;?>
+                </carousel-3d>
+               </div>
+              
+              <div class="visible-xs">
+                <carousel-3d :controls-visible="true" display="7" :inverse-scaling="0" :width="140" :height="200" :perspective="0">
+                <?php $i=0;foreach($colorSlider as $color):
+                            $colorTitle = $color['color_title'];
+                            $colorImage = $color['color_image'];?>
+                    <slide :index="<?php echo $i;?>">
+                    <figure>
+                        <img src="<?php echo $colorImage['url']; ?>">
+                    </figure>
+                    <figcaption><?php echo $colorTitle;?></figcaption>
+                    </slide>
+                    <?php $i++;endforeach;?>
+                </carousel-3d>
+              </div>
 
             </div>
             <a href="<?php echo Mage::getUrl('loose-diamonds'); ?>" class="readmore"><?php echo $this->__('Explore our Diamonds');?></a> </div>

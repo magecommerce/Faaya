@@ -368,8 +368,9 @@ $grandTotal = $quoteData['grand_total'];
             var billingForm = new VarienForm('co-billing-form', true);
             var shippingForm = new VarienForm('co-shipping-form', true);
             if ((billingForm.validator && billingForm.validator.validate()) && (shippingForm.validator && shippingForm.validator.validate())){
-                billing.save();
-                setTimeout(function(){ shipping.save(); }, 4000);
+                billing.save('stop');
+                shipping.save();
+                console.log('Different');
                 setTimeout(function(){ jQuery(".payment-btn").removeAttr('disabled');jQuery(".loading").hide();} , 8000);
              }
         }

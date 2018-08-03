@@ -1,4 +1,5 @@
  <?php
+    $productTypelist = Mage::helper('wizard')->getProductTypeList();
    $_helper = $this->helper('catalog/output');
    $editid = ($this->getRequest()->getParam('editid'))?$this->getRequest()->getParam('editid'):0;
    $currentCategory = Mage::registry('current_category');
@@ -22,30 +23,30 @@
 
     <div class="block block-layered-nav block-layered-nav--no-filters sticky-category-filter">
 
-   <?php  switch ($catName) {
-            case "Ring":
+   <?php  switch (strtolower($catName)) {
+            case $productTypelist['ring']:
                 echo $ringSort = $this->getLayout()->createBlock('catalog/product')->setTemplate('catalog/product/sort/ringupdate.phtml')->toHtml();
                 break;
-            case "Earring":
+            case $productTypelist['earring']:
                 echo $earringsSort = $this->getLayout()->createBlock('catalog/product')->setTemplate('catalog/product/sort/earrings.phtml')->toHtml();
                 break;
-            case "Pendant":
+            case $productTypelist['pendant']:
                 echo $pendentsSort = $this->getLayout()->createBlock('catalog/product')->setTemplate('catalog/product/sort/pendantupdate.phtml')->toHtml();
                 break;
-            case "Bracelets":
+            case $productTypelist['bracelet']:
                 echo $braceletSort = $this->getLayout()->createBlock('catalog/product')->setTemplate('catalog/product/sort/bracelet.phtml')->toHtml();
                 break;
-            case "Band":
+            case $productTypelist['band']:
                 echo $braceletSort = $this->getLayout()->createBlock('catalog/product')->setTemplate('catalog/product/sort/band.phtml')->toHtml();
                 break;
-            case "Collection":
+            case "collection":
                 echo $collectionSort = $this->getLayout()->createBlock('catalog/product')->setTemplate('catalog/product/sort/collection.phtml')->toHtml();
                 break;
             default:
                 echo $ringSort = $this->getLayout()->createBlock('catalog/product')->setTemplate('catalog/product/sort/ring.phtml')->toHtml();
     }?>
 </div>
-<?php if($catName == 'Ring'){
+<?php if($catName == 'Rings'){
     $_productCollection = array();
 }?>
 <?php if($totalRecord <= 0): ?>
@@ -186,7 +187,7 @@
                    elem.parents('.mainlist').find('.regular-price').find('.price').text(varianthtml.price);
                    elem.parents('.mainlist').find('.four-c-content').html(varianthtml.diahtml);
                     elem.parents('.mainlist').find('.styleid').val(response.styleid);
-                    elem.parents('.mainlist').find('.desc').text(varianthtml.variant_name);
+                    //elem.parents('.mainlist').find('.desc').text(varianthtml.variant_name);
                     elem.parents('.mainlist').find('.metal-options').find('.options').find('ul').html(response.html);
                     elem.parents('.mainlist').find('.button-proceed').find('a').attr('href',varianthtml.url);
                     elem.parents('.mainlist').find('.product-image').attr('href',varianthtml.url);
@@ -208,7 +209,7 @@
                     elem.parents('.mainlist').find('.regular-price').find('.price').text(varianthtml.price);
                     elem.parents('.mainlist').find('.four-c-content').html(varianthtml.diahtml);
                     elem.parents('.mainlist').find('.styleid').val(response.styleid);
-                    elem.parents('.mainlist').find('.desc').text(varianthtml.variant_name);
+                    //elem.parents('.mainlist').find('.desc').text(varianthtml.variant_name);
                     elem.parents('.mainlist').find('.metal-options').find('.options').find('ul').html(response.html);
                     elem.parents('.mainlist').find('.button-proceed').find('a').attr('href',varianthtml.url);
                     elem.parents('.mainlist').find('.product-image').attr('href',varianthtml.url);
@@ -248,7 +249,7 @@
                     elem.parents('.mainlist').find('.link-wishlist').attr('href',response.wishlist);
                     elem.parents('.mainlist').find('.regular-price').find('.price').text(response.price);
                     elem.parents('.mainlist').find('.styleid').val(pid);
-                    elem.parents('.mainlist').find('.desc').text(response.variant_name);
+                    //elem.parents('.mainlist').find('.desc').text(response.variant_name);
                     elem.parents('.mainlist').find('.button-proceed').find('a').attr('href',response.url);
                     elem.parents('.mainlist').find('.four-c-content').html(response.diahtml);
                     elem.parents('.mainlist').find('.product-image').attr('href',response.url);
@@ -268,7 +269,7 @@
                     elem.parents('.mainlist').find('.link-wishlist').attr('href',response.wishlist);
                     elem.parents('.mainlist').find('.regular-price').find('.price').text(response.price);
                     elem.parents('.mainlist').find('.styleid').val(pid);
-                    elem.parents('.mainlist').find('.desc').text(response.variant_name);
+                    //elem.parents('.mainlist').find('.desc').text(response.variant_name);
                     elem.parents('.mainlist').find('.button-proceed').find('a').attr('href',response.url);
                     elem.parents('.mainlist').find('.four-c-content').html(response.diahtml);
                     elem.parents('.mainlist').find('.product-image').attr('href',response.url);

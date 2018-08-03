@@ -29,6 +29,8 @@
             </action>
         </reference>
         <reference name="head">
+            <action method="setTitle" translate="title"><title>Select Diamond - Start with a diamond | Faaya Grown Diamonds</title></action>
+            <action method="setDescription" translate="description"><description>Pick a diamond shape - round, princess, oval &amp; more. Go on to choose cut, clarity and then the color. Follow simple steps to make the perfect ring for yourself.</description></action>
          </reference>
         <reference name="content">
             <block type="wizard/index" name="wizard" template="wizard/selectdiamond.phtml" />
@@ -68,6 +70,8 @@
             </action>
         </reference>
         <reference name="head">
+            <action method="setTitle" translate="title"><title>Select Style - Start with ring setting | Faaya Grown Diamonds</title></action>
+            <action method="setDescription" translate="description"><description>Choose a setting - solitaire, halo, 3 stone, trellis and vintage. Go on to select a shape - round, princess, oval and more. Finally select a metal color.</description></action>
          </reference>
         <reference name="content">
             <block type="wizard/ring" name="wizard" template="wizard/select-setting-page.phtml" />
@@ -152,5 +156,14 @@
             <block type="wizard/product" name="promisecomplete" template="wizard/view-completed-set.phtml" />
         </reference>
     </wizard_completedset_index>
+
+    <wizard_search_index>
+        <reference name="root">
+            <action method="setTemplate"><template>page/1column.phtml</template></action>
+        </reference>
+        <reference name="content">
+            <block type="wizard/search" name="promisecomplete" template="catalog/product/catalogsearch.phtml" />
+        </reference>
+    </wizard_search_index>
 </layout>
 

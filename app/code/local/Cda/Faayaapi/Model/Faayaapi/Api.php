@@ -126,9 +126,9 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                     $this->_webCategories[$firstData["SMRY_ID"]][]  = array('name'=>strtolower("jewelry"),'path'=>trim(strtolower("Other")));
                 }
             }
-            if($firstData["COLLECTION"] != "" && $firstData["COLLECTION"] !="NA"){
+            /*if($firstData["COLLECTION"] != "" && $firstData["COLLECTION"] !="NA"){
                 $this->_webCategories[$firstData["SMRY_ID"]][]  = array('name'=>strtolower("Collection"),'path'=> "Collection"."/". trim(strtolower($firstData["COLLECTION"])));
-            }
+            }*/
             /*if($firstData['SMRY_ITEM_TYPE']=='DIAMOND'){*/
             if($firstData['SMRY_ITEM_TYPE']=='DIAMOND'){
                 $this->_allcsvsku[] = $firstData["STOCK_CODE"];
@@ -477,6 +477,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
             $simProduct = Mage::getModel("catalog/product");
             $simProduct->setName($itemName);
             $simProduct->setSku($productSku);
+            $simProduct->setUrlKey(str_replace(" ", "_",strtolower($itemName)).'-'.$productSku);
             $simProduct->setTypeId('simple');
             $simProduct->setAttributeSetId(4);     // Default
             $simProduct->setWebsiteIds(array(Mage::app()->getStore(true)->getWebsite()->getId()));
@@ -654,11 +655,11 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                                     }
 
                                if(file_exists($isFileExist)) {
-                                    $filepath = "media" . DS . "styleimages" . DS . $name;
+                                    $filepath = Mage::getBaseDir('media') . DS . "styleimages" . DS . $name;
                                     if ($image['IMAGE_TYPE'] == "CATALOGUE") {
                                         $simProduct->addImageToMediaGallery($filepath, $mediaAttribute, false, false);
                                     } else {
-                                        $simProduct->addImageToMediaGallery($filepath, array(), false, false);
+                                        $simProduct->addImageToMediaGallery($filepath, null, false, false);
                                     }
                                 }
 
@@ -678,7 +679,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                              if($ext !="mp4" && $ext !="tif"){
                                 $isFileExist = Mage::getBaseDir('media').DS.'diamondimages'.DS . $name;
                                if(file_exists($isFileExist)) {
-                                    $filepath = "media" . DS . "diamondimages" . DS . $name;
+                                    $filepath = Mage::getBaseDir('media') . DS . "diamondimages" . DS . $name;
                                     $simProduct->addImageToMediaGallery($filepath, $mediaAttribute, false, false);
                                 }
                             }
@@ -741,6 +742,10 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
     //protected function inserWidzetRelation($simProduct,$childAttribute,$sku){
     protected function inserWidzetRelation($simProduct,$childAttribute){
         $productId = $simProduct->getId();
+        /*$realationModel= Mage::getModel('wizard/wizardrelation')->getCollection()->addFieldToFilter('pid', $productId);
+        foreach ($realationModel as $item) {
+            $item->delete();
+        }*/
         $smryId =  $simProduct->getSmryId();
         $wigzetRelation = Mage::getModel("wizard/wizardrelation");
         $data = array();
@@ -865,6 +870,13 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
         $proCollection = $childAttribute['COLLECTION'];
 
 
+        $stockCode = $childAttribute['STOCK_CODE'];
+        $description = $childAttribute['DESCRIPTION'];
+        $gender = $childAttribute['GENDER'];
+        $finishType = $childAttribute['FINISH_TYPE'];
+        $certificateNo = $childAttribute['CERTIFICATE_NO'];
+
+
         if(count($sizes) > 0){
             foreach($sizes as $size){
                $availableSize .=  $size['PRODUCT_SIZE_ID'].":".$size['PRODUCT_SIZE'].',';
@@ -955,6 +967,12 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
             $data['depth_per'] = $depthPer;
             $data['status'] = 1;
             $data['collection'] = $proCollection;
+
+            $data['stock_code'] = $stockCode;
+            $data['description'] = $description;
+            $data['gender'] = $gender;
+            $data['finish_type'] = $finishType;
+            $data['certificate_no'] = $certificateNo;
 
             $dbConnection = $this->_getConnection('core_write');
             $setString = array();
@@ -1049,6 +1067,12 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
         $depthPer = $childAttribute['DEPTH_PER'];
         $proCollection = $childAttribute['COLLECTION'];
 
+        $stockCode = $childAttribute['STOCK_CODE'];
+        $description = $childAttribute['DESCRIPTION'];
+        $gender = $childAttribute['GENDER'];
+        $finishType = $childAttribute['FINISH_TYPE'];
+        $certificateNo = $childAttribute['CERTIFICATE_NO'];
+
 
         if(count($sizes) > 0){
             foreach($sizes as $size){
@@ -1085,7 +1109,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                 }
             }
         }
-
+        Mage::getModel('wizard/wizardmaster')->load($productId,'pid')->delete();
        $wigzetMaster = Mage::getModel("wizard/wizardmaster");
        $data = array();
         try{
@@ -1139,6 +1163,13 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
             $data['depth_per'] = $depthPer;
             $data['status'] = 1;
             $data['collection'] = $proCollection;
+
+            $data['stock_code'] = $stockCode;
+            $data['description'] = $description;
+            $data['gender'] = $gender;
+            $data['finish_type'] = $finishType;
+            $data['certificate_no'] = $certificateNo;
+
 
             $wigzetMaster->setData($data)->save();
             if(isset($sizes)){
@@ -1234,12 +1265,19 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
         }
     }
     protected function _removeProductImage($_product){
-        $mediaApi = Mage::getModel("catalog/product_attribute_media_api");
+        $query = "select *  FROM `catalog_product_entity_media_gallery` where entity_id = '".$_product->getId()."'";
+        $alldata = Mage::getSingleton('core/resource')->getConnection('core_read')->fetchAll($query);
+        foreach ($alldata as $item) {
+            @unlink(Mage::getBaseDir('media') . DS.'catalog'.DS.'product'.DS . $item['value']);
+        }
+        $q = "DELETE FROM `catalog_product_entity_media_gallery` where entity_id = '".$_product->getId()."'";
+        Mage::getSingleton('core/resource')->getConnection('core_write')->query($q);
+      /*$mediaApi = Mage::getModel("catalog/product_attribute_media_api");
         $mediaApiItems = $mediaApi->items($_product->getId());
         foreach($mediaApiItems as $item) {
             $datatemp=$mediaApi->remove($_product->getId(), $item['file']);
             @unlink(Mage::getBaseDir('media') . DS.'catalog'.DS.'product'.DS . $item['file']);
-        }
+        }*/
     }
     public function importCategories(){
         $categories = array();
@@ -1458,6 +1496,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
 
                 $simProduct->setName($itemName);
                 $simProduct->setSku($productSku);
+                $simProduct->setUrlKey(str_replace(" ", "_",strtolower($itemName)).'-'.$productSku);
                 $simProduct->setTypeId('simple');
                 $simProduct->setAttributeSetId(4);     // Default
                 $simProduct->setWebsiteIds(array(Mage::app()->getStore(true)->getWebsite()->getId()));
@@ -1638,11 +1677,11 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                                         $isFileExist = Mage::getBaseDir('media').DS.'styleimages'.DS . $name;
                                     }
                                if(file_exists($isFileExist)) {
-                                    $filepath = "media" . DS . "styleimages" . DS . $name;
+                                    $filepath = Mage::getBaseDir('media') . DS . "styleimages" . DS . $name;
                                     if ($image['IMAGE_TYPE'] == "CATALOGUE") {
                                         $simProduct->addImageToMediaGallery($filepath, $mediaAttribute, false, false);
                                     } else {
-                                        $simProduct->addImageToMediaGallery($filepath, array(), false, false);
+                                        $simProduct->addImageToMediaGallery($filepath, null, false, false);
                                     }
                                 }
                             }elseif ($ext =="mp4"){
@@ -1661,7 +1700,7 @@ class Cda_Faayaapi_Model_Faayaapi_Api extends Mage_Api_Model_Resource_Abstract
                              if($ext !="mp4"  && $ext !="tif"){
                                 $isFileExist = Mage::getBaseDir('media').DS.'diamondimages'.DS . $name;
                                if(file_exists($isFileExist)) {
-                                    $filepath = "media" . DS . "diamondimages" . DS . $name;
+                                    $filepath = Mage::getBaseDir('media') . DS . "diamondimages" . DS . $name;
                                     $simProduct->addImageToMediaGallery($filepath, $mediaAttribute, false, false);
                                 }
                             }

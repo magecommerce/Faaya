@@ -89,7 +89,7 @@ if($editid){
 
 
 ?>
-<form method="POST" action="<?php echo $actionurl;?>">
+<form method="POST" action="<?php echo $actionurl;?>" id="promiseform" name="promiseform">
 <section class="main-content view-page">
         <div class="tabs">
             <ul>
@@ -219,8 +219,8 @@ if($editid){
                 </div>
             </div>
             <div class="col-sm-6 pull-right blocks-navs blocks-navs-btns">
-
-                 <input class="link next-links proceed btn" type="submit"  name="submit" value="<?php echo $this->__('Add promise ring');?>">
+                <button class="link next-links proceed btn addpromise"><?php echo $this->__('Add promise ring');?></button>
+                <span id="errormessage" style="display: none;"><i class="fa fa-warning"></i> <?php echo $this->__('Please select ring size');?></span>
                  <?php if(!$promiseStart){ ?>
                  <a href="<?php echo $proceedUrl;?>" class="link next-links proceed btn"><?php echo $this->__('Checkout with diamond'); ?></a>
                  <?php } ?>
@@ -297,22 +297,12 @@ if($editid){
                                             <input type="radio" id="Baskerville" class="radio" name="fonts-family" checked="checked" value="Libre Baskerville">
                                             <label style="font-family: 'Libre Baskerville' !important;" for="Baskerville">Aa</label>
                                         </li>
-                                        <!-- <li>
-                                            <input type="radio" class="radio" id="Impact" name="fonts-family" value="Impact">
-                                            <label style="font-family:'Impact'!important;" for="Impact">Aa</label>
-                                        </li>
-                                        <li>
-                                            <input type="radio" class="radio" id="Comic Sans MS" name="fonts-family" value="Comic Sans MS">
-                                            <label style="font-family:'Comic Sans MS'!important;" for="Comic Sans MS">Aa</label>
-                                        </li> -->
                                     </ul>
                                 </div>
                                 <div class="save-button-block">
                                     <button type="button" onclick="savetext()" class="button save-button">Save</button>
                                     <span id="rpmessage"></span>
                                 </div>
-
-
                             </div>
                         </div>
 
@@ -336,7 +326,7 @@ if($editid){
                                 <span class="selected-value"><span>6.0</span></span>
                                 <ul class="ring-size-radio size-dropdown">
                                     <?php foreach ($availableSizes as $key=>$value) { ?>
-                                        <?php $cls = ($ringsize == $value)?'checked="checked"':'';?>
+                                        <?php //$cls = ($ringsize == $value)?'checked="checked"':'';?>
                                         <li>
                                             <input type="radio" <?php echo $cls;?> class="radio" id="<?php echo number_format($value,1);?>" name="availblesize" value="<?php echo number_format($value,1);?>">
                                             <label for="<?php echo number_format($value,1);?>"><?php echo number_format($value,1);?></label>
@@ -450,6 +440,17 @@ if($editid){
                     type: "POST",
                     data: {pid:pid,size:ringsize}
                 })
+            })
+            jQuery('.addpromise').click(function(e){
+              if(jQuery('input[name="availblesize"]:checked').val() != undefined){
+                jQuery("#promiseform").submit();
+              }else{
+                jQuery('#errormessage').show();
+                setTimeout(function(){
+                  jQuery('#errormessage').hide();
+                },2000)
+                return false;
+              }
             })
         });
         function savetext(){

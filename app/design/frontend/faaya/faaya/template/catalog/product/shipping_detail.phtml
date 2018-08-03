@@ -3,52 +3,19 @@ $orderBy = Mage::getStoreConfig('wizard/wizard_group/wizard_orderby');
 $shippingVia = Mage::getStoreConfig('wizard/wizard_group/wizard_shippingvia');
 $_product =  Mage::registry('current_product');
 $receiveDay =  Mage::Helper('wizard')->getOrderDate($_product->getId());
-/*$resource = Mage::getSingleton('core/resource');
-$readConnection = $resource->getConnection('core_read');
-echo "server time" . date('Y-m-d h:i:s');
-echo "<br/>";
-date_default_timezone_set('Asia/kolkata');
-echo "local time" . date('Y-m-d h:i:s');
 
-echo $hour = date('H');
-echo $amPm = date('a');
-$orderTime = '3-b';
-if($hour >= 15){
-    $orderTime = '3-a';
-}
-$catIds = $_product->getCategoryIds();
-$catId = $catIds[0];
-$subCategory = $_product->getSubCategory();
-$query = 'SELECT * FROM customshipping where jewelery = '.$catId;
-$results = $readConnection->fetchAll($query);
-//echo '<pre>';
-//print_r($results);
-//echo $orderTime;
-$receiveDay = 0;
-foreach($results as $ship){
-    if($ship['jewelery_style'] == $subCategory && $ship['order_time'] == $orderTime){
-        $receiveDay =  Mage::Helper('wizard')->getShippingDate($ship['days']);
-        break;
-    }
-    elseif($ship['jewelery_style'] == $subCategory && $ship['order_time'] == ''){
-        $receiveDay =  Mage::Helper('wizard')->getShippingDate($ship['days']);
-        break;
-    }else{
-        $receiveDay =  Mage::Helper('wizard')->getShippingDate($receive);
-    }
-}*/
 ?>
 <div class="content">
     <div class="item">
         <table width="100%">
             <tr>
-                <td><?php echo $this->__('Dispatch by:');?></td>
-                <td><?php echo $orderBy; ?></td>
-            </tr>
-            <tr>
-                <td><?php echo $this->__('Receive on: ');?></td>
+                <td><?php echo $this->__('Dispatch on:');?></td>
                 <td><?php echo $receiveDay;?></td>
             </tr>
+            <?php /*?><tr>
+                <td><?php echo $this->__('Receive on: ');?></td>
+                <td><?php echo $orderBy; ?></td>
+            </tr><?php */?>
             <tr>
                 <td><?php echo $this->__('Free shipping via: ');?></td>
                 <td><?php echo $shippingVia;?></td>
@@ -63,7 +30,8 @@ foreach($results as $ship){
         <p>Diamond upgrade program</p>
         <p><small>Note: Prices and availability are subject to change without notice. View our terms and conditions for more information. Some limitations may apply to free returns. See our Return Policy for details.</small></p>
     </div>
-    <div class="item">
+    
+	<?php /* <div class="item">
         <p><strong>Financing Options</strong></p>
         <p> Flexible payment options available with FaayaCredit Card. <a href="#">Learn More</a></p>
         <ul>
@@ -72,5 +40,5 @@ foreach($results as $ship){
             <li>* 48 month financing available for orders of $4,000 or more.</li>
         </ul>
         <p>Subject to credit approval.</p>
-    </div>
+    </div> */ ?>
 </div>

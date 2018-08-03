@@ -9,74 +9,127 @@ class Cda_Latestblogpost_Block_Latestblogpost extends Fishpig_Wordpress_Block_Po
                  ->setOrderByPostDate('desc')
                  ->setPageSize(8)
                  ->load();
-        return  $collection;    
+        return  $collection;
     }
   public function getLatestBlogPostCollection(){
-     /* $collection = Mage::getResourceModel('wordpress/post_collection')
-                 ->addIsViewableFilter()
-                 ->addPostTypeFilter($this->getPostType())
-                 ->addFieldToFilter('post_type', array('eq' => 'post'))
-                 ->setOrderByPostDate('desc')
-                 ->setPageSize(6)
-                 ->load();
-        return  $collection;      */
-        /*$meta_query_args = array(
-            'relation' => 'OR', // Optional, defaults to "AND"
-            array(
-                'key'     => 'top_story',
-                'value'   => '1',
-                'compare' => '='
-            )
-        );
-        $meta_query = new WP_Meta_Query( $meta_query_args );
-        echo '<pre>';print_r($meta_query);exit;   */
-        $posts = Mage::getResourceModel('wordpress/post_collection')
-                ->addIsViewableFilter()
+        $catId = Mage::app()->getRequest()->getParam('id');
+        $catIdArray = $this->getPostByCategory($catId);
+
+                $posts = Mage::getResourceModel('wordpress/post_collection');
+                if(!empty($catIdArray)){
+                    $posts->addFieldToFilter('ID', array('in' => $catIdArray));
+                }
+                $posts->addIsViewableFilter()
                 ->addPostTypeFilter($this->getPostType())
                 ->addFieldToFilter('post_type', array('eq' => 'post'))
                 ->setOrderByPostDate('desc')
                 ->addMetaFieldToFilter('top_story', '1')
                  ->setPageSize(6)
                 ->load();
-                //echo '<pre>';print_r($posts->getData());
                 return $posts;
-    
+
     }
     public function getLatestTopPostCollection(){
-     $posts = Mage::getResourceModel('wordpress/post_collection')
-                ->addIsViewableFilter()
+    $catId = Mage::app()->getRequest()->getParam('id');
+    $catIdArray = $this->getPostByCategory($catId);
+     $posts = Mage::getResourceModel('wordpress/post_collection');
+                if(!empty($catIdArray)){
+                    $posts->addFieldToFilter('ID', array('in' => $catIdArray));
+                }
+                $posts->addIsViewableFilter()
                 ->addPostTypeFilter($this->getPostType())
                 ->addFieldToFilter('post_type', array('eq' => 'post'))
                 ->setOrderByPostDate('desc')
                 ->addMetaFieldToFilter('featured_top', '1')
                  ->setPageSize(1)
-                ->load();   
-                //echo '<pre>';print_r($posts->getData()); 
+                ->load();
+                //echo '<pre>';print_r($posts->getData());
                 return $posts;
     }
     public function getLatestBottomPostCollection(){
-      $posts = Mage::getResourceModel('wordpress/post_collection')
-                ->addIsViewableFilter()
+        $catId = Mage::app()->getRequest()->getParam('id');
+        $catIdArray = $this->getPostByCategory($catId);
+      $posts = Mage::getResourceModel('wordpress/post_collection');
+                if(!empty($catIdArray)){
+                    $posts->addFieldToFilter('ID', array('in' => $catIdArray));
+                }
+                $posts->addIsViewableFilter()
                 ->addPostTypeFilter($this->getPostType())
                 ->addFieldToFilter('post_type', array('eq' => 'post'))
                 ->setOrderByPostDate('desc')
                 ->addMetaFieldToFilter('featured_bottom', '1')
                  ->setPageSize(1)
-                ->load(); 
+                ->load();
                 return $posts;
-                //echo '<pre>';print_r($posts->getData());   
+                //echo '<pre>';print_r($posts->getData());
     }
     public function getAllTimeFavouritePostCollection(){
-      $posts = Mage::getResourceModel('wordpress/post_collection')
-                ->addIsViewableFilter()
+        $catId = Mage::app()->getRequest()->getParam('id');
+        $catIdArray = $this->getPostByCategory($catId);
+        $posts = Mage::getResourceModel('wordpress/post_collection');
+                if(!empty($catIdArray)){
+                    $posts->addFieldToFilter('ID', array('in' => $catIdArray));
+                }
+                $posts->addIsViewableFilter()
                 ->addPostTypeFilter($this->getPostType())
                 ->addFieldToFilter('post_type', array('eq' => 'post'))
                 ->setOrderByPostDate('desc')
                 ->addMetaFieldToFilter('all_time_favourite', '1')
                  ->setPageSize(8)
-                ->load();   
+                ->load();
                 return $posts;
-                //echo '<pre>';print_r($posts->getData());exit; 
+                //echo '<pre>';print_r($posts->getData());exit;
     }
-}  
-?>    
+
+    public function getPostByCategory($catId)
+    {
+        $catIdArray = array();
+        if($catId){
+            $getCatPosts = new WP_Query(
+                        array('post_type'=>'post',
+                              'posts_per_page' => -1,
+                               'tax_query' => array(
+                                                array(
+                                                    'taxonomy' => 'category',
+                                                    'field' => 'term_id',
+                                                    'terms' => $catId
+                                                    )
+                                                )
+                                )
+                        );
+            if($getCatPosts->have_posts()){
+                while($getCatPosts->have_posts()){ $getCatPosts->the_post();
+                    $catIdArray[] = get_the_ID();
+                }
+            }
+        }
+        return $catIdArray;
+
+    }
+
+    public function getRelatedPost()
+    {
+        $id = Mage::app()->getRequest()->getParam('id');
+
+        $terms = get_the_terms($id,'category');
+
+
+        $getCatPosts = new WP_Query(
+                        array('post_type'=>'post',
+                              'posts_per_page' => 3,
+                              'orderby' => 'date',
+                              'order' => 'DESC',
+                              'post__not_in' => array($id),
+                               'tax_query' => array(
+                                                array(
+                                                    'taxonomy' => 'category',
+                                                    'field' => 'term_id',
+                                                    'terms' => $terms[0]->term_id
+                                                    )
+                                                )
+                                )
+                        );
+            return $getCatPosts;
+    }
+}
+?>

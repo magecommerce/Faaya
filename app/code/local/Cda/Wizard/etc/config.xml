@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Cda_Wizard>
-            <version>1.0.23</version>
+            <version>1.0.26</version>
         </Cda_Wizard>
     </modules>
     <frontend>
@@ -31,6 +31,26 @@
         </layout>
     </frontend>
     <global>
+        <events>
+            <catalog_product_save_after>
+                <observers>
+                    <product_save_after_observer>
+                        <type>singleton</type>
+                        <class>Cda_Wizard_Model_Observer</class>
+                        <method>catalogProductSaveAfter</method>
+                    </product_save_after_observer>
+                </observers>
+            </catalog_product_save_after>
+            <catalog_product_delete_before>
+                <observers>
+                    <product_delete_after_observer>
+                        <type>singleton</type>
+                        <class>Cda_Wizard_Model_Observer</class>
+                        <method>catalogProductDeleteAfter</method>
+                    </product_delete_after_observer>
+                </observers>
+            </catalog_product_delete_before>
+        </events>
         <models>
             <wizard>
                 <class>Cda_Wizard_Model</class>

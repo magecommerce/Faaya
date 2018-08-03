@@ -103,7 +103,9 @@ foreach ($_productCollection as $_product): ?>
                 $product = Mage::getModel('catalog/product')->load($pid);
                 if ($this->helper('wishlist')->isAllow()) : ?>
                     <li>
-                        <a href="<?php echo $this->helper('wishlist')->getAddUrl($product) ?>" class="link-wishlist"></a>
+                        <a href="<?php echo $this->helper('wishlist')->getAddUrl($product) ?>" class="link-wishlist">
+                            <span class="tiptext">Wishlist</span>
+                        </a>
                     </li>
                 <?php endif; ?>
 

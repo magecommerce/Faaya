@@ -2,7 +2,7 @@
 class Cda_Wizard_Model_Observer extends Mage_Core_Model_Abstract {
     public function addtocartData($data,$ringData){
         //echo "<pre/>";print_r($data);exit;
-
+        $productTypelist = Mage::helper('wizard')->getProductTypeList();
         $resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
         $writeConnection = $resource->getConnection('core_write');
@@ -16,8 +16,8 @@ class Cda_Wizard_Model_Observer extends Mage_Core_Model_Abstract {
             $randomInt = strtotime("now");
         }
 
-
-        //$cart = Mage::getSingleton('checkout/cart');
+        //$cart = Mage::getModel('checkout/cart');
+        $cart = Mage::getSingleton('checkout/cart');
         $weddding = $diamondSet = array();
         $cnt = count($data);
         $promiseset =  false;
@@ -46,7 +46,6 @@ class Cda_Wizard_Model_Observer extends Mage_Core_Model_Abstract {
             $id = $item[0];
             $flag = $item[1];
             if($id){
-                $cart = Mage::getModel('checkout/cart');
                 $cart->init();
                 $subItem = Mage::getModel('catalog/product')->load($id);
                 $smryItemType = $subItem->getResource()->getAttribute('smry_item_type')->getFrontend()->getValue($subItem);
@@ -82,29 +81,27 @@ class Cda_Wizard_Model_Observer extends Mage_Core_Model_Abstract {
                     $options['group']['construction'] = $product['construction'];
                     $options['group']['product_type'] = $product['product_type'];
                     $productType = strtolower($product['product_type']);
-                    if($productType == "ring"){
+                    if($productType == $productTypelist['ring']){
                        $ring  = 'Carat : <strong>' . $product['karat']."</strong> | ".'Color : <strong>'.$product['metal_color']."</strong> | ".'Style : <strong>' .$product['sub_category'].'</strong>';
                        $options['group']['ring'] = $ring;
                     }
-                    elseif($productType == "pendant"){
+                    elseif($productType == $productTypelist['pendant']){
                        $pendent  = 'Carat : <strong>' . $product['karat']."</strong> | ".'Color : <strong>'.$product['metal_color']."</strong> | ".'Style : <strong>' .$product['sub_category'].'</strong>';
                        $options['group']['pendant'] = $pendent;
                     }
-                    elseif($productType == "earring"){
+                    elseif($productType == $productTypelist['earring']){
                         $earring  = 'Carat : <strong>' . $product['karat']."</strong> | ".'Color : <strong>'.$product['metal_color']."</strong> | ".'Style : <strong>' .$product['sub_category'].'</strong>';
                         $options['group']['earring'] = $earring;
                     }
-                    elseif($productType == "bracelets"){
+                    elseif($productType == $productTypelist['bracelet']){
                         $bracelets  = 'Carat : <strong>' . $product['karat']."</strong> | ".'Color : <strong>'.$product['metal_color']."</strong> | ".'Style : <strong>' .$product['sub_category'].'</strong>';
                         $options['group']['bracelets'] = $bracelets;
                     }
-                    elseif($productType == "diamond" && $key != "side1" && $key != "side2"){
-                        //$diamond  = $product['weight']." Carat"." ".$product['stone_color']." ".$product['stone_cut']." ".$product['stone_quality'];
-                        //$diamond  = 'Carat : ' . $product['weight']." |".' Color : '.$product['stone_color']." |".' Cut :'.$product['stone_cut']." |".' Clarity : '.$product['stone_quality'];
+                    elseif($productType == $productTypelist['diamond'] && $key != "side1" && $key != "side2"){
                         $diamond  = 'Carat :<strong> ' . $product['weight']." </strong>|".' Color : <strong>'.$product['stone_color']." </strong>|".' Cut :<strong>'.$product['stone_cut']."</strong> |".' Clarity : <strong>'.$product['stone_quality'].'</strong>';
                         $options['group']['diamond'] = $diamond;
                     }
-                    elseif($productType == "chain"){
+                    elseif($productType == $productTypelist['chain']){
                         $chain  = 'Length : <strong>' . $product['chain_length']."</strong> | ".'Type : <strong>'.$product['chain_type'].'</strong>';
                         $options['group']['chain_length'] = $product['chain_length'];
                         $options['group']['chain_type'] = $product['chain_type'];
@@ -122,7 +119,7 @@ class Cda_Wizard_Model_Observer extends Mage_Core_Model_Abstract {
                         $side2  = 'Carat : <strong>' . $product['karat']."</strong> | ".'Color : <strong>'.$product['metal_color']."</strong> | ".'Style : <strong>' .$product['sub_category'].'</strong>';
                         $options['group']['side2'] = $side2;
                     }
-                    elseif($productType == "promise ring"){
+                    elseif($productType == $productTypelist['promise']){
                        $promiseRing  = 'Carat : <strong>' . $product['karat']."</strong> | ".'Color : <strong>'.$product['metal_color']."</strong> | ".'Style : <strong>' .$product['sub_category'].'</strong>';
                        $options['group']['promise'] = $promiseRing;
                     }
@@ -166,7 +163,7 @@ class Cda_Wizard_Model_Observer extends Mage_Core_Model_Abstract {
 
 
 
-                if($options['group']['construction'] == 'Create your own' && $productType == 'ring'){
+                if($options['group']['construction'] == 'Create your own' && $productType == $productTypelist['ring']){
                     $insetData = array();
                     $insetData['diamond'] = Mage::getSingleton('core/session')->getSelectedValue();
                     $insetData['style'] = Mage::getSingleton('core/session')->getRingSelected();
@@ -206,7 +203,6 @@ class Cda_Wizard_Model_Observer extends Mage_Core_Model_Abstract {
             }
         }
         if(!empty($weddding)){
-            $cart = Mage::getModel('checkout/cart');
             $cart->init();
             $subItem = Mage::getModel('catalog/product')->load($weddding['item']);
             $options = array();
@@ -235,7 +231,6 @@ class Cda_Wizard_Model_Observer extends Mage_Core_Model_Abstract {
             }
         }
         if(!empty($diamondSet)){
-            $cart = Mage::getModel('checkout/cart');
             $cart->init();
             $subItem = Mage::getModel('catalog/product')->load($diamondSet['item']);
             $product =  Mage::Helper('wizard')->getProductFromMaster($diamondSet['item']);
@@ -248,7 +243,7 @@ class Cda_Wizard_Model_Observer extends Mage_Core_Model_Abstract {
             $options['group']['matchingset'] = $randomInt;
             $receiveDay =  Mage::Helper('wizard')->getOrderDate($subItem->getId());
             $options['group']['orderdate'] = $receiveDay;
-             if($productType == "diamond"){
+             if($productType ==$productTypelist['diamond']){
                 //$diamond  = $product['weight']." Carat"." ".$product['stone_color']." ".$product['stone_cut']." ".$product['stone_quality'];
                 $diamond  = 'Carat :<strong> ' . $product['weight']." </strong>|".' Color : <strong>'.$product['stone_color']." </strong>|".' Cut :<strong>'.$product['stone_cut']."</strong> |".' Clarity : <strong>'.$product['stone_quality'].'</strong>';
                 $options['group']['diamond'] = $diamond;
@@ -300,6 +295,80 @@ class Cda_Wizard_Model_Observer extends Mage_Core_Model_Abstract {
                   $item->getProduct()->setIsSuperMode(true);
                }
             }
+        }
+    }
+    public function catalogProductSaveAfter($observer)
+    {
+        $staticArr = array(
+                'item_id'=>0,
+                'variant_id'=>0,
+                'smry_id'=>0,
+                'base_variant_id'=>0,
+                'construction'=>0,
+                'variant_remark'=>0,
+                'variant_name'=>0,
+                'price'=>0,
+                'special_price'=>0,
+                'total_dia_wt'=>0,
+                'metal_color'=>1,
+                'karat'=>1,
+                'weight'=>0,
+                'sub_category'=>1,
+                'stone_shape'=>1,
+                'row_identity'=>0,
+                'product_size'=>1,
+                'stone_quality'=>1,
+                'group_code'=>0,
+                'polish'=>0,
+                'symmetry'=>0,
+                'fluorescence'=>0,
+                'depth_mm'=>0,
+                'table_per'=>0,
+                'band_width'=>1,
+                'metal_type'=>1,
+                'stone_cut'=>1,
+                'stone_color'=>1,
+                'chain_type'=>1,
+                'chain_length'=>1,
+                'back_type'=>0,
+                'depth_per'=>0,
+                'collection'=>1,
+                'image'=>0
+        );
+
+        $helper = Mage::helper('wizard');
+        if ($actionInstance = Mage::app()->getFrontController()->getAction()) {
+            $action = $actionInstance->getFullActionName();
+            if ($action == 'adminhtml_catalog_product_save') { //if on admin save action
+                $product = $observer->getProduct();
+                $masterModel = Mage::getModel('wizard/wizardmaster')->load($product->getId(),'pid');
+                $optionArray = array();
+                $optionArray['product_type'] =$helper->getAttributeValue('jewelry',$product->getData('jewelry'));
+                $optionArray['url'] =$product->getUrlKey();
+
+                foreach ($staticArr as $key=>$value) {
+                    $optionArray[$key] = ($value == 1)?$helper->getAttributeValue($key,$product->getData($key)):$product->getData($key);
+                    if($optionArray[$key] == 'N/A'){
+                        $optionArray[$key] = '';
+                    }
+                    $masterModel->setData($key,$optionArray[$key]);
+                }
+                $masterModel->save();
+            }
+        }
+    }
+
+    public function catalogProductDeleteAfter($observer)
+    {
+        $productId = $observer->getProduct()->getId();
+        try {
+            $masterModel = Mage::getModel('wizard/wizardmaster')->load($productId,'pid')->delete();
+            $realationModel= Mage::getModel('wizard/wizardrelation')->getCollection()->addFieldToFilter('pid', $productId);
+            foreach ($realationModel as $item) {
+                $item->delete();
+            }
+        } catch (Exception $e){
+            echo $e->getMessage();
         }
     }
 }

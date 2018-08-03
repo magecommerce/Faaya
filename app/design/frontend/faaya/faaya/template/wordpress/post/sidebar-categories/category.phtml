@@ -1,37 +1,33 @@
-<div class="related-post">
-	<ul>
-		<li class="item">
-			<div class="image">
-				<img src="<?php echo $this->getSkinUrl('images/blog/2.jpg'); ?>" alt="image1">
-			</div>
-			<div class="category-name">
-				<?php echo $this->__('WEDDING IDEAS'); ?>					
-			</div>
-			<h3>
-				<?php echo $this->__('Magen Markel’s wedding ring inspiration');?>
-			</h3> 
-		</li>
-		<li class="item">
-			<div class="image">
-				<img src="<?php echo $this->getSkinUrl('images/blog/5.jpg'); ?>" alt="image1">
-			</div>
-			<div class="category-name">
-				<?php echo $this->__('WEDDING IDEAS'); ?>					
-			</div>
-			<h3>
-				<?php echo $this->__('Winter Proposals by Faaya customers');?>
-			</h3> 
-		</li>
-		<li class="item">
-			<div class="image">
-				<img src="<?php echo $this->getSkinUrl('images/blog/3.jpg'); ?>" alt="image1">
-			</div>
-			<div class="category-name">
-				<?php echo $this->__('PLANNING'); ?>					
-			</div>
-			<h3>
-				<?php echo $this->__('Top 5 wedding rings trending this season');?>
-			</h3> 
-		</li>
-	</ul>
-</div>
+<?php
+$getCatPosts = $this->getRelatedPost();
+if($getCatPosts->have_posts()){ ?>
+	<div class="related-post">
+		<ul>
+	    <?php while($getCatPosts->have_posts()){
+	    	$getCatPosts->the_post();
+	    	$slug = Mage::getUrl('blog').( basename(get_permalink(get_the_ID())));
+	    	$title = get_the_title();
+	    	//$content = apply_filters('the_content',get_the_content());
+	    	$content = get_the_excerpt();
+	    	$content =  Mage::helper('core/string')->truncate($content, 40);
+	    	$wpblog_fetrdimg = wp_get_attachment_url( get_post_thumbnail_id($post->ID) );
+	    	?>
+	    	<li class="item">
+				<div class="image">
+					<a href="<?php echo $slug;?>">
+						<img src="<?php echo $wpblog_fetrdimg; ?>" alt="<?php echo $title;?>">
+					</a>
+				</div>
+				<div class="category-name">
+					<a href="<?php echo $slug;?>">
+						<?php echo $title; ?>
+					</a>
+				</div>
+				<h3>
+					<?php echo $content;?>
+				</h3>
+			</li>
+	    <?php }?>
+		</ul>
+	</div>
+<?php }?>

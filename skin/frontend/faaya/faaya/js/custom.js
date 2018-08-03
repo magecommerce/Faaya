@@ -96,6 +96,14 @@ jQuery(document).ready(function () {
                 scrollTop: jQuery(".wizard-toolbar").offset().top - 100},
             'slow');
     });
+    jQuery(document).on('click touchstart',function() {
+        jQuery('.skip-content').removeClass('skip-active');
+    });
+	
+	jQuery('.skip-content,.skip-link.skip-nav,.skip-link.skip-search').on('click touchstart',function(e){
+		e.stopPropagation();
+	});
+	
 
     categoryViewBannerImage();
     containerHeight()
@@ -104,9 +112,19 @@ jQuery(document).ready(function () {
       if(jQuery('body').find('.inner-top-banner').length > 0){
         jQuery('body').addClass('transparent-header');
       }
+	  
+	  jQuery('.sizeSelectpicker').selectpicker();
 
 
-
+		  var pgurl = window.location.href;  
+		jQuery(".footer-menu ul li a").each(function() {
+			 if (jQuery(this).attr("href") == pgurl || jQuery(this).attr("href") == '')
+				jQuery(this).addClass("active");
+		  });
+		  jQuery(".nav-primary li a").each(function() {
+			 if (jQuery(this).attr("href") == pgurl || jQuery(this).attr("href") == '')
+				jQuery(this).addClass("active");
+		  });
 
 });
 
@@ -132,10 +150,10 @@ jQuery(window).load(function () {
   categoryViewBannerImage();
   containerHeight()
 
-  jQuery('.product-shop').mCustomScrollbar({
+  /* jQuery('.product-shop').mCustomScrollbar({
      mouseWheelPixels: 10,
      scrollbarPosition: "inside"
-  });
+  }); */
 
 
    /*Transparent Header*/
@@ -211,7 +229,14 @@ function navHeight() {
     jQuery('.home-banner').css({"height": winHeight});
 }
 
-
+// Cancel
+jQuery(function( $ ) {
+   $(".cancel").click(function(){
+	   $(this).hide();
+	   $(".stikers").hide();
+   });
+});
+					
 jQuery(function( $ ) {
     var scrolling = "Scrolling",
         stopped = "Stopped";
@@ -353,3 +378,7 @@ function categoryViewBannerImage() {
     var categoryViewImage =  jQuery('.categoryView-image img').outerHeight();
     //jQuery('.category-description').css('min-height', categoryViewImage);
 }
+
+jQuery(function( $ ) {
+jQuery(".tandc-list .faq-a").hide(); 	jQuery(".tandc-list .faq-list:first .faq-a").show(); 	jQuery(".tandc-list .faq-q:first").addClass("active"); 	jQuery("#all").click(); jQuery(".tandc-list faq-list:first .faq-q").addClass("active"); 	jQuery(".tandc-list .faq-q").click(function() { 	if(!jQuery(this).hasClass("active")) 	{ 		jQuery(".tandc-list .faq-a").stop(true).slideUp(200); 		jQuery(".tandc-list .faq-q").removeClass("active"); 		jQuery(this).addClass("active"); 		jQuery(this).next(".faq-a").stop(true).slideDown(200); 	} 	else{ 		jQuery(".tandc-list .faq-a").stop(true).slideUp(200); 		jQuery(".tandc-list .faq-q").removeClass("active"); 	} 	});
+});

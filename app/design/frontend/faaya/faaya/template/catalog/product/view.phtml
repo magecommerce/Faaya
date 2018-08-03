@@ -1,4 +1,6 @@
 <?php
+$catId = $this->getRequest()->getParam('category');
+
 $helper = Mage::Helper('wizard');
 $editid = ($this->getRequest()->getParam('editid'))?$this->getRequest()->getParam('editid'):0;
  $did = $this->getRequest()->getParam('did');
@@ -28,7 +30,7 @@ if(!empty($chainlength) && !empty($chainType)){
 }
 
 
-$productType = Mage::Helper('wizard')->getProductType($pid);
+$productType = strtolower(Mage::Helper('wizard')->getProductType($pid));
 
 $stylePrice = $_product->getPrice();
 $styleSpecialPrice = $_product->getSpecialPrice();
@@ -79,12 +81,20 @@ $attribute = Mage::helper('wizard')->getAllAttribute();
 $mainPrice  = $stylePrice+$diamondPrice;
 $mainPrice = (!empty($sidestoneArr))?($sidestoneArr['price']+$mainPrice):$mainPrice;
 $ids = $_product->getCategoryIds();
-$category = Mage::getModel("catalog/category")->load($ids[0]);
+if($catId){
+    $category = Mage::getModel("catalog/category")->load($catId);
+}else{
+    $category = Mage::getModel("catalog/category")->load($ids[0]);
+}
+
 $categoryLink = $category->getUrl();
 $categoryName = $category->getName();
 if($editid){
     $categoryLink = $categoryLink.'?editid='.$editid;
 }
+
+
+$productTypelist = Mage::helper('wizard')->getProductTypeList();
 ?>
             <div id="messages_product_view">
                 <?php echo $this->getMessagesBlock()->toHtml() ?>
@@ -197,7 +207,7 @@ if($editid){
                                                     <tr>
                                                         <th><?php echo ucfirst(strtolower($productType)).' '.$this->__('Information');?></th>
                                                     </tr>
-                                                    <?php if($productType == 'RING' || $productType == 'Bracelets'): ?>
+                                                    <?php if($productType == $productTypelist['ring'] || $productType == $productTypelist['bracelet']): ?>
                                                     <tr>
                                                         <td><?php echo $this->__('Style: ').($styleId ? $styleId : 'N/A');?></td>
                                                     </tr>
@@ -207,7 +217,7 @@ if($editid){
 
                                                     <?php endif;?>
 
-                                                    <?php if($productType == 'Band' || $productType == 'Bracelets'): ?>
+                                                    <?php if($productType == $productTypelist['band'] || $productType == $productTypelist['bracelet']): ?>
                                                     <tr>
                                                         <td><?php echo $this->__('Style: ').($styleId ? $styleId : 'N/A');?></td>
                                                     </tr>
@@ -217,7 +227,7 @@ if($editid){
 
                                                     <?php endif;?>
 
-                                                    <?php if($productType == 'PENDANT'): ?>
+                                                    <?php if($productType == $productTypelist['pendant']): ?>
                                                     <tr>
                                                         <td><?php echo $this->__('Stock Number: ');?><?php echo $_product->getItemName();?></td>
                                                     </tr>
@@ -231,7 +241,7 @@ if($editid){
 
                                                     <?php endif;?>
 
-                                                    <?php if($productType == 'EARRING'): ?>
+                                                    <?php if($productType == $productTypelist['earring']): ?>
                                                     <tr>
                                                         <td><?php echo $this->__('Stock Number: ');?><?php echo $_product->getItemName();?></td>
                                                     </tr>
@@ -245,7 +255,7 @@ if($editid){
                                                         <td><?php echo $this->__('Clarity: ').($stoneQuality ? $stoneQuality : 'N/A');?></td>
                                                     </tr>
                                                     <?php endif;?>
-                                                    <?php if($productType == 'RING' || $productType == 'Band'): ?>
+                                                    <?php if($productType == $productTypelist['ring'] || $productType == $productTypelist['band']): ?>
                                                         <?php //if($ringSize == $size):?>
                                                     <tr>
                                                         <th><?php //echo $this->__('Ring Size -');?>
@@ -274,7 +284,7 @@ if($editid){
                                                     <?php if(Mage::helper('wizard')->checkRemoteFile($pdfCerti)):?><tr><td class="certificate_link"><a href="<?php echo $pdfCerti;?>" target="_blank"><?php echo $this->__('Download Certificate'); ?></a></td></tr><?php endif;?>
                                                     </table>
                                                     <?php endif;?>
-                                                    <?php if($productType == 'PENDANT'): ?>
+                                                    <?php if($productType == $productTypelist['pendant']): ?>
                                                     <table class="chain-attributes">
                                                          <tr>
                                                             <?php if(!empty($chainlength)): ?>
@@ -302,12 +312,12 @@ if($editid){
                                                                     <ul class="chain_type">
                                                                         <?php foreach ($chainType as $key=>$option) { ?>
                                                                         <li>
-                                                                            <input type="radio" class="radio validate-one-required-by-name" id="chain_type-<?php echo $option['chain_type']?>" name="chain_type[]" value="<?php echo $option['chain_type']?>" />
-                                                                            <label for="chain_type-<?php echo $option['chain_type']?>">
+                                                                            <input type="radio" class="radio validate-one-required-by-name" id="chain_type-<?php echo $option?>" name="chain_type[]" value="<?php echo $option?>" />
+                                                                            <label for="chain_type-<?php echo $option?>">
                                                                                 <span class="image">
-                                                                                    <img src="<?php echo Mage::getBaseUrl('media');?>catalog/product/<?php echo $option['image'];?>">
+                                                                                    <img src="<?php echo Mage::getBaseUrl('media');?>chaintype/<?php echo str_replace(" ","-",strtolower($option)) ;?>.png">
                                                                                 </span>
-                                                                                <span><?php echo $option['chain_type'];?></span>
+                                                                                <span><?php echo $option;?></span>
                                                                             </label>
                                                                         </li>
                                                                         <?php } ?>
@@ -531,6 +541,7 @@ if($editid){
             var form = this.form;
             if(did == 0){
                 form.submit();
+                return true;
             }
             jQuery.ajax({
                 url: BASE_URL+"wizard/index/checkdiamond",
@@ -556,28 +567,11 @@ if($editid){
                         });
                     }else{
                         form.submit();
+                        return true;
                     }
                 }
             })
-
             return false;
-            /*var form = this.form;
-            var oldUrl = form.action;
-            if (url) {
-                form.action = url;
-            }
-            var e = null;
-            try {
-                this.form.submit();
-            }
-            catch (e) {}
-            this.form.action = oldUrl;
-            if (e) {
-                throw e;
-            }
-            if (button && button != 'undefined') {
-                button.disabled = true;
-            }*/
         }
     }.bind(productAddToCartForm);
 

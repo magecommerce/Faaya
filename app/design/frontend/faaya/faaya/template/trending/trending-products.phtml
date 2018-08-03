@@ -33,27 +33,32 @@ $_helper = $this->helper('catalog/output');?>
 
             items.eq(e.relatedTarget.normalize(current)).toggleClass('current', add)
         }).owlCarousel({
-            items: 5,
-            loop: (jQuery(".trending-carousel .item").length > 5) ? true : false,
+            items: 4,
+            //loop: (jQuery(".trending-carousel .item").length > 5) ? true : false,
             margin: 14,
-            nav: (jQuery(".trending-carousel .item").length > 5) ? true : false,
+            //nav: (jQuery(".trending-carousel .item").length > 5) ? true : false,
+			nav: true,
+			loop: true,
             responsive: {
                 0: {
                     items: 1,
-                    nav: (jQuery(".trending-carousel .item").length > 2) ? true : false,
-                    loop: (jQuery(".trending-carousel .item").length > 2) ? true : false
-                    center: true
+                    center: true,
+					nav: true,
+                    //nav: (jQuery(".trending-carousel .item").length > 2) ? true : false,
+                    //loop: (jQuery(".trending-carousel .item").length > 2) ? true : false
                 },
                 600: {
                     items: 3,
-                    nav: (jQuery(".trending-carousel .item").length > 3) ? true : false,
-                    loop: (jQuery(".trending-carousel .item").length > 3) ? true : false,
-                    center: true
+					center: true,
+					nav: true,
+                    //nav: (jQuery(".trending-carousel .item").length > 3) ? true : false,
+                    //loop: (jQuery(".trending-carousel .item").length > 3) ? true : false,
                 },
                 1000: {
-                    items: 4,
-                    nav: (jQuery(".trending-carousel .item").length > 4) ? true : false,
-                    loop: (jQuery(".trending-carousel .item").length > 4) ? true : false
+                    //items: 4,
+					nav: true,
+                    //nav: (jQuery(".trending-carousel .item").length > 4) ? true : false,
+                    //loop: (jQuery(".trending-carousel .item").length > 4) ? true : false
                 }
             }
         });
@@ -61,6 +66,8 @@ $_helper = $this->helper('catalog/output');?>
         owl.on('changed.owl.carousel', function(event) {
             navHeight();
         })
+		
+		
 
 
     })

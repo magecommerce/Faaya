@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+        <reference name="head">
+            <block type="core/text" name="head.viewport">
+                <action method="setText"><text><![CDATA[<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />]]>&#10;</text></action>
+            </block>
+            <action method="addItem"><type>skin_css</type><name>css/font-awesome.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/bootstrap.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/slick.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/owl.carousel.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/about-us-slider-styles.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/circle.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/jquery.sliderTabs.min.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/wizard/jquery-ui.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/wizard/jquery-ui-slider-pips.css</name></action>
+
+            <action method="addItem"><type>skin_css</type><name>css/master.css</name><params/><if><![CDATA[<!--[if (gte IE 9) | (IEMobile)]><!-->]]></if></action>
+
+            <action method="addItem"><type>skin_css</type><name>css/responsive.css</name><params/><if><![CDATA[<!--[if (gte IE 9) | (IEMobile)]><!-->]]></if></action>
+            <action method="addLinkRel"><rel>stylesheet</rel><href>//fonts.googleapis.com/css?family=Arsenal:400,400i,700,700i</href></action>
+
+            <action method="additem"><type>skin_js</type><name>js/isotope.pkgd.js</name></action>
+            <action method="additem"><type>skin_js</type><name>js/owl.carousel.js</name></action>
+            <action method="additem"><type>skin_js</type><name>js/jquery.scrollify.js</name></action>
+            <action method="additem"><type>skin_js</type><name>js/slick.js</name></action>
+            <action method="additem"><type>skin_js</type><name>js/pinwheelAlt.js</name></action>
+            <action method="additem"><type>skin_js</type><name>js/jquery.touchwipe.js</name></action>
+            <action method="additem"><type>skin_js</type><name>js/jquery.fractionslider.js</name></action>
+            <action method="additem"><type>skin_js</type><name>js/jquery.sliderTabs.js</name></action>
+            <action method="addItem"><type>skin_js</type><name>js/wizard/jquery-ui.js</name></action>
+            <action method="addItem"><type>skin_js</type><name>js/wizard/jquery-ui-slider-pips.js</name></action>
+            <action method="addItem"><type>skin_js</type><name>js/wizard/jquery.ui.touch-punch.min.js</name></action>
+            <action method="additem"><type>skin_js</type><name>js/custom.js</name></action>
+
+        </reference>
+        <reference name="footer">
+            <remove name="footer_links" />
+            <remove name="footer_links2" />
+            <remove name="store_switcher" />
+            <remove name="sale.reorder.sidebar" />
+            <remove name="wishlist_sidebar" />
+            <remove name="right.poll" />
+            <remove name="paypal.partner.right.logo" />
+            <remove name="left.reports.product.viewed" />
+        </reference>
+
+        <reference name="right">
+            <remove name="right.reports.product.compared" />
+            <remove name="cart_sidebar" />
+            <remove name="sale.reorder.sidebar"></remove>
+            <remove name="catalog.compare.sidebar"></remove>
+        </reference>
+        <remove name="footer.newsletter" />
+        <remove name="tags_popular" />
+
+    </default>
+</layout>
+
+
+
+

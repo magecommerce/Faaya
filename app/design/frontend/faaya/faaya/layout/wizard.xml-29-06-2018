@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+         <reference name="head">
+
+            <action method="addItem"><type>skin_css</type><name>css/wizard/bootstrap-select.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/wizard/jquery.dataTables.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/wizard/jquery.mCustomScrollbar.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/wizard/jquery.fancybox.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/wizard/slick.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/wizard/custom.css</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/wizard/responsive.css</name></action>
+
+
+            <action method="addItem"><type>skin_js</type><name>js/wizard/bootstrap.js</name></action>
+            <action method="addItem"><type>skin_js</type><name>js/wizard/bootstrap-select.js</name></action>
+            <action method="addItem"><type>skin_js</type><name>js/wizard/jquery.dataTables.js</name></action>
+            <action method="addItem"><type>skin_js</type><name>js/wizard/jquery.mCustomScrollbar.js</name></action>
+            <action method="addItem"><type>skin_js</type><name>js/wizard/jquery.fancybox.js</name></action>
+            <action method="addItem"><type>skin_js</type><name>js/wizard/slick.js</name></action>
+            <action method="addItem"><type>skin_js</type><name>js/wizard/custom.js</name></action>
+
+         </reference>
+    </default>
+    <wizard_index_index>
+        <reference name="root">
+            <action method="setTemplate">
+                    <template>page/wizard.phtml</template>
+            </action>
+        </reference>
+        <reference name="head">
+         </reference>
+        <reference name="content">
+            <block type="wizard/index" name="wizard" template="wizard/selectdiamond.phtml" />
+        </reference>
+    </wizard_index_index>
+    <wizard_sidestone_index>
+        <reference name="root">
+            <action method="setTemplate">
+                    <template>page/wizard.phtml</template>
+            </action>
+        </reference>
+        <reference name="head">
+         </reference>
+		<reference name="content">
+            <block type="wizard/index" name="wizard" template="wizard/sidestone.phtml" />
+		</reference>
+	</wizard_sidestone_index>
+
+    <wizard_diamond_index>
+        <reference name="root">
+            <action method="setTemplate">
+                    <template>page/wizard.phtml</template>
+            </action>
+        </reference>
+        <reference name="head">
+         </reference>
+        <reference name="content">
+            <block type="wizard/product" name="wizard" template="wizard/select-diamond-details-page.phtml" />
+        </reference>
+    </wizard_diamond_index>
+
+
+    <wizard_ring_index>
+        <reference name="root">
+            <action method="setTemplate">
+                    <template>page/wizard.phtml</template>
+            </action>
+        </reference>
+        <reference name="head">
+         </reference>
+        <reference name="content">
+            <block type="wizard/ring" name="wizard" template="wizard/select-setting-page.phtml" />
+        </reference>
+    </wizard_ring_index>
+
+    <wizard_ringdetail_index>
+        <reference name="root">
+            <action method="setTemplate">
+                    <template>page/wizard.phtml</template>
+            </action>
+        </reference>
+        <reference name="head">
+         </reference>
+        <reference name="content">
+            <block type="wizard/product" name="wizard" template="wizard/select-setting-details-page.phtml" />
+        </reference>
+    </wizard_ringdetail_index>
+
+    <wizard_sidedetail_index>
+        <reference name="root">
+            <action method="setTemplate">
+                    <template>page/wizard.phtml</template>
+            </action>
+        </reference>
+        <reference name="head">
+         </reference>
+        <reference name="content">
+            <block type="wizard/product" name="wizard" template="wizard/sidestone-details-page.phtml" />
+        </reference>
+    </wizard_sidedetail_index>
+
+
+    <wizard_completed_index>
+        <reference name="root">
+            <action method="setTemplate">
+                    <template>page/wizard.phtml</template>
+            </action>
+        </reference>
+        <reference name="head">
+         </reference>
+        <reference name="content">
+            <block type="wizard/product" name="wizard" template="wizard/view-completed-ring-page.phtml" />
+        </reference>
+    </wizard_completed_index>
+
+	<cms_view_completed_ring_page>
+        <reference name="root">
+            <action method="setTemplate">
+                    <template>page/wizard.phtml</template>
+            </action>
+        </reference>
+	</cms_view_completed_ring_page>
+    <wizard_compare_index translate="label">
+        <label>Catalog Product Compare List</label>
+        <reference name="root">
+            <action method="setTemplate"><template>page/compare.phtml</template></action>
+        </reference>
+        <reference name="content">
+            <block type="catalog/product_compare_list" name="catalog.compare.list" template="catalog/product/compare/compare-sidebar.phtml" />
+        </reference>
+    </wizard_compare_index>
+
+    <wizard_index_getpopupproduct>
+        <block type="wizard/product" name="root" template="catalog/product/popup.phtml" />
+    </wizard_index_getpopupproduct>
+
+    <wizard_index_promise>
+        <reference name="root">
+            <action method="setTemplate"><template>page/wizard.phtml</template></action>
+        </reference>
+        <reference name="content">
+            <block type="wizard/promise" name="promisering" template="wizard/promise.phtml" />
+        </reference>
+    </wizard_index_promise>
+
+    <wizard_completedset_index>
+        <reference name="root">
+            <action method="setTemplate"><template>page/wizard.phtml</template></action>
+        </reference>
+        <reference name="content">
+            <block type="wizard/product" name="promisecomplete" template="wizard/view-completed-set.phtml" />
+        </reference>
+    </wizard_completedset_index>
+</layout>
+

@@ -32,15 +32,21 @@
                         <div class="icon"><img src="<?php echo $trendingIcon; ?>" /></div>
                     </div>
                     <div class="details">
-                        <h4><a href="<?php echo $posturl;?>"><?php echo $title;?>></a></h4>
+                        <h4><a href="<?php echo $posturl;?>"><?php echo $title;?></a></h4>
                         <p><?php echo $custompostHelper->textlimit($description,150); ?></p>
                     </div>
+                    <a href="<?php echo $posturl;?>" class="over-block-link"></a>
                 </div>
             <?php endforeach;?>
         </div>
     </div>
 </section>
 <?php endif;?>
+
+<style>
+.trending-carousel.owl-carousel .owl-nav.disabled,
+.trending-carousel.owl-carousel .owl-dots.disabled{ display: block; }
+</style>
 
 <script type="text/javascript">
     jQuery(document).ready(function() {
@@ -53,30 +59,37 @@
 
             items.eq(e.relatedTarget.normalize(current)).toggleClass('current', add)
         }).owlCarousel({
-            items: 5,
-            loop: (jQuery(".trending-carousel .item").length > 5) ? true : false,
+            items: 4,
+            //loop: (jQuery(".trending-carousel .item").length > 5) ? true : false,
             margin: 14,
-            nav: (jQuery(".trending-carousel .item").length > 5) ? true : false,
+            //nav: (jQuery(".trending-carousel .item").length > 5) ? true : false,
+			nav:true,
+			loop: true,
             responsive:{
             0:{
                 items:2,
-                nav:(jQuery(".trending-carousel .item").length > 2) ? true : false,
-                loop:(jQuery(".trending-carousel .item").length > 2) ? true : false,
-                center:true
+                //nav:(jQuery(".trending-carousel .item").length > 2) ? true : false,
+                //loop:(jQuery(".trending-carousel .item").length > 2) ? true : false,
+                center:true,
+				nav: true,
             },
             600:{
                 items:3,
-                nav:(jQuery(".trending-carousel .item").length > 3) ? true : false,
-                loop:(jQuery(".trending-carousel .item").length > 3) ? true : false,
+                //nav:(jQuery(".trending-carousel .item").length > 3) ? true : false,
+                //loop:(jQuery(".trending-carousel .item").length > 3) ? true : false,
                 center: true,
+				nav: true,
             },
             1000:{
-                items:4,
-                nav:(jQuery(".trending-carousel .item").length > 4) ? true : false,
-                loop:(jQuery(".trending-carousel .item").length > 4) ? true : false
+                //items:4,
+				nav: true,
+                //nav:(jQuery(".trending-carousel .item").length > 4) ? true : false,
+                //loop:(jQuery(".trending-carousel .item").length > 4) ? true : false
             }
         }
         });
+		
+		
 
 
     })

@@ -23,6 +23,7 @@
  * @copyright   Copyright (c) 2006-2017 X.commerce, Inc. and affiliates (http://www.magento.com)
  * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
+$productTypelist = Mage::helper('wizard')->getProductTypeList();
 ?>
 
 <?php $_creditmemo = $this->getCreditmemo() ?>
@@ -122,7 +123,7 @@
 								//echo "<br/>";
 								$type = $items[$itm]->getGroupType();
                                 if($type == "sid"){
-                                  $proType = $items[$itm]->getProductcsType();
+                                  $proType = strtolower($items[$itm]->getProductcsType());
                                 }
 								//echo "<br/>";
 								$orderDate = $items[$itm]->getGroupOrderdate();
@@ -268,7 +269,7 @@
                                              </p>
                                              <?php endif; ?>
                                          <?php
-                                           if(($ringSize && $proType == 'RING') || ($ringSize && $proType == 'Band')):?>
+                                           if(($ringSize && $proType == $productTypelist['ring']) || ($ringSize && $proType == $productTypelist['band']) || ($ringSize && $proType == $productTypelist['promise'])):?>
                                             <div class="cart-ring-size">
                                               <strong><?php echo $this->__('Ring Size : '); ?></strong><?php echo $ringSize;?>
                                             </div>

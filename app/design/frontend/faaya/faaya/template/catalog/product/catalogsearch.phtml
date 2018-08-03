@@ -1,0 +1,957 @@
+ <?php
+    $queryString = Mage::app()->getRequest()->getParam('q');
+    $productTypelist = Mage::helper('wizard')->getProductTypeList();
+   $_helper = $this->helper('catalog/output');
+   $catId = 'search';
+   $editid = 0;
+   $_productCollection = $this->getLoadCollection($catId);
+   $_productCollection = Mage::helper('core')->jsonDecode($_productCollection);
+   $minprice = $_productCollection['minprice'];
+   $maxprice = $_productCollection['maxprice'];
+   $limit =  Mage::getSingleton('core/session')->getLimitData();
+   $_productCollection = $_productCollection['data'];
+   $totalRecord = count($_productCollection);
+   $_productCollection = array_slice($_productCollection,0,$limit);
+
+   ?>
+    <div class="filter-wrapper"><div class="filtered-options" style="display: none;"><a href="javascript:void(0);" class="clear-all"><?php echo $this->__('Clear All');?></a></div></div>
+    <div class="block block-layered-nav block-layered-nav--no-filters sticky-category-filter">
+
+   <?php  echo $collectionSort = $this->getLayout()->createBlock('catalog/product')->setTemplate('catalog/product/sort/collectionsearch.phtml')->toHtml();?>
+</div>
+<?php if($totalRecord <= 0): ?>
+<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>
+<?php else: ?>
+<div class="category-products">
+    <?php // List mode ?>
+    <?php if($this->getMode()!='grid'): ?>
+    <?php $_iterator = 0; ?>
+    <ol class="products-list" id="products-list">
+        <?php echo Mage::app()->getLayout()->createBlock('core/template')->setData('products', $_productCollection)->setData('editid',$editid)->setTemplate('catalog/product/list-result.phtml')->toHtml();?>
+    </ol>
+    <a href="javascript:void(0)" class="load-more"><?php echo $this->__('Load More');?></a>
+    <img src="<?php echo $this->getSkinUrl('images/spinner-m.gif')?>" style="display: none;" class="loading-icon" alt="Loading"/>
+    <script type="text/javascript">decorateList('products-list', 'none-recursive')</script>
+    <?php endif; ?>
+</div>
+<?php endif; ?>
+<input type="hidden" value="<?php echo (intval($totalRecord))?intval($totalRecord):intval(0);?>" name="total-product" class="total-product" id="total-product"/>
+<input type="hidden" value="1" name="pagenumber"/>
+
+
+<div class="compare-sidebar-window">
+    <div class="compare-min-icon">
+        <a href="javascript:void(0);"><img src="<?php echo $this->getSkinUrl('images/compare-sidebar-icon.gif'); ?>" alt="" /></a>
+    </div>
+    <div class="compare-content">
+        <div class="top-toolbar">
+            <a class="close-icon" href="javascript:void(0);"><img src="<?php echo $this->getSkinUrl('images/close-icon1.png'); ?>" width="19" alt=""></a>
+            <a class="minimize-icon" href="javascript:void(0);"><img src="<?php echo $this->getSkinUrl('images/minimize-icon.png'); ?>" alt=""></a>
+            <a class="fullscreen-icon" href="javascript:void(0);"><img src="<?php echo $this->getSkinUrl('images/fullscreen-icon.png'); ?>" alt=""></a>
+        </div>
+        <div class="more-content">
+
+        </div>
+
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    var editid = "<?php echo $editid;?>";
+    var stickyOffset = jQuery('.sticky-category-filter').offset().top;
+    var HeaderHeight = jQuery('.page-header').outerHeight();
+    jQuery(window).load(function(){
+      var stickyOffset = jQuery('.sticky-category-filter').offset().top;
+        var HeaderHeight = jQuery('.page-header').outerHeight();
+    });
+    jQuery(window).resize(function(){
+
+      var stickyOffset = jQuery('.sticky-category-filter').offset().top;
+        var HeaderHeight = jQuery('.page-header').outerHeight();
+    });
+    jQuery(window).scroll(function(){
+        var stickyOffset = jQuery('.sticky-category-filter').offset().top;
+        var HeaderHeight = jQuery('.page-header').outerHeight();
+        var sticky = jQuery('.sticky-category-filter #narrow-by-list');
+        var scroll = jQuery(window).scrollTop();
+        sticky.css({"top":HeaderHeight});
+        if (scroll >= stickyOffset){
+            sticky.addClass('fixed');
+         }
+          else {
+            sticky.removeClass('fixed');
+        }
+
+    });
+
+    var BASE_URL='<?php echo preg_replace('/(.*?)(index.php\/?)?/','\1',Mage::getBaseURL());?>';
+    var querystring='<?php echo $queryString;?>';
+    var catId = '<?php echo $catId;?>';
+    var maxprice = '<?php echo $maxprice;?>';
+    var minprice = '<?php echo $minprice;?>';
+
+    jQuery(document).ready(function () {
+        if(jQuery('#Solitaires').length > 0){
+            setTimeout(function(){
+                jQuery(".ring_style").find('.list').find('li').first().find('input').trigger('click');
+            },1000);
+        }
+
+        loadPriceSlider(minprice,maxprice);
+        showLoadmore();
+        jQuery('.load-more').click(function(){
+            jQuery('.loading-icon').show();
+            var url = '<?php echo $this->getUrl('wizard/search/loadmore');?>';
+            var pagenumber = jQuery('input[name=pagenumber]').val();
+            pagenumber = parseInt(pagenumber)+1;
+            jQuery.ajax({
+                url : url,
+                type: 'POST',
+                data: {page:pagenumber,catId:catId,editid:editid},
+                success : function(response) {
+                    jQuery(".products-list").append(response);
+                    jQuery('.loading-icon').hide();
+                    showLoadmore();
+                    jQuery('input[name=pagenumber]').val(pagenumber);
+                    $$('.link-wishlist').each(function(a) {
+                      a.setAttribute('onclick', '');
+                      a.addEventListener('click', function () {
+                        ShowWishlistPopup('cminds-wishlist-popup', getIdParam(a));
+                      });
+                    });
+                },error: function(error){
+                    jQuery(".products-list").append(error.responseText);
+                    jQuery('.loading-icon').hide();
+                    showLoadmore();
+                    jQuery('input[name=pagenumber]').val(pagenumber);
+                    $$('.link-wishlist').each(function(a) {
+                      a.setAttribute('onclick', '');
+                      a.addEventListener('click', function () {
+                        ShowWishlistPopup('cminds-wishlist-popup', getIdParam(a));
+                      });
+                    });
+                }
+            });
+        });
+
+        jQuery(document).on('click','.mainlist .caratoptions .options input[type=radio]',function(){
+            var elem = jQuery(this);
+            elem.parents('.mainlist').find('.product-image').addClass('load-image');
+            elem.parents('.mainlist').find('.fa-spinner').show();
+            var diawt =  elem.val();
+            var productid =  elem.parents('.mainlist').find('.styleid').val();
+            var metalselected =  elem.parents('.mainlist').find('.metal-color:checked').data("id");
+            var url = '<?php echo $this->getUrl('layernavigation/index/changemetal');?>';
+            jQuery.ajax({
+                url : url,
+                type: 'POST',
+                data: {diawt:diawt,productid:productid,metalselected:metalselected,editid:editid},
+                success : function(response) {
+                    response = JSON.parse(response);
+                    varianthtml = JSON.parse(response.varianthtml);
+
+                    elem.parents('.mainlist').find('.product-image').find('img').attr("src",varianthtml.image);
+                    elem.parents('.mainlist').find('.link-compare').attr('data-url',varianthtml.compareurl);
+                    elem.parents('.mainlist').find('.link-compare').attr('data-id',varianthtml.pid);
+                    elem.parents('.mainlist').find('.link-wishlist').attr('href',varianthtml.wishlist);
+                   elem.parents('.mainlist').find('.regular-price').find('.price').text(varianthtml.price);
+                   elem.parents('.mainlist').find('.four-c-content').html(varianthtml.diahtml);
+                    elem.parents('.mainlist').find('.styleid').val(response.styleid);
+                    //elem.parents('.mainlist').find('.desc').text(varianthtml.variant_name);
+                    elem.parents('.mainlist').find('.metal-options').find('.options').find('ul').html(response.html);
+                    elem.parents('.mainlist').find('.button-proceed').find('a').attr('href',varianthtml.url);
+                    elem.parents('.mainlist').find('.product-image').attr('href',varianthtml.url);
+                    elem.parents('.mainlist').find('.product-name').find('a').attr('href',varianthtml.url);
+                    setTimeout(function(){
+                        elem.parents('.mainlist').find('.product-image').removeClass('load-image');
+                        elem.parents('.mainlist').find('.fa-spinner').hide();
+                    },500);
+
+
+                },error: function(error){
+                    response = JSON.parse(error.responseText);
+                    varianthtml = JSON.parse(response.varianthtml);
+
+                    elem.parents('.mainlist').find('.product-image').find('img').attr("src",varianthtml.image);
+                    elem.parents('.mainlist').find('.link-compare').attr('data-url',varianthtml.compareurl);
+                    elem.parents('.mainlist').find('.link-compare').attr('data-id',varianthtml.pid);
+                    elem.parents('.mainlist').find('.link-wishlist').attr('href',varianthtml.wishlist);
+                    elem.parents('.mainlist').find('.regular-price').find('.price').text(varianthtml.price);
+                    elem.parents('.mainlist').find('.four-c-content').html(varianthtml.diahtml);
+                    elem.parents('.mainlist').find('.styleid').val(response.styleid);
+                    //elem.parents('.mainlist').find('.desc').text(varianthtml.variant_name);
+                    elem.parents('.mainlist').find('.metal-options').find('.options').find('ul').html(response.html);
+                    elem.parents('.mainlist').find('.button-proceed').find('a').attr('href',varianthtml.url);
+                    elem.parents('.mainlist').find('.product-image').attr('href',varianthtml.url);
+                    elem.parents('.mainlist').find('.product-name').find('a').attr('href',varianthtml.url);
+                    setTimeout(function(){
+                        elem.parents('.mainlist').find('.product-image').removeClass('load-image');
+                        elem.parents('.mainlist').find('.fa-spinner').hide();
+                    },500);
+
+                }
+            });
+        })
+        jQuery(document).on('click','.metal-color',function(){
+            var elem = jQuery(this);
+            elem.parents('.mainlist').find('.product-image').addClass('load-image');
+            elem.parents('.mainlist').find('.fa-spinner').show();
+            var id = elem.data("id");
+            var itemid = elem.data("item-id");
+            var pid = elem.data("pid");
+            var name = elem.attr('name');
+            var diaprice = elem.parents('.mainlist').find('.diamondprice').val();
+
+            var url = '<?php echo $this->getUrl('layernavigation/index/changevarint');?>';
+            jQuery.ajax({
+                url : url,
+                type: 'POST',
+                data: {id:id,name:name,itemid:itemid,pid:pid,editid:editid},
+                success : function(response) {
+                    response = JSON.parse(response);
+                    console.log(response);
+
+                    elem.parents('.mainlist').find('.product-image').find('img').attr("src",response.image);
+
+                    elem.parents('.mainlist').find('.link-compare').attr('data-url',response.compareurl);
+                    elem.parents('.mainlist').find('.link-compare').attr('data-id',response.pid);
+
+                    elem.parents('.mainlist').find('.link-wishlist').attr('href',response.wishlist);
+                    elem.parents('.mainlist').find('.regular-price').find('.price').text(response.price);
+                    elem.parents('.mainlist').find('.styleid').val(pid);
+                    //elem.parents('.mainlist').find('.desc').text(response.variant_name);
+                    elem.parents('.mainlist').find('.button-proceed').find('a').attr('href',response.url);
+                    elem.parents('.mainlist').find('.four-c-content').html(response.diahtml);
+                    elem.parents('.mainlist').find('.product-image').attr('href',response.url);
+                    elem.parents('.mainlist').find('.product-name').find('a').attr('href',response.url);
+                    setTimeout(function(){
+                        elem.parents('.mainlist').find('.product-image').removeClass('load-image');
+                        elem.parents('.mainlist').find('.fa-spinner').hide();
+                    },500);
+                    //jQuery(".products-list").append(response);
+                },error: function(error){
+                    response = JSON.parse(error.responseText);
+                    console.log(response);
+
+                    elem.parents('.mainlist').find('.product-image').find('img').attr("src",response.image);
+                    elem.parents('.mainlist').find('.link-compare').attr('data-url',response.compareurl);
+                    elem.parents('.mainlist').find('.link-compare').attr('data-id',response.pid);
+                    elem.parents('.mainlist').find('.link-wishlist').attr('href',response.wishlist);
+                    elem.parents('.mainlist').find('.regular-price').find('.price').text(response.price);
+                    elem.parents('.mainlist').find('.styleid').val(pid);
+                    //elem.parents('.mainlist').find('.desc').text(response.variant_name);
+                    elem.parents('.mainlist').find('.button-proceed').find('a').attr('href',response.url);
+                    elem.parents('.mainlist').find('.four-c-content').html(response.diahtml);
+                    elem.parents('.mainlist').find('.product-image').attr('href',response.url);
+                    elem.parents('.mainlist').find('.product-name').find('a').attr('href',response.url);
+                    setTimeout(function(){
+                        elem.parents('.mainlist').find('.product-image').removeClass('load-image');
+                        elem.parents('.mainlist').find('.fa-spinner').hide();
+                    },500);
+                }
+            });
+        })
+
+
+
+        /* Filter Option Request */
+        jQuery('.shopby-attr').click(function(){
+            var sortByField = jQuery(this).hasClass('sort-by');
+           //jQuery('.loading-icon').show();
+            var minPrice = jQuery("#min-priceval").val();
+            var maxPrice = jQuery("#max-priceval").val();
+            jQuery(".category-products").addClass('loading');
+            jQuery("p#totalRecord").text('');
+            jQuery("p#max-price").text('');
+            jQuery("p#min-price").text('');
+            jQuery(".filter-limit-record").val(0);
+            var sort = {};
+            var limit = jQuery(".filter-limit-record").val();
+            var orderby = "created_at";
+            var sortby = "asc";
+            var len = jQuery("li .shopby-attr-selected").length;
+            // Close DropDown
+            jQuery(".filter-options .filter-label").removeClass("active");
+            jQuery(".filter-options .list").removeClass("active");
+            if(jQuery(this).hasClass("sort-by")){
+               jQuery(".list ol li a").removeClass("selected");
+               jQuery(this).addClass("selected");
+               orderby = jQuery(this).attr("data-order");
+               sortby = jQuery(this).attr("data-sort");
+               /* Code for selected Karat with Metal Color*/
+                   //var karatLen = jQuery(".metal_karat ol").find('input.shopby-attr-selected').length;
+                   //if(karatLen ==0){
+              var metalLen = jQuery(".metal ol").find('input.shopby-attr-selected').length;
+              var ringStyleLen = jQuery(".ring_style ol").find('input.shopby-attr-selected').length;
+              var shape = jQuery(".shape ol").find('input.shopby-attr-selected').length;
+              var diamondSize = jQuery(".diamond_size ol").find('input.shopby-attr-selected').length;
+
+              if(metalLen > 0 || ringStyleLen > 0 || shape > 0 || diamondSize> 0){
+                 //jQuery(".metal_karat ol li").find("input").eq(0).addClass("shopby-attr-selected");
+                 //jQuery(".metal_karat ol li").find("input").eq(0).prop('checked',true);
+              }
+                   //}
+               /* End Code for selected Karat with Metal Color*/
+               jQuery("li .shopby-attr-selected" ).each(function(index) {
+                  if(sort[jQuery(this).attr('data-attname')] == undefined){
+                    sort[jQuery(this).attr('data-attname')] = [];
+                  }
+                  sort[jQuery(this).attr('data-attname')].push(jQuery(this).val());
+                });
+            }
+            else{
+                if(jQuery(this).hasClass('shopby-attr-selected')){
+                  jQuery(this).removeClass('shopby-attr-selected');
+                  jQuery(this).removeAttr("checked");
+                }else{
+                    jQuery(this).addClass('shopby-attr-selected');
+                }
+                /* Code for selected Karat with Metal Color*/
+                   var karatLen = jQuery(".metal_karat ol").find('input.shopby-attr-selected').length;
+                   if(karatLen ==0){
+                      var metalLen = jQuery(".metal ol").find('input.shopby-attr-selected').length;
+                      var ringStyleLen = jQuery(".ring_style ol").find('input.shopby-attr-selected').length;
+                      var shape = jQuery(".shape ol").find('input.shopby-attr-selected').length;
+                      var diamondSize = jQuery(".diamond_size ol").find('input.shopby-attr-selected').length;
+                      if(metalLen > 0 || ringStyleLen > 0 || shape > 0 || diamondSize > 0){
+                         //jQuery(".metal_karat ol li").find("input").eq(0).trigger('click');
+                         //jQuery(".metal_karat ol li").find("input").eq(0).addClass("shopby-attr-selected");
+                         //jQuery(".metal_karat ol li").find("input").eq(0).prop('checked',true);
+                      }
+                   }
+                jQuery("li .shopby-attr-selected" ).each(function(index) {
+                  if(sort[jQuery(this).attr('data-attname')] == undefined){
+                    sort[jQuery(this).attr('data-attname')] = [];
+                  }
+                  sort[jQuery(this).attr('data-attname')].push(jQuery(this).val());
+                });
+                var selectedsortLength = jQuery(".list ol li").find("a.selected").length;
+                if(selectedsortLength > 0){
+                    orderby = jQuery(".list ol li a.selected").attr("data-order");
+                    sortby = jQuery(".list ol li a.selected").attr("data-sort");
+                }
+            }
+            if(len > 0){
+                //limit = parseInt(jQuery(".filter-limit-record").val());
+                jQuery(".filter-flag").val(1);
+           }else{
+               jQuery(".filter-flag").val(0);
+           }
+            /* Dislaying Select Added filter option */
+               var attrlabel = jQuery(this).parents(".filter-options").find('.filter-label').text();
+               if(jQuery.trim(attrlabel) !="Sort by"){
+                attrlabel = jQuery.trim(attrlabel);
+                attrClass = jQuery.trim(attrlabel.replace(/\s+/g, '_').toLowerCase());
+                var selectLenth = jQuery('.filtered-options').find("."+attrClass).length;
+                    if(selectLenth == 0){
+                             var html = "<div class='block "+attrClass+"'>";
+                             html += "<span class='label'>"+attrlabel+"</span>";
+                             html += "<ul>";
+                             jQuery("."+attrClass+" ol li .shopby-attr-selected").each(function(index) {
+                                html += "<li class="+jQuery(this).attr('data-id')+"><span>"+jQuery(this).attr('data-optionval')+"</span><a href='javascript:void(0);' data-class="+attrClass+" data-id="+jQuery(this).attr('data-id')+" class='remove-filter'>remove</a></li>";
+                            });
+                             html += "</ul>";
+                             html += "</div>";
+                             //alert(html);
+                             jQuery(".filtered-options").append(html);
+                             jQuery(".filtered-options").show();
+
+                    }else{
+                        //alert(jQuery(".filtered-options ."+attrClass+" ul").find("."+jQuery(this).attr("data-id")).length);
+                       if(jQuery(".filtered-options ."+attrClass+" ul").find("."+jQuery(this).attr("data-id")).length == 0){
+                           var html = "<li class="+jQuery(this).attr('data-id')+"><span>"+jQuery(this).attr('data-optionval')+"</span><a href='javascript:void(0);' data-class="+attrClass+" data-id="+jQuery(this).attr('data-id')+" class='remove-filter'>remove</a></li>";
+                           jQuery(".filtered-options ."+attrClass).find("ul").append(html);
+                       }else{
+                           jQuery(".filtered-options ."+attrClass).find("ul ."+jQuery(this).attr('data-id')).remove();
+                           var isLength = jQuery(".filtered-options ."+attrClass).find("ul").find("li").length;
+                           if(isLength == 0){
+                               jQuery(".filtered-options").find("."+attrClass).remove();
+                           }
+                           if(jQuery(".filtered-options").find("ul").length == 0){
+                                jQuery(".filtered-options").hide();
+                           }
+                       }
+                    }
+                    //jQuery(".filtered-options").show();
+               }
+            /* End Displaying Select Added filter option */
+            if(sortByField){
+              priceflag = true;
+            }else{
+              priceflag = false;
+            }
+            var url = '<?php echo $this->getUrl('wizard/search/loadnew');?>';
+            jQuery.ajax({
+                url : url,
+                dataType : 'html',
+                type: 'POST',
+                data: {limit: limit,catId:catId,sort:sort,orderby:orderby,sortby:sortby,minPrice:minPrice,maxPrice:maxPrice,priceflag:priceflag,editid:editid,querystring:querystring},
+                success : function(response) {
+                    reData = JSON.parse(response);
+                    if(reData.html == ''){
+                        reData.html = '<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>';
+                    }
+                    jQuery(".products-list").html(reData.html);
+                    jQuery("#total-product").val(reData.count);
+                    jQuery(".category-products").removeClass('loading');
+                    jQuery('input[name=pagenumber]').val(1);
+                    if(!sortByField){
+                      loadPriceSlider(reData.minprice,reData.maxprice);
+                    }
+                    showLoadmore();
+                },error :  function(error){
+                    reData = JSON.parse(error.responseText);
+                    if(reData.html == ''){
+                        reData.html = '<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>';
+                    }
+                    jQuery(".products-list").html(reData.html);
+                    jQuery("#total-product").val(reData.count);
+                    jQuery(".category-products").removeClass('loading');
+                    jQuery('input[name=pagenumber]').val(1);
+                    if(!sortByField){
+                      loadPriceSlider(reData.minprice,reData.maxprice);
+                    }
+                    showLoadmore();
+                }
+            });
+        });
+        /* Select All Request */
+        jQuery('.selectAll').click(function(){
+           jQuery(".category-products").addClass('loading');
+           var minPrice = jQuery("#min-priceval").val();
+           var maxPrice = jQuery("#max-priceval").val();
+           //jQuery('.loading-icon').show();
+           jQuery("p#totalRecord").text('');
+           jQuery("p#max-price").text('');
+           jQuery("p#min-price").text('');
+           jQuery(".filter-flag").val(0);
+           jQuery(".filter-limit-record").val(0);
+           var sort = {};
+           var orderby = "created_at";
+           var sortby = "asc";
+           //var limit = parseInt(jQuery(".limit-record").val());
+           // Close DropDown
+            jQuery(".filter-options .filter-label").removeClass("active");
+            jQuery(".filter-options .list").removeClass("active");
+           if(jQuery(".list ol li a").hasClass("selected")){
+            orderby = jQuery(".list ol li a.selected").attr("data-order");
+            sortby = jQuery(".list ol li a.selected").attr("data-sort");
+           }
+            var limit = parseInt(jQuery(".filter-limit-record").val());
+           // jQuery(this).next().find(".shopby-attr").attr("checked","checked");
+            jQuery(this).next().find(".shopby-attr").prop('checked',true);
+            jQuery(this).next().find(".shopby-attr").addClass("shopby-attr-selected");
+
+            /* Code for selected Karat with Metal Color*/
+               var karatLen = jQuery(".metal_karat ol").find('input.shopby-attr-selected').length;
+               //if(karatLen ==0){
+                  var metalLen = jQuery(".metal ol").find('input.shopby-attr-selected').length;
+                  var ringStyleLen = jQuery(".ring_style ol").find('input.shopby-attr-selected').length;
+                  var shape = jQuery(".shape ol").find('input.shopby-attr-selected').length;
+                  var diamondSize = jQuery(".diamond_size ol").find('input.shopby-attr-selected').length;
+                  if(metalLen > 0 || ringStyleLen > 0 || shape > 0 || diamondSize > 0){
+                     //jQuery(".metal_karat ol li").find("input").eq(0).trigger('click');
+                     //jQuery(".metal_karat ol li").find("input").eq(0).addClass("shopby-attr-selected");
+                     //jQuery(".metal_karat ol li").find("input").eq(0).prop('checked',true);
+                  }
+              // }
+            /* End Code for selected Karat with Metal Color*/
+            // if checkbox size is greater than 0
+            var len = jQuery("li .shopby-attr-selected").length;
+            jQuery("li .shopby-attr-selected" ).each(function(index) {
+              if(sort[jQuery(this).attr('data-attname')] == undefined){
+                sort[jQuery(this).attr('data-attname')] = [];
+              }
+              sort[jQuery(this).attr('data-attname')].push(jQuery(this).val());
+            });
+
+            /* Dislaying Select Added filter option */
+               var attrlabel = jQuery(this).parents(".filter-options").find('.filter-label').text();
+               if(jQuery.trim(attrlabel) !="Sort by"){
+                attrlabel = jQuery.trim(attrlabel);
+                attrClass = jQuery.trim(attrlabel.replace(/\s+/g, '_').toLowerCase());
+                var selectLenth = jQuery('.filtered-options').find("."+attrClass).length;
+                    if(selectLenth == 0){
+                          var html = "<div class='block "+attrClass+"'>";
+                             html += "<span class='label'>"+attrlabel+"</span>";
+                             html += "<ul>";
+                             jQuery("."+attrClass+" ol li .shopby-attr-selected").each(function(index) {
+                                html += "<li class="+jQuery(this).attr('data-id')+"><span>"+jQuery(this).attr('data-optionval')+"</span><a href='javascript:void(0);' data-class="+attrClass+" data-id="+jQuery(this).attr('data-id')+" class='remove-filter'>remove</a></li>";
+                            });
+                             html += "</ul>";
+                             html += "</div>";
+                             //alert(html);
+                             jQuery(".filtered-options").append(html);
+
+                    }else{
+                        var html = '';
+                        jQuery(".filtered-options ."+attrClass).find("li").remove();
+                        jQuery("."+attrClass+" ol li .shopby-attr-selected").each(function(index) {
+                                html += "<li class="+jQuery(this).attr('data-id')+"><span>"+jQuery(this).attr('data-optionval')+"</span><a href='javascript:void(0);' data-class="+attrClass+" data-id="+jQuery(this).attr('data-id')+" class='remove-filter'>remove</a></li>";
+                        });
+                        jQuery(".filtered-options ."+attrClass).find("ul").append(html);
+                    }
+                    jQuery(".filtered-options").show();
+               }
+            /* End Displaying Select Added filter option */
+
+            var url = '<?php echo $this->getUrl('wizard/search/loadnew');?>';
+            jQuery.ajax({
+                url : url,
+                dataType : 'html',
+                type: 'POST',
+                data: {limit: limit,catId:catId,sort:sort,orderby:orderby,sortby:sortby,minPrice:minPrice,maxPrice:maxPrice,priceflag:false,editid:editid,querystring:querystring},
+                success : function(response) {
+                    reData = JSON.parse(response);
+                    if(reData.html == ''){
+                        reData.html = '<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>';
+                    }
+                    jQuery(".products-list").html(reData.html);
+                    jQuery("#total-product").val(reData.count);
+                    jQuery(".category-products").removeClass('loading');
+                    jQuery('input[name=pagenumber]').val(1);
+                    loadPriceSlider(reData.minprice,reData.maxprice);
+                    showLoadmore();
+                },error :  function(error){
+                    reData = JSON.parse(error.responseText);
+                    if(reData.html == ''){
+                        reData.html = '<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>';
+                    }
+                    jQuery(".products-list").html(reData.html);
+                    jQuery("#total-product").val(reData.count);
+                    jQuery(".category-products").removeClass('loading');
+                    jQuery('input[name=pagenumber]').val(1);
+                    loadPriceSlider(reData.minprice,reData.maxprice);
+                    showLoadmore();
+                }
+            });
+        });
+        jQuery(document).on('click',".remove-filter",function(){
+           //jQuery('.loading-icon').show();
+           jQuery("p#totalRecord").text('');
+           jQuery("p#max-price").text('');
+           jQuery("p#min-price").text('');
+           jQuery(".filter-flag").val(0);
+           jQuery(".filter-limit-record").val(0);
+           var minPrice = jQuery("#min-priceval").val();
+           var maxPrice = jQuery("#max-priceval").val();
+           var optionId = jQuery(this).attr("data-id");
+           var attrClass = jQuery(this).attr("data-class");
+           var orderby = "created_at";
+           var sortby = "asc";
+           var sort = {};
+           var limit = parseInt(jQuery(".filter-limit-record").val());
+           // Close DropDown
+           jQuery(".filter-options .filter-label").removeClass("active");
+           jQuery(".filter-options .list").removeClass("active");
+           jQuery(".category-products").addClass('loading');
+           jQuery("#"+optionId).removeClass("shopby-attr-selected");
+           jQuery("#"+optionId).removeAttr('checked');
+           jQuery(".filtered-options ul li."+optionId).remove();
+           var isLength = jQuery(".filtered-options ."+attrClass).find("ul").find("li").length;
+           // If all option removed then remove Label
+           if(isLength == 0){
+               jQuery(".filtered-options").find("."+attrClass).remove();
+           }
+           if(jQuery(".filtered-options").find("ul").length == 0){
+                jQuery(".filtered-options").hide();
+           }
+           if(jQuery(".list ol li a").hasClass("selected")){
+                orderby = jQuery(".list ol li a.selected").attr("data-order");
+                sortby = jQuery(".list ol li a.selected").attr("data-sort");
+           }
+
+            jQuery("li .shopby-attr-selected" ).each(function(index) {
+              if(sort[jQuery(this).attr('data-attname')] == undefined){
+                sort[jQuery(this).attr('data-attname')] = [];
+              }
+              sort[jQuery(this).attr('data-attname')].push(jQuery(this).val());
+            });
+            var url = '<?php echo $this->getUrl('wizard/search/loadnew');?>';
+            jQuery.ajax({
+                url : url,
+                dataType : 'html',
+                type: 'POST',
+                data: {limit: limit,catId:catId,sort:sort,orderby:orderby,sortby:sortby,minPrice:minPrice,maxPrice:maxPrice,priceflag:false,editid:editid,querystring:querystring},
+                success : function(response) {
+                    reData = JSON.parse(response);
+                    if(reData.html == ''){
+                        reData.html = '<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>';
+                    }
+                    jQuery(".products-list").html(reData.html);
+                    jQuery("#total-product").val(reData.count);
+                    jQuery(".category-products").removeClass('loading');
+                    jQuery('input[name=pagenumber]').val(1);
+                    loadPriceSlider(reData.minprice,reData.maxprice);
+                    showLoadmore();
+                },error :  function(error){
+                    reData = JSON.parse(error.responseText);
+                    if(reData.html == ''){
+                        reData.html = '<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>';
+                    }
+                    jQuery(".products-list").html(reData.html);
+                    jQuery("#total-product").val(reData.count);
+                    jQuery(".category-products").removeClass('loading');
+                    jQuery('input[name=pagenumber]').val(1);
+                    loadPriceSlider(reData.minprice,reData.maxprice);
+                    showLoadmore();
+                }
+            });
+        });
+
+        jQuery(document).on('click',".clear-all",function(){
+            var minPrice = jQuery("#resetMinPrice").val();
+            var maxPrice = jQuery("#resetMaxPrice").val();
+            jQuery(".category-products").addClass('loading');
+            jQuery("p#totalRecord").text('');
+            jQuery("p#max-price").text('');
+            jQuery("p#min-price").text('');
+            jQuery(".filter-flag").val(0);
+            jQuery(".filter-limit-record").val(0);
+            var sort = {};
+            var limit = parseInt(jQuery(".filter-limit-record").val());
+            var orderby = "created_at";
+            var sortby = "asc";
+            // Close DropDown
+           jQuery(".filter-options .filter-label").removeClass("active");
+           jQuery(".filter-options .list").removeClass("active");
+            if(jQuery(".sort-by .list ol li a").hasClass("selected")){
+                /*orderby = jQuery(".list ol li a.selected").attr("data-order");
+                sortby = jQuery(".list ol li a.selected").attr("data-sort");*/
+                jQuery(".list ol li a").removeClass("selected");
+            }
+            jQuery(".filtered-options").find(".block").remove();
+            jQuery(".filtered-options").hide();
+            jQuery("li .shopby-attr-selected").each(function(index) {
+                  jQuery(this).removeClass('shopby-attr-selected');
+                  jQuery(this).removeAttr("checked");
+            });
+            var url = '<?php echo $this->getUrl('wizard/search/loadnew');?>';
+            jQuery.ajax({
+                url : url,
+                dataType : 'html',
+                type: 'POST',
+                data: {limit: limit,catId:catId,sort:sort,orderby:orderby,sortby:sortby,minPrice:minPrice,maxPrice:maxPrice,priceflag:false,editid:editid,querystring:querystring},
+                success : function(response) {
+                    reData = JSON.parse(response);
+                    if(reData.html == ''){
+                        reData.html = '<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>';
+                    }
+                    jQuery(".products-list").html(reData.html);
+                    jQuery("#total-product").val(reData.count);
+                    jQuery(".category-products").removeClass('loading');
+                    jQuery('input[name=pagenumber]').val(1);
+                    loadPriceSlider(reData.minprice,reData.maxprice);
+                    showLoadmore();
+                },error :  function(error){
+                    reData = JSON.parse(error.responseText);
+                    if(reData.html == ''){
+                        reData.html = '<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>';
+                    }
+                    jQuery(".products-list").html(reData.html);
+                    jQuery("#total-product").val(reData.count);
+                    jQuery(".category-products").removeClass('loading');
+                    jQuery('input[name=pagenumber]').val(1);
+                    loadPriceSlider(reData.minprice,reData.maxprice);
+                    showLoadmore();
+                }
+            });
+        });
+        /* Price AJAX call*/
+        jQuery(".updateclass").change(function() {
+          jQuery("#price_range_filter").slider("values", 0, jQuery("#min-priceval").val());
+          jQuery("#price_range_filter").slider("values", 1, jQuery("#max-priceval").val());
+          var minPrice = jQuery("#min-priceval").val();
+          var maxPrice = jQuery("#max-priceval").val();
+          //jQuery('.loading-icon').show();
+         jQuery(".category-products").addClass('loading');
+         jQuery("p#totalRecord").text('');
+         jQuery("p#max-price").text('');
+         jQuery("p#min-price").text('');
+         jQuery(".filter-flag").val(0);
+         var len = parseInt(jQuery("li .shopby-attr-selected").length);
+         var limit = parseInt(jQuery(".filter-limit-record").val(0));
+         var sort = {};
+         var orderby = "created_at";
+         var sortby = "asc";
+          // Close DropDown
+           jQuery(".filter-options .filter-label").removeClass("active");
+           jQuery(".filter-options .list").removeClass("active");
+            if(jQuery(".list ol li a").hasClass("selected")){
+                orderby = jQuery(".list ol li a.selected").attr("data-order");
+                sortby = jQuery(".list ol li a.selected").attr("data-sort");
+            }
+            jQuery("li .shopby-attr-selected" ).each(function(index) {
+              if(sort[jQuery(this).attr('data-attname')] == undefined){
+                sort[jQuery(this).attr('data-attname')] = [];
+              }
+              sort[jQuery(this).attr('data-attname')].push(jQuery(this).val());
+            });
+           if(len > 0){
+                limit = parseInt(jQuery(".filter-limit-record").val());
+                jQuery(".filter-flag").val(1);
+           }else{
+               jQuery(".filter-flag").val(0);
+           }
+           var url = '<?php echo $this->getUrl('wizard/search/loadnew');?>';
+            jQuery.ajax({
+                url : url,
+                dataType : 'html',
+                type: 'POST',
+                data: {limit: limit,catId:catId,sort:sort,orderby:orderby,sortby:sortby,minPrice:minPrice,maxPrice:maxPrice,priceflag:true,editid:editid,querystring:querystring},
+                success : function(response) {
+                    reData = JSON.parse(response);
+                    if(reData.html == ''){
+                        reData.html = '<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>';
+                    }
+                    jQuery(".products-list").html(reData.html);
+                    jQuery("#total-product").val(reData.count);
+                    jQuery(".category-products").removeClass('loading');
+                    jQuery('input[name=pagenumber]').val(1);
+                    ///loadPriceSlider(reData.minprice,reData.maxprice);
+                    showLoadmore();
+                },error :  function(error){
+                    reData = JSON.parse(error.responseText);
+                    if(reData.html == ''){
+                        reData.html = '<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>';
+                    }
+                    jQuery(".products-list").html(reData.html);
+                    jQuery("#total-product").val(reData.count);
+                    jQuery(".category-products").removeClass('loading');
+                    jQuery('input[name=pagenumber]').val(1);
+                   // loadPriceSlider(reData.minprice,reData.maxprice);
+                    showLoadmore();
+                }
+            });
+        });
+        jQuery('.popop-product').click(function(){
+            var productId = jQuery(this).attr('data-productId');
+            url = '<?php echo $this->getUrl('wizard/index/getpopupproduct');?>';
+            jQuery('#custom-popup').hide();
+            jQuery("#custom-popup .loading").show();
+            jQuery.ajax( {
+                url : url,
+                dataType : 'html',
+                type: 'POST',
+                data: {id: productId},
+                success : function(response) {
+                  //alert(response);
+                    jQuery('#custom-popup .loading').removeClass();
+                    jQuery('#custom-popup').show();
+                    jQuery('.custom-popup').html(response);
+                    setTimeout(function(){ popupSlider(); }, 500);
+                }
+            });
+        });
+        /*-------- END LOAD MORE PRODUCT SCRIPT -------*/
+            jQuery('.compare-min-icon').click(function() {
+                jQuery(this).next().toggleClass('active');
+                jQuery('.compare-sidebar-window').addClass('fullwidth');
+                jQuery('html').addClass('fullwidth-window');
+            })
+            jQuery('.top-toolbar .close-icon').click(function() {
+                jQuery('.compare-content').removeClass('active');
+                jQuery('.compare-sidebar-window').removeClass('fullwidth');
+                jQuery('html').removeClass('fullwidth-window');
+            })
+            jQuery('.top-toolbar .minimize-icon').click(function() {
+                jQuery('.compare-sidebar-window').removeClass('fullwidth');
+                jQuery('html').removeClass('fullwidth-window');
+            })
+            jQuery('.top-toolbar .fullscreen-icon').click(function() {
+                jQuery('.compare-sidebar-window').removeClass('fullwidth');
+                jQuery('.compare-sidebar-window').addClass('fullwidth');
+                jQuery('html').addClass('fullwidth-window');
+
+            })
+            jQuery('.compare-min-icon').addClass('loading');
+            jQuery.get( BASE_URL+"wizard/compare", function( data ) {
+              jQuery( ".more-content" ).html( data );
+             // jQuery('.compare-sidebar-window.fullwidth .product-shop').mCustomScrollbar("destroy");
+             // jQuery('.compare-sidebar-window .product-shop').mCustomScrollbar();
+              jQuery('.compare-min-icon').removeClass('loading');
+              blankHtml();
+            });
+            jQuery('.compare-min-icon').click(function() {
+                jQuery('.catalog-category-view .category-products, .catalog-category-view .block-layered-nav, .catalog-category-view .footer-container').addClass('compare-active');
+            })
+            jQuery('.top-toolbar .close-icon').click(function() {
+                jQuery('.catalog-category-view .category-products, .catalog-category-view .block-layered-nav, .catalog-category-view .footer-container').removeClass('compare-active');
+            });
+            /* Active menu Script*/
+            jQuery(".filter-options .filter-label").click(function () {
+              if(jQuery(".filter-options .filter-label").hasClass("active")){
+                 if(jQuery(this).hasClass('active')){
+                     jQuery(".filter-options .filter-label").removeClass("active");
+                     jQuery(".filter-options .list").removeClass("active");
+                 }else{
+                    jQuery(".filter-options .filter-label").removeClass("active");
+                    jQuery(".filter-options .list").removeClass("active");
+                    jQuery(this).addClass('active');
+                    jQuery(this).next().addClass('active');
+                    equelItems();
+                 }
+              }else{
+                 jQuery(".filter-options .filter-label").removeClass("active");
+                 jQuery(".filter-options .list").removeClass("active");
+                 jQuery(this).addClass('active');
+                 jQuery(this).next().addClass('active');
+                  equelItems();
+              }
+            });
+    });
+
+     jQuery(document).click(function(){
+       jQuery(".filter-options .filter-label").removeClass("active");
+       jQuery(".filter-options .list").removeClass("active");
+     });
+
+    jQuery(".filter-options").click(function(e){
+      e.stopPropagation();
+    });
+
+
+
+    function showLoadmore(){
+        var totalRing = parseInt(jQuery(".total-product").val());
+        var liLength =  parseInt(jQuery(".products-list > li").length);
+        if(liLength < totalRing){
+           jQuery(".load-more").show()
+        }else{
+            jQuery(".load-more").hide()
+        }
+    }
+
+    function blankHtml() {
+        var blank = jQuery('.more-content').html();
+        blank = jQuery.trim(blank);
+        if(blank == ''){
+            jQuery('.compare-min-icon').addClass('blank');
+        } else {
+            jQuery('.compare-min-icon').removeClass('blank');
+        }
+    }
+
+    function compareProduct(pid){
+        jQuery.ajax({
+            url: BASE_URL+"wizard/index/compareproduct",
+            type: "POST",
+            data: {pid:pid},
+                success: function(redata){
+                    redata = JSON.parse(redata);
+                    getCompareHtml();
+                    jQuery("[data-compare=compare-" + redata.pid + "]").addClass('added-to-compare');
+                }
+        })
+    }
+
+    function updatePriceSldier(){
+     jQuery("#price_range_filter").slider("values", 0, jQuery("#min-priceval").val());
+     jQuery("#price_range_filter").slider("values", 1, jQuery("#max-priceval").val());
+      var minPrice = jQuery("#min-priceval").val();
+      var maxPrice = jQuery("#max-priceval").val();
+      //jQuery('.loading-icon').show();
+            jQuery(".category-products").addClass('loading');
+            jQuery("p#totalRecord").text('');
+            jQuery("p#max-price").text('');
+            jQuery("p#min-price").text('');
+            jQuery(".filter-flag").val(0);
+            jQuery(".filter-limit-record").val(0);
+            var sort = {};
+            var limit = parseInt(jQuery(".filter-limit-record").val());
+            var categotyId = parseInt(jQuery(".categotyId").val());
+            var orderby = "created_at";
+            var sortby = "asc";
+            if(jQuery(".list ol li a").hasClass("selected")){
+                orderby = jQuery(".list ol li a.selected").attr("data-order");
+                sortby = jQuery(".list ol li a.selected").attr("data-sort");
+            }
+            jQuery("li .shopby-attr-selected" ).each(function(index) {
+              if(sort[jQuery(this).attr('data-attname')] == undefined){
+                sort[jQuery(this).attr('data-attname')] = [];
+              }
+              sort[jQuery(this).attr('data-attname')].push(jQuery(this).val());
+            });
+            /*alert(minPrice);
+            alert(maxPrice);*/
+            var url = '<?php echo $this->getUrl('wizard/search/loadnew');?>';
+            jQuery.ajax({
+                url : url,
+                dataType : 'html',
+                type: 'POST',
+                data: {limit: limit,catId:catId,sort:sort,orderby:orderby,sortby:sortby,minPrice:minPrice,maxPrice:maxPrice,priceflag:true,editid:editid,querystring:querystring},
+                success : function(response) {
+                    reData = JSON.parse(response);
+                    if(reData.html == ''){
+                        reData.html = '<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>';
+                    }
+                    jQuery(".products-list").html(reData.html);
+                    jQuery("#total-product").val(reData.count);
+                    jQuery(".category-products").removeClass('loading');
+                    jQuery('input[name=pagenumber]').val(1);
+                   // loadPriceSlider(reData.minprice,reData.maxprice);
+                    showLoadmore();
+                },error :  function(error){
+                    reData = JSON.parse(error.responseText);
+                    if(reData.html == ''){
+                        reData.html = '<p class="note-msg"><?php echo $this->__('There are no products matching the selection.') ?></p>';
+                    }
+                    jQuery(".products-list").html(reData.html);
+                    jQuery("#total-product").val(reData.count);
+                    jQuery(".category-products").removeClass('loading');
+                    jQuery('input[name=pagenumber]').val(1);
+                    //loadPriceSlider(reData.minprice,reData.maxprice);
+                    showLoadmore();
+                }
+            });
+ }
+
+
+  function loadPriceSlider(minprice,maxprice){
+    jQuery("#min-priceval").val(parseInt(minprice));
+    jQuery("#max-priceval").val(parseInt(maxprice));
+    jQuery("#price_range_filter").slider({
+          range: true,
+          min: parseInt(minprice),
+          max: parseInt(maxprice),
+          values: [parseInt(minprice),parseInt(maxprice)],
+          slide: function(event, ui) {
+            jQuery("#min-priceval").val(ui.values[0]);
+            jQuery("#max-priceval").val(ui.values[1]);
+          },
+          stop: function(event, ui) {
+            jQuery("#min-priceval").val(ui.values[0]);
+            jQuery("#max-priceval").val(ui.values[1]);
+            updatePriceSldier();
+          }
+        });
+  }
+
+function getCompareHtml(){
+    jQuery('.compare-min-icon').addClass('loading');
+    jQuery.get( BASE_URL+"wizard/compare", function( data ) {
+      jQuery( ".more-content" ).html( data );
+      //jQuery('.compare-sidebar-window.fullwidth .product-shop').mCustomScrollbar("destroy");
+      //jQuery('.compare-sidebar-window .product-shop').mCustomScrollbar();
+      jQuery('.compare-min-icon').removeClass('loading');
+      blankHtml();
+    });
+}
+function removeItem(url) {
+    new Ajax.Request(url, {
+        parameters: {
+            isAjax: 1
+            , method: 'POST'
+        }
+        , onLoading: function () {
+            jQuery('.compare-window').addClass('loading');
+        }
+        , onSuccess: function (transport) {
+            getCompareHtml();
+            jQuery('.compare-window').removeClass('loading');
+        }
+    });
+}
+
+</script>

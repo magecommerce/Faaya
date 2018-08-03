@@ -1,9 +1,0 @@
-[25-Jun-2018 11:45:30 UTC] PHP Fatal error:  Class 'ZipArchive' not found in /home/faaya/public_html/import-product.php on line 9
-[25-Jun-2018 11:45:48 UTC] PHP Fatal error:  Class 'ZipArchive' not found in /home/faaya/public_html/import-product.php on line 9
-[25-Jun-2018 08:23:31 America/New_York] PHP Fatal error:  Call to a member function getData() on null in /home/faaya/public_html/app/code/core/Mage/Catalog/Helper/Image.php on line 167
-[25-Jun-2018 08:26:51 America/New_York] PHP Fatal error:  Call to a member function getData() on null in /home/faaya/public_html/app/code/core/Mage/Catalog/Helper/Image.php on line 167
-[25-Jun-2018 12:36:41 UTC] PHP Fatal error:  Class 'ZipArchive' not found in /home/faaya/public_html/import-product.php on line 9
-[25-Jun-2018 12:36:48 UTC] PHP Fatal error:  Class 'ZipArchive' not found in /home/faaya/public_html/import-product.php on line 9
-[25-Jun-2018 12:39:27 UTC] PHP Fatal error:  Class 'ZipArchive' not found in /home/faaya/public_html/import-product.php on line 9
-[25-Jun-2018 12:40:13 UTC] PHP Fatal error:  Class 'ZipArchive' not found in /home/faaya/public_html/import-product.php on line 9
-[25-Jun-2018 12:40:43 UTC] PHP Fatal error:  Class 'ZipArchive' not found in /home/faaya/public_html/import-product.php on line 9

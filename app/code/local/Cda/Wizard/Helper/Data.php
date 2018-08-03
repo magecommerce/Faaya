@@ -7,6 +7,7 @@ class Cda_Wizard_Helper_Data extends Mage_Core_Helper_Abstract
     public $_resource;
     public $_writeConnection;
     public $_readConnection;
+    public $_productTypeList;
     public function __construct(){
        $this->_allTitle = $this->getAlltitle();
        $this->_caratReader = $this->getcaratFileRead();
@@ -14,6 +15,7 @@ class Cda_Wizard_Helper_Data extends Mage_Core_Helper_Abstract
        $this->_resource = Mage::getSingleton('core/resource');
        $this->_writeConnection = $this->_resource->getConnection('core_write');
        $this->_readConnection = $this->_resource->getConnection('core_read');
+       $this->_productTypeList = $this->getProductTypeList();
     }
 
     public function getAttributeValue($code,$oid){
@@ -206,10 +208,10 @@ class Cda_Wizard_Helper_Data extends Mage_Core_Helper_Abstract
         $stonequality = array('FL','IF','VVS1','VVS2','VS1','VS2','SI1','SI2','SI3','I1','I2','I3');
         $stonecolor = array('D','E','F','G','H','I','J','K','L','M','COL');
         if(!empty($ringCollection)){
-            $itemDiamond = $this->_readConnection->fetchCol("select DISTINCT({$code}) from wizardmaster where product_type='DIAMOND' and sku IN ('".implode("','",$ringCollection)."')");
+            $itemDiamond = $this->_readConnection->fetchCol("select DISTINCT({$code}) from wizardmaster where LOWER(product_type)='".$this->_productTypeList['diamond']."' and sku IN ('".implode("','",$ringCollection)."')");
 
         }else{
-            $itemDiamond = $this->_readConnection->fetchCol("select DISTINCT({$code}) from wizardmaster where product_type='DIAMOND'");
+            $itemDiamond = $this->_readConnection->fetchCol("select DISTINCT({$code}) from wizardmaster where LOWER(product_type)='".$this->_productTypeList['diamond']."'");
         }
 
         if($code == 'stone_cut'){
@@ -233,7 +235,7 @@ class Cda_Wizard_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         $code = strtolower($code);
-        $itemDiamond = $this->_readConnection->fetchRow("select MIN({$code}) as min,MAX({$code}) as max from wizardmaster where product_type='DIAMOND'");
+        $itemDiamond = $this->_readConnection->fetchRow("select MIN({$code}) as min,MAX({$code}) as max from wizardmaster where LOWER(product_type)='".$this->_productTypeList['diamond']."'");
         return $itemDiamond;
     }
 
@@ -251,17 +253,17 @@ class Cda_Wizard_Helper_Data extends Mage_Core_Helper_Abstract
         }
         $code = strtolower($code);
         if($code == 'sub_category'){
-            $itemDiamond = $this->_readConnection->fetchCol("select DISTINCT({$code}) from wizardmaster where product_type='RING' and lower(sub_category) != 'wedding band' ".$qury);
+            $itemDiamond = $this->_readConnection->fetchCol("select DISTINCT({$code}) from wizardmaster where LOWER(product_type)='".$this->_productTypeList['ring']."' and lower(sub_category) != 'wedding band' ".$qury);
             if(empty($itemDiamond)){
-                $itemDiamond = $this->_readConnection->fetchCol("select DISTINCT({$code}) from wizardmaster where product_type='RING' and lower(sub_category) != 'wedding band' ");
+                $itemDiamond = $this->_readConnection->fetchCol("select DISTINCT({$code}) from wizardmaster where LOWER(product_type)='".$this->_productTypeList['ring']."' and lower(sub_category) != 'wedding band' ");
             }
 
             $stylesorting = array('Solitaires','Halo Ring','3 Stone Ring','Trellis','Vintage');
             $itemDiamond = array_intersect($stylesorting, $itemDiamond);
         }else{
-            $itemDiamond = $this->_readConnection->fetchCol("select DISTINCT({$code}) from wizardmaster where product_type='RING' ".$qury);
+            $itemDiamond = $this->_readConnection->fetchCol("select DISTINCT({$code}) from wizardmaster where LOWER(product_type)='".$this->_productTypeList['ring']."' ".$qury);
             if(empty($itemDiamond)){
-                $itemDiamond = $this->_readConnection->fetchCol("select DISTINCT({$code}) from wizardmaster where product_type='RING'");
+                $itemDiamond = $this->_readConnection->fetchCol("select DISTINCT({$code}) from wizardmaster where LOWER(product_type)='".$this->_productTypeList['ring']."'");
             }
         }
 
@@ -377,7 +379,7 @@ class Cda_Wizard_Helper_Data extends Mage_Core_Helper_Abstract
 
             $ringData = $this->_readConnection->fetchRow("select karat,metal_color,sub_category,price from wizardmaster where pid=".$promiseSet['promise']);
             $price = Mage::helper('core')->currency($ringData['price'], true, false);
-            $ringText = '<span class="tab-subtitle">'.$ringData['karat'].' '.$ringData['metal_color'].' '.$ringData['sub_category'].' <strong class="price">'.$price.'</strong></span>';
+            $ringText = '<span class="tab-subtitle">'.$ringData['metal_color'].' '.$ringData['sub_category'].' <strong class="price">'.$price.'</strong></span>';
         }
 
         $stepList = array();
@@ -816,29 +818,6 @@ class Cda_Wizard_Helper_Data extends Mage_Core_Helper_Abstract
           if (!file_exists($imagePath)) {
               return Mage::getSingleton('catalog/product_media_config')->getBaseMediaUrl(). '/placeholder/' .Mage::getStoreConfig("catalog/placeholder/small_image_placeholder");
           }
-
-
-            /*if (@getimagesize($imagePath)) {
-
-            }else{
-                return Mage::getSingleton('catalog/product_media_config')->getBaseMediaUrl(). '/placeholder/' .Mage::getStoreConfig("catalog/placeholder/small_image_placeholder");
-            }*/
-          // resize the image if needed
-          /*$rszImagePath = Mage::getBaseDir('media') . DS . 'catalog' . DS . 'product'
-                        . DS . 'cache' . DS . $width . 'x' . $height . DS
-                        . $productImage;
-
-          if (!file_exists($rszImagePath)) {
-              $image = new Varien_Image($imagePath);
-              //$image->resize($width, $height);
-            $image->constrainOnly(TRUE);
-            $image->keepAspectRatio(TRUE);
-            $image->keepFrame(FALSE);
-            $image->resize($width,null);
-            $image->save($rszImagePath);
-          }*/
-          // return the image URL
-          //return Mage::getBaseUrl('media') . '/catalog/product/cache/' . $width . 'x'
           return $imageurl;
     }
 
@@ -875,12 +854,13 @@ class Cda_Wizard_Helper_Data extends Mage_Core_Helper_Abstract
         return $chainlength;
     }
     public function getChainType($pid,$length){
-
+        $chainTypeArr = array('Cable Chain- Thin','Cable Chain- Medium','Cable Chain- Thick','Thin','Medium','Thick','CHAIN');
         $chaintype = $this->_readConnection->fetchCol("select variant_refsmryid from wizardrelation where type='chain' AND pid =".$pid);
         if(!empty($chaintype)){
             $relationtype = '"'.implode('","', $chaintype).'"';
-            $chaintype = $this->_readConnection->fetchAll("select chain_type,image from wizardmaster where sku IN (".$relationtype.") and chain_length=".$length." group by chain_type");
+            $chaintype = $this->_readConnection->fetchCol("select chain_type from wizardmaster where sku IN (".$relationtype.") and chain_length=".$length." group by chain_type");
         }
+        $chaintype = array_intersect($chainTypeArr,$chaintype);
         return $chaintype;
     }
     public function getChainId($pid,$length,$type){
@@ -950,6 +930,12 @@ class Cda_Wizard_Helper_Data extends Mage_Core_Helper_Abstract
             $productId = array_merge($productId,$existData);
         }
         return $productId;
+    }
+
+
+    public function getProductTypeList()
+    {
+        return array('ring'=>'rings','band'=>'bands','bracelet'=>'bracelets','chain'=>'chain','diamond'=>'diamond','earring'=>'earrings','pendant'=>'pendants','promise'=>'promise ring');
     }
 
 }

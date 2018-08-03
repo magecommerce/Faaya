@@ -671,7 +671,7 @@ a.icon-zoom.video-zoom-icon {
 
 .wizard-ring-index .custom-options .clarity.shapes-2.diamondshape h2 { margin-bottom:15px; }
 .compare-remove { position:absolute; right:15px; top:10px; font-size:0; }
-.compare-remove:before { content:""; display:inline-block; width:13px; height:13px; background:url(../../images/close-compare.jpg) no-repeat left top; }
+.compare-remove:before { content:""; display:inline-block; width:13px; height:13px; background:url(../../images/close-compare.png) no-repeat left top; }
 
 table.dataTable.display tbody tr td.dataTables_empty, table.dataTable.display tbody tr.selected td.dataTables_empty { border:0!important; }
 

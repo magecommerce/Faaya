@@ -70,9 +70,6 @@ $backlink = Mage::app()->getStore()->getUrl($stepList[2]['backurl']);
                 </div>
                 <?php //if(count($gallery['images']) > 0 || $product->getVideoUrl()){ ?>
                 <div class="viewcomplete-image">
-                    <div class="item">
-                        <img src="<?php echo $this->getSkinUrl('images/loose-diamond/'.$stoneShape.'.png'); ?>" alt="" />
-                    </div>
                     <?php foreach ($gallery['images'] as $item) { ?>
                         <div class="item">
                             <img src="<?php echo Mage::helper('catalog/image')->init($product, 'thumbnail', $item['file'])->resize(600); ?>" alt="" />
@@ -103,9 +100,6 @@ $backlink = Mage::app()->getStore()->getUrl($stepList[2]['backurl']);
                     </div>
                 <?php } */ ?>
                 <div class="viewcomplete-thumb">
-                   <div class="item">
-                        <img src="<?php echo $this->getSkinUrl('images/loose-diamond/'.$stoneShape.'.png'); ?>" alt="" />
-                    </div>
                    <?php foreach ($gallery['images'] as $item) { ?>
                         <div class="item">
                             <img src="<?php echo Mage::helper('catalog/image')->init($product, 'thumbnail', $item['file'])->backgroundColor(255,255,255)->resize(90); ?>" alt="" />
@@ -203,13 +197,11 @@ $backlink = Mage::app()->getStore()->getUrl($stepList[2]['backurl']);
                                                 if($item['number_format']){
                                                     echo number_format($product->getData($item['code']),2);
                                                 }else{
-                                                    if($item['code'] == 'certificate_no'){
-
-                                                        if(Mage::helper('wizard')->checkRemoteFile($product->getCertificatePdf())){ ?>
+                                                    if($item['code'] == 'certificate_no' && Mage::helper('wizard')->checkRemoteFile($product->getCertificatePdf())){ ?>
 
                                                         <a class="diamond-pdf" href="<?php echo $product->getCertificatePdf();?>" target="_blank" ><span><?php echo $product->getData($item['code']);?></span></a>
 
-                                                        <?php  }
+                                                        <?php
                                                     }else{
                                                         echo $product->getData($item['code']);
                                                     }
@@ -230,17 +222,17 @@ $backlink = Mage::app()->getStore()->getUrl($stepList[2]['backurl']);
                             <ul>
                                 <?php foreach ($this->getAttributeArry('right') as $item) { ?>
                                     <li>
-                                        <span class="title"><?php echo $item['title'];?>
-                                            <?php if($item['tooltip'] != ''){ ?>
+                                        <span class="title"><?php echo $helper->getAttrTitle($item);?>
+                                            <?php if($helper->getTooltip($item)){ ?>
                                             <div class="tooltip-options">
                                                 <div class="tooltip-image">
                                                     <img src="<?php echo $this->getSkinUrl('css/images/info-icon.png') ?>" alt="">
                                                 </div>
                                                 <div class="tooltip-content">
-                                                    <a class="close-btn" href="javascript:void(0);"><img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt=""></a>
-                                                    <h3><?php echo $this->__('Color Grade');?></h3>
-                                                    <img src="<?php echo $this->getSkinUrl('css/images/tooltip-img1.png'); ?>" alt="">
-                                                    <p><?php echo $this->__('Near-colorless.');?> <br><?php echo $this->__('Slightly detected color—a good value.');?></p>
+                                                    <a class="close-btn" href="javascript:void(0);">
+                                                        <img src="<?php echo $this->getSkinUrl('css/images/close-icon2.png'); ?>" alt="">
+                                                    </a>
+                                                    <?php echo $helper->getTooltip($item);?>
                                                 </div>
                                             </div>
                                             <?php } ?>

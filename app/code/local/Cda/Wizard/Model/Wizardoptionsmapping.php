@@ -6,12 +6,14 @@ class Cda_Wizard_Model_Wizardoptionsmapping extends Mage_Core_Model_Abstract
     public $_styleListId;
     public $_resource;
     public $_readConnection;
+    public $_productType;
     protected function _construct(){
        //$this->_init("wizard/wizardoptionsmapping");
         $this->_pageLimit = 18;
         $this->_styleListId = $this->getProductstyle();
         $this->_resource = Mage::getSingleton('core/resource');
         $this->_readConnection = $this->_resource->getConnection('core_read');
+        $this->_productType = Mage::helper('wizard')->getProductTypeList();
     }
 
     public function deleteCartItem($deleteid,$matchflag)
@@ -107,9 +109,9 @@ class Cda_Wizard_Model_Wizardoptionsmapping extends Mage_Core_Model_Abstract
                 $existDiamond = Mage::helper('wizard')->existDiamonds(false);
             }
             if(!empty($existDiamond)){
-                $query = 'SELECT sku FROM wizardmaster where stone_shape IN ("'.implode('","',$values['value']['STONE_SHAPE']).'") and product_type = "DIAMOND" and pid NOT IN ('.implode(",",$existDiamond).')';
+                $query = 'SELECT sku FROM wizardmaster where stone_shape IN ("'.implode('","',$values['value']['STONE_SHAPE']).'") and LOWER(product_type) = "'.$this->_productType['diamond'].'" and pid NOT IN ('.implode(",",$existDiamond).')';
             }else{
-                $query = 'SELECT sku FROM wizardmaster where stone_shape IN ("'.implode('","',$values['value']['STONE_SHAPE']).'") and product_type = "DIAMOND"';
+                $query = 'SELECT sku FROM wizardmaster where stone_shape IN ("'.implode('","',$values['value']['STONE_SHAPE']).'") and LOWER(product_type) = "'.$this->_productType['diamond'].'"';
             }
 
             $diamondData = $this->_readConnection->fetchCol($query);
@@ -120,7 +122,7 @@ class Cda_Wizard_Model_Wizardoptionsmapping extends Mage_Core_Model_Abstract
 
         $metalSelected = false;
         $query = 'SELECT pid,price,special_price,image,variant_remark,variant_name FROM wizardmaster where IF(  `center_diamond` =1, special_character LIKE  "%C%", 1 ) AND IF(  `matchpair` =1, special_character LIKE  "%M%", 1 ) AND ';
-        $where = array('product_type = "RING"');
+        $where = array('LOWER(product_type) = "'.$this->_productType['ring'].'"');
         foreach ($values['value'] as $key=>$value) {
             if($key == 'STONE_SHAPE'){ continue; }
             if($key == 'PRODUCT_SIZE'){ continue; }
@@ -188,6 +190,7 @@ class Cda_Wizard_Model_Wizardoptionsmapping extends Mage_Core_Model_Abstract
                 $where = array();
             }
         }
+
         $mainQuery = '';
         if(!empty($where)){
             $whereQry = implode(' AND ', $where);
@@ -252,20 +255,26 @@ class Cda_Wizard_Model_Wizardoptionsmapping extends Mage_Core_Model_Abstract
         $pid = $values['ringid'];
 
         $relationRing = array();
-        $relationRing = $this->_readConnection->fetchCol("select DISTINCT variant_refsmryid from wizardrelation where type='material' and special_character='M' and pid=".$pid." group by variant_refsmryid");
+        /*$relationRing = $this->_readConnection->fetchCol("select DISTINCT variant_refsmryid from wizardrelation where type='material' and special_character='M' and pid=".$pid." group by variant_refsmryid");
 
-        $relationRing = Mage::Helper('wizard')->getIdfromRefSmy(implode(',', $relationRing));
+        $relationRing = Mage::Helper('wizard')->getIdfromRefSmy(implode(',', $relationRing));*/
+        $relationRing = $this->_readConnection->fetchCol("select group_code from wizardrelation where type='material' and special_character='M' and pid=".$pid." group by group_code HAVING COUNT(group_code)=2");
 
+        if(!empty($relationRing)){
+            $groupsetting = ' and group_code IN ("'.implode('","',$relationRing).'")';
+            $relationRing = $this->_readConnection->fetchCol("select DISTINCT variant_refsmryid from wizardrelation where type='material' and special_character='M'".$groupsetting);
+        }
 
         $query = 'SELECT * FROM wizardmaster where ';
-        $where = array('product_type = "DIAMOND"');
+        $where = array('LOWER(product_type) = "'.$this->_productType['diamond'].'"');
         $where[] = 'group_code != ""';
         foreach ($values['value'] as $key=>$value) {
             $key = strtolower($key);
             $where []= $key.' IN ("'.implode('","',$value).'")';
         }
         $where []= 'weight > "'.$values['caratArr'][0].'" and weight < "'.$values['caratArr'][1].'"';
-        $where []= 'pid IN ('.implode(",",$relationRing).')';
+        //$where []= 'pid IN ('.implode(",",$relationRing).')';
+        $where []= 'sku IN ("'.implode('","',$relationRing).'")';
         if($values['editid']){
             $existDiamond = Mage::helper('wizard')->existDiamonds(true);
         }else{
@@ -286,14 +295,19 @@ field( `stone_shape`, "ROUND", "PRINCESS", "CUSHION","OVAL","EMERALD"),weight AS
         foreach ($alldata as $value) {
             $updatedData[$value['group_code']][] = $value;
         }
+        $pidArr = array();
         foreach ($updatedData as $key=>$value) {
             if(count($value) != 2){
                 unset($updatedData[$key]);
+            }else{
+                $pidArr[] = $value[0]['pid'];
+                $pidArr[] = $value[1]['pid'];
             }
         }
-        $shapeQuery = 'SELECT stone_shape,COUNT(stone_shape),MIN(price) as min_price,MAX(price) as max_price  FROM wizardmaster where '.$whereQry.'  group by stone_shape order by
+
+        $shapeQuery = 'SELECT stone_shape,COUNT(stone_shape),MIN(price) as min_price,MAX(price) as max_price  FROM wizardmaster where '.$whereQry.' and pid IN ('.implode(",",$pidArr).') group by stone_shape order by
 field( `stone_shape`, "ROUND", "PRINCESS", "CUSHION","OVAL","EMERALD"),weight ASC';
-        if(empty($relationRing)){
+        if(empty($relationRing) || empty($updatedData)){
             $shapedata = array();
         }else{
             $shapedata = $this->_readConnection->fetchAll($shapeQuery);
@@ -358,7 +372,7 @@ $productShapes .= '<li class="item">
             $setStyle = $this->_readConnection->fetchRow("select metal_color,karat,item_id from wizardmaster where pid=".$ringId);
 
             $currentStyle = $this->_readConnection->fetchCol("select pid from wizardrelation where variant_refsmryid='".$diaSku[0]."' ");
-            $newStyle = $this->_readConnection->fetchCol("select pid from wizardmaster where metal_color='".$setStyle['metal_color']."' and  karat ='".$setStyle['karat']."' and pid IN (".implode(',', $currentStyle).") AND item_id=".$setStyle['item_id']." AND IF(  `center_diamond` =1, special_character LIKE  '%C%', 1 ) AND IF(  `matchpair` =1, special_character LIKE  '%M%', 1 ) AND product_type = 'RING' AND construction = 'Create your own'");
+            $newStyle = $this->_readConnection->fetchCol("select pid from wizardmaster where metal_color='".$setStyle['metal_color']."' and  karat ='".$setStyle['karat']."' and pid IN (".implode(',', $currentStyle).") AND item_id=".$setStyle['item_id']." AND IF(  `center_diamond` =1, special_character LIKE  '%C%', 1 ) AND IF(  `matchpair` =1, special_character LIKE  '%M%', 1 ) AND LOWER(product_type) = '".$this->_productType['ring']."' AND construction = 'Create your own'");
             $updatedRingId = $ringId;
             if(!in_array($ringId, $newStyle) && !empty($newStyle)){
                 $updatedRingId = $newStyle[0];
@@ -385,7 +399,7 @@ $productShapes .= '<li class="item">
 
 
         $query = 'SELECT * FROM wizardmaster where ';
-        $where = array('product_type = "DIAMOND"');
+        $where = array('LOWER(product_type) = "'.$this->_productType['diamond'].'"');
         $where[] = 'group_code = ""';
         foreach ($values['value'] as $key=>$value) {
             $key = strtolower($key);
@@ -537,7 +551,7 @@ $productShapes .= '<li class="item">
 
             $multiArr = array($product1,$product2);
             $image = '<span class="zoom-icon">
-            <a data-fancybox data-type="ajax" data-src="'.Mage::getBaseURL().'popuphtml/popup.php?pid='.$product1['pid'].'" href="javascript:;">
+            <a data-fancybox data-type="ajax" data-src="'.Mage::getBaseURL().'popuphtml/multidiamond.php?pid1='.$product1['pid'].'&pid2='.$product2['pid'].'" href="javascript:;">
                     <img src="'.$mediapath.'wizard/zoom-icon.png" alt="'.$product1["pid"].'" class="mCS_img_loaded">
                 </a>
             </span>
